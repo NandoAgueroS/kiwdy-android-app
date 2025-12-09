@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -30,6 +31,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
+        buildConfig = true
         viewBinding = true
     }
 }
@@ -43,7 +45,14 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.converter.gson)
+    implementation(libs.glide)
+    implementation(libs.gson)
+    implementation(libs.retrofit)
+    implementation(libs.activity)
+    implementation(libs.java.jwt)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation("com.github.ybq:Android-SpinKit:1.4.0")
 }

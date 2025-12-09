@@ -1,9 +1,10 @@
-package com.example.kiwdy;
+package com.example.kiwdy.ui.instructor;
 
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
 
+import com.example.kiwdy.R;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -16,7 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.kiwdy.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity {
+public class InstructorMainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
