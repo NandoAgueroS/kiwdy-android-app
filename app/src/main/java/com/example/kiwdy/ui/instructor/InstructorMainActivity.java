@@ -5,6 +5,8 @@ import android.view.View;
 import android.view.Menu;
 
 import com.example.kiwdy.R;
+import com.example.kiwdy.model.CursoLocal;
+import com.example.kiwdy.model.SeccionLocal;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -17,10 +19,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.kiwdy.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 public class InstructorMainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
+    public static CursoLocal seccionesLocal = new CursoLocal();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +50,7 @@ public class InstructorMainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
+                R.id.nav_inicio, R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);

@@ -1,4 +1,4 @@
-package com.example.kiwdy.ui.login;
+package com.example.kiwdy.ui.compartido.login;
 
 import android.content.Intent;
 import android.os.Bundle;

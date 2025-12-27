@@ -1,4 +1,4 @@
-package com.example.kiwdy.ui.bienvenida;
+package com.example.kiwdy.ui.compartido.bienvenida;
 
 import android.app.Application;
 import android.util.Log;

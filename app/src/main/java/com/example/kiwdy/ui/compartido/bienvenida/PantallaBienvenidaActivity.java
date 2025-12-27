@@ -1,4 +1,4 @@
-package com.example.kiwdy.ui.bienvenida;
+package com.example.kiwdy.ui.compartido.bienvenida;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.kiwdy.R;
 import com.example.kiwdy.ui.instructor.InstructorMainActivity;
-import com.example.kiwdy.ui.login.LoginActivity;
+import com.example.kiwdy.ui.compartido.login.LoginActivity;
 
 public class PantallaBienvenidaActivity extends AppCompatActivity {
 

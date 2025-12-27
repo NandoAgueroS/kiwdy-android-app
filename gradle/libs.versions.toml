@@ -18,6 +18,8 @@ activity = "1.12.1"
 jwtdecode = "2.0.2"
 javaJwt = "4.5.0"
 materialVersion = "1.13.0-alpha14"
+legacySupportV4 = "1.0.0"
+recyclerview = "1.4.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -38,6 +40,8 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 jwtdecode = { group = "com.auth0.android", name = "jwtdecode", version.ref = "jwtdecode" }
 java-jwt = { group = "com.auth0", name = "java-jwt", version.ref = "javaJwt" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
+legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
+recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

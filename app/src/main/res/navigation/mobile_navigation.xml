@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/nav_inicio">
 
     <fragment
         android:id="@+id/nav_home"
@@ -22,4 +22,23 @@
         android:name="com.example.kiwdy.ui.instructor.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
+    <fragment
+        android:id="@+id/nav_inicio"
+        android:name="com.example.kiwdy.ui.compartido.inicio.InicioFragment"
+        android:label="@string/inicio"
+        tools:layout="@layout/fragment_inicio" >
+        <action
+            android:id="@+id/action_nav_inicio_to_crearCursoFragment"
+            app:destination="@id/crearCursoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/crearCursoFragment"
+        android:name="com.example.kiwdy.ui.instructor.crear_curso.CrearCursoFragment"
+        android:label="fragment_crear_curso"
+        tools:layout="@layout/fragment_crear_curso" />
+    <fragment
+        android:id="@+id/crearSeccionFragment"
+        android:name="com.example.kiwdy.ui.instructor.crear_curso.CrearSeccionFragment"
+        android:label="fragment_crear_seccion"
+        tools:layout="@layout/fragment_crear_seccion" />
 </navigation>

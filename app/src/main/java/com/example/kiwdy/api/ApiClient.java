@@ -1,6 +1,8 @@
 package com.example.kiwdy.api;
 
 import com.example.kiwdy.BuildConfig;
+import com.example.kiwdy.api.service.CursosService;
+import com.example.kiwdy.api.service.SeccionesService;
 import com.example.kiwdy.api.service.UsuariosService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,6 +31,14 @@ public class ApiClient {
 
     public static UsuariosService getUsuariosService(){
         return getRetrofit().create(UsuariosService.class);
+    }
+
+    public static CursosService getCursosService(){
+        return getRetrofit().create(CursosService.class);
+    }
+
+    public static SeccionesService getSeccionesService(){
+        return getRetrofit().create(SeccionesService.class);
     }
 
 }

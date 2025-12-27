@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.kiwdy"
-        minSdk = 33
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -51,6 +51,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.activity)
     implementation(libs.java.jwt)
+    implementation(libs.legacy.support.v4)
+    implementation(libs.recyclerview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
