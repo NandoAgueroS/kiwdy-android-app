@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.widget.Toast;
@@ -49,7 +50,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
 
     private MutableLiveData<Integer> mIdCurso;
     private MutableLiveData<CursoLocal> mCursoLocal;
-    private MutableLiveData<Boolean> mSeccionAgregada;
+    private MutableLiveData<Boolean> mSeccionAgregada = new MutableLiveData<>();
     private MutableLiveData<Uri> mVideoUri;
     private MutableLiveData<Uri> mImagenUri;
     private MutableLiveData<List<MaterialExtra>> mMaterialesExtra;
@@ -281,4 +282,30 @@ public class CrearCursoViewModel extends AndroidViewModel {
         }
     }
 
+    public void restaurarCurso(Bundle arguments) {
+        if (arguments == null) return;
+        if (!arguments.containsKey("curso")) return;
+        CursoResponse curso = (CursoResponse) arguments.getSerializable("curso");
+        if (curso != null){
+            CursoLocal cursoLocal = new CursoLocal();
+
+            cursoLocal.setTitulo(curso.getTitulo());
+            cursoLocal.setDescripcion(curso.getDescripcion());
+            for (SeccionResponse seccionResponse: curso.getSecciones()) {
+
+                cursoLocal.getSeccionLocalList().add(new SeccionLocal(
+                        seccionResponse.getIdSeccion(),
+                        seccionResponse.getTitulo(),
+                        seccionResponse.getContenido(),
+                        seccionResponse.getOrden(),
+                        seccionResponse.getVideoUrl()
+                ));
+            }
+            mCursoLocal.setValue(cursoLocal);
+            mSeccionAgregada.setValue(true);
+
+        }
+
+
+    }
 }

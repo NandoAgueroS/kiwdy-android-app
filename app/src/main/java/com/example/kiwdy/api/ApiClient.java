@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiClient {
 
     private static Retrofit retrofit;
-    public static final String URL_BASE = BuildConfig.URL_BASE_API + "api/";
+    public static final String URL_BASE = BuildConfig.URL_BASE_API;
 
     private static Retrofit getRetrofit(){
         if (retrofit == null) {
@@ -22,7 +22,7 @@ public class ApiClient {
                     .setLenient()
                     .create();
             retrofit = new Retrofit.Builder()
-                    .baseUrl(URL_BASE)
+                    .baseUrl(URL_BASE + "/api/")
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
         }

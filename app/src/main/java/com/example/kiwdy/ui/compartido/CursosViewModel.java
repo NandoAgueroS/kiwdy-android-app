@@ -1,4 +1,4 @@
-package com.example.kiwdy.ui.compartido.inicio;
+package com.example.kiwdy.ui.compartido;
 
 import android.app.Application;
 
@@ -17,16 +17,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class InicioViewModel extends AndroidViewModel {
+public class CursosViewModel extends AndroidViewModel {
     private MutableLiveData<List<CursoResponse>> mCursos;
 
-    public InicioViewModel(@NonNull Application application) {
+    public CursosViewModel(@NonNull Application application) {
         super(application);
     }
 
     public LiveData<List<CursoResponse>> getmCursos(){
         if (mCursos == null) {
-           mCursos = new MutableLiveData<>();
+            mCursos = new MutableLiveData<>();
         }
         return mCursos;
     }
@@ -49,5 +49,4 @@ public class InicioViewModel extends AndroidViewModel {
 
             }
         });
-    }
-}
+}}

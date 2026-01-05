@@ -94,6 +94,8 @@ public class CrearCursoFragment extends Fragment {
                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.crearSeccionFragment);
             }
         });
+
+        mViewModel.restaurarCurso(getArguments());
         return binding.getRoot();
     }
 

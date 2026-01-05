@@ -18,6 +18,7 @@ public class SeccionLocal {
     private int orden;
 
     private Uri videoUri;
+    private String videoUrl;
 
     private List<MaterialExtra> materialesExtra = new LinkedList<>();
 
@@ -31,6 +32,14 @@ public class SeccionLocal {
         this.orden = orden;
         this.videoUri = videoUri;
         this.materialesExtra = materialesExtra;
+    }
+
+    public SeccionLocal(int idSeccion, String titulo, String contenido, int orden, String videoUrl) {
+        this.idSeccion = idSeccion;
+        this.titulo = titulo;
+        this.contenido = contenido;
+        this.orden = orden;
+        this.videoUrl = videoUrl;
     }
 
     public int getOrden() {

@@ -1,12 +1,13 @@
 package com.example.kiwdy.api.service;
 
-import com.example.kiwdy.api.dto.request.CrearCursoRequest;
 import com.example.kiwdy.api.dto.response.CursoResponse;
+
+import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
-import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -21,4 +22,7 @@ public interface CursosService {
                                    @Part("descripcion") RequestBody descripcion,
                                    @Part("precio") RequestBody precio,
                                    @Part MultipartBody.Part portada);
+
+    @GET("cursos/populares")
+    Call<List<CursoResponse>> listarCursos(@Header("Authorization") String token);
 }

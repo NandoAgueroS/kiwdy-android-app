@@ -1,21 +1,32 @@
 package com.example.kiwdy.api.dto.response;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CursoResponse {
+public class CursoResponse implements Serializable {
     private int idCurso;
     private String titulo;
     private String descripcion;
+    private String portadaUrl;
     private List<SeccionResponse> secciones;
 
     public CursoResponse() {
     }
 
-    public CursoResponse(int idCurso, String titulo, String descripcion, List<SeccionResponse> secciones) {
+    public CursoResponse(int idCurso, String titulo, String descripcion, String portadaUrl, List<SeccionResponse> secciones) {
         this.idCurso = idCurso;
         this.titulo = titulo;
         this.descripcion = descripcion;
+        this.portadaUrl = portadaUrl;
         this.secciones = secciones;
+    }
+
+    public String getPortadaUrl() {
+        return portadaUrl;
+    }
+
+    public void setPortadaUrl(String portadaUrl) {
+        this.portadaUrl = portadaUrl;
     }
 
     public int getIdCurso() {

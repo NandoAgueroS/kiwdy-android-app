@@ -6,23 +6,6 @@
     app:startDestination="@+id/nav_inicio">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="com.example.kiwdy.ui.instructor.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
-
-    <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.example.kiwdy.ui.instructor.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
-
-    <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.kiwdy.ui.instructor.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
-    <fragment
         android:id="@+id/nav_inicio"
         android:name="com.example.kiwdy.ui.compartido.inicio.InicioFragment"
         android:label="@string/inicio"
@@ -41,4 +24,9 @@
         android:name="com.example.kiwdy.ui.instructor.crear_curso.CrearSeccionFragment"
         android:label="fragment_crear_seccion"
         tools:layout="@layout/fragment_crear_seccion" />
+    <fragment
+        android:id="@+id/nav_cursos"
+        android:name="com.example.kiwdy.ui.compartido.CursosFragment"
+        android:label="fragment_cursos"
+        tools:layout="@layout/fragment_cursos" />
 </navigation>
