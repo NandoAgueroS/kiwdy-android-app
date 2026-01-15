@@ -6,9 +6,12 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.navigation.Navigation;
 
+import com.example.kiwdy.R;
 import com.example.kiwdy.api.ApiClient;
 import com.example.kiwdy.api.dto.response.CursoResponse;
+import com.example.kiwdy.api.utils.JwtUtil;
 import com.example.kiwdy.api.utils.SharedPreferencesUtil;
 
 import java.util.List;
@@ -19,6 +22,8 @@ import retrofit2.Response;
 
 public class InicioViewModel extends AndroidViewModel {
     private MutableLiveData<List<CursoResponse>> mCursos;
+    private MutableLiveData<Boolean> mAlumnoNavigation;
+    private MutableLiveData<Boolean> mInstructorNavigation;
 
     public InicioViewModel(@NonNull Application application) {
         super(application);
@@ -29,6 +34,20 @@ public class InicioViewModel extends AndroidViewModel {
            mCursos = new MutableLiveData<>();
         }
         return mCursos;
+    }
+
+    public LiveData<Boolean> getmAlumnoNavigation(){
+        if (mAlumnoNavigation == null) {
+            mAlumnoNavigation = new MutableLiveData<>();
+        }
+        return mAlumnoNavigation;
+    }
+
+    public LiveData<Boolean> getmInstructorNavigation(){
+        if (mInstructorNavigation == null) {
+            mInstructorNavigation = new MutableLiveData<>();
+        }
+        return mInstructorNavigation;
     }
 
     public void cargarListaCursos(){

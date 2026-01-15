@@ -12,6 +12,7 @@ import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 
 public interface CursosService {
 
@@ -23,6 +24,13 @@ public interface CursosService {
                                    @Part("precio") RequestBody precio,
                                    @Part MultipartBody.Part portada);
 
-    @GET("cursos/populares")
+    @GET("cursos/listar")
     Call<List<CursoResponse>> listarCursos(@Header("Authorization") String token);
+
+    @GET("cursos/listar/populares")
+    Call<List<CursoResponse>> listarCursosPopulares(@Header("Authorization") String token);
+
+    @GET("cursos/{idCurso}")
+    Call<CursoResponse> buscarCurso(@Header("Authorization") String token, @Path("idCurso") int idCurso);
+
 }

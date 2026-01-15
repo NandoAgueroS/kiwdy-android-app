@@ -29,4 +29,9 @@
         android:name="com.example.kiwdy.ui.compartido.CursosFragment"
         android:label="fragment_cursos"
         tools:layout="@layout/fragment_cursos" />
+    <fragment
+        android:id="@+id/nav_logout"
+        android:name="com.example.kiwdy.ui.compartido.logout.LogoutFragment"
+        android:label="@string/logout"
+        tools:layout="@layout/fragment_logout" />
 </navigation>

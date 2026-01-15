@@ -282,10 +282,29 @@ public class CrearCursoViewModel extends AndroidViewModel {
         }
     }
 
-    public void restaurarCurso(Bundle arguments) {
+    public void restaurarCurso(Bundle arguments){
         if (arguments == null) return;
-        if (!arguments.containsKey("curso")) return;
-        CursoResponse curso = (CursoResponse) arguments.getSerializable("curso");
+        int idCurso = arguments.getInt("idCurso");
+
+        String token = SharedPreferencesUtil.leerToken(getApplication());
+
+        Call<CursoResponse> buscarCursoCall = ApiClient.getCursosService().buscarCurso(token, idCurso);
+
+        buscarCursoCall.enqueue(new Callback<CursoResponse>() {
+            @Override
+            public void onResponse(Call<CursoResponse> call, Response<CursoResponse> response) {
+                if (response.isSuccessful()) mostrarCurso(response.body());
+                else Toast.makeText(getApplication(), "Error al recuperar el curso: " + response.code(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<CursoResponse> call, Throwable t) {
+                Toast.makeText(getApplication(), "Error en el servidor", Toast.LENGTH_LONG).show();
+
+            }
+        });}
+    public void mostrarCurso(CursoResponse curso) {
+
         if (curso != null){
             CursoLocal cursoLocal = new CursoLocal();
 

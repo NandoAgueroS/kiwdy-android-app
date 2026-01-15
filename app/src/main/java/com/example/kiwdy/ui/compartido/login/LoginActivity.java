@@ -12,6 +12,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.kiwdy.ui.alumno.AlumnoActivity;
+import com.example.kiwdy.ui.compartido.registro.RegistroActivity;
 import com.example.kiwdy.ui.instructor.InstructorMainActivity;
 import com.example.kiwdy.R;
 import com.example.kiwdy.databinding.ActivityLoginBinding;
@@ -32,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(binding.getRoot());
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.login), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -43,6 +45,16 @@ public class LoginActivity extends AppCompatActivity {
             public void onChanged(String s) {
                 mv.guardarEmail(binding.etEmail.getText().toString());
                 Intent intent = new Intent(LoginActivity.this, InstructorMainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+        mv.getmLoginAlumno().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                mv.guardarEmail(binding.etEmail.getText().toString());
+                Intent intent = new Intent(LoginActivity.this, AlumnoActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -82,6 +94,14 @@ public class LoginActivity extends AppCompatActivity {
         });
         mv.verificarSesionExpirada(getIntent());
         mv.recuperarEmail();
+
+        binding.btRegistrarseLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, RegistroActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 }

@@ -3,6 +3,7 @@ package com.example.kiwdy.ui.compartido.inicio;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,8 @@ import com.bumptech.glide.Glide;
 import com.example.kiwdy.R;
 import com.example.kiwdy.api.ApiClient;
 import com.example.kiwdy.api.dto.response.CursoResponse;
+import com.example.kiwdy.api.utils.JwtUtil;
+import com.example.kiwdy.api.utils.SharedPreferencesUtil;
 
 import java.util.List;
 
@@ -52,11 +55,19 @@ public class CursoAdapter extends RecyclerView.Adapter<CursoAdapter.CursoViewHol
                 .error(R.drawable.fondo)
                 .into(holder.ivPortadaCurso);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("curso", curso);
+        bundle.putSerializable("idCurso", curso.getIdCurso());
+        Log.d("TOKEN", SharedPreferencesUtil.leerToken(context));
+        String rol = JwtUtil.obtenerRol(SharedPreferencesUtil.leerToken(context).replace("Bearer ", ""));
+
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController( (Activity) v.getContext(), R.id.nav_host_fragment_content_main).navigate(R.id.crearCursoFragment, bundle);
+                switch (rol){
+                    case "Instructor": Navigation.findNavController((Activity) v.getContext(), R.id.nav_host_fragment_content_main).navigate(R.id.crearCursoFragment, bundle);
+                        break;
+                    case "Alumno": Navigation.findNavController((Activity) v.getContext(), R.id.nav_host_fragment_content_alumno).navigate(R.id.detalleCursoFragment, bundle);
+                        break;
+                }
             }
         });
 
@@ -78,7 +89,6 @@ public class CursoAdapter extends RecyclerView.Adapter<CursoAdapter.CursoViewHol
             tvTituloCurso = itemView.findViewById(R.id.tvTituloCursoItem);
             tvDescripcionCurso = itemView.findViewById(R.id.tvDescripcionCursoItem);
             ivPortadaCurso = itemView.findViewById(R.id.ivPortadaCursoItem);
-            //item = itemView.findViewById(R.id.crearCursoFragment);
             item = itemView;
         }
     }

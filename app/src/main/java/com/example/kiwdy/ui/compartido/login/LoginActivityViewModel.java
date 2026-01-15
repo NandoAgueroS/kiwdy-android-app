@@ -24,29 +24,49 @@ import retrofit2.Response;
 
 public class LoginActivityViewModel extends AndroidViewModel {
 
-    private MutableLiveData<String> mLoginInstructor = new MutableLiveData<>();
-    private MutableLiveData<String> mMensaje= new MutableLiveData<>();
-    private MutableLiveData<String> mEmailGuardado= new MutableLiveData<>();
-    private MutableLiveData<Boolean> mSesionInvalida = new MutableLiveData<>();
+    private MutableLiveData<String> mLoginInstructor;
+    private MutableLiveData<String> mLoginAlumno;
+    private MutableLiveData<String> mMensaje;
+    private MutableLiveData<String> mEmailGuardado;
+    private MutableLiveData<Boolean> mSesionInvalida;
 
     public LoginActivityViewModel(@NonNull Application application) {
         super(application);
     }
 
     public LiveData<String> getmLoginInstructor() {
+        if (mLoginInstructor == null) {
+           mLoginInstructor = new MutableLiveData<>();
+        }
         return mLoginInstructor;
     }
 
+    public LiveData<String> getmLoginAlumno() {
+        if (mLoginAlumno == null) {
+            mLoginAlumno = new MutableLiveData<>();
+        }
+        return mLoginAlumno;
+    }
+
     public LiveData<String> getmMensaje() {
+        if (mMensaje == null) {
+            mMensaje = new MutableLiveData<>();
+        }
         return mMensaje;
     }
 
     public LiveData<String> getmEmailGuardado() {
+        if (mEmailGuardado == null) {
+            mEmailGuardado = new MutableLiveData<>();
+        }
         return mEmailGuardado;
     }
 
 
     public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
         return mSesionInvalida;
     }
 
@@ -63,8 +83,15 @@ public class LoginActivityViewModel extends AndroidViewModel {
                     if (response.isSuccessful()){
                         String token = response.body();
                         SharedPreferencesUtil.guardarToken(getApplication(), token);
-                        if (JwtUtil.obtenerRol(token).equals("Instructor"))
-                            mLoginInstructor.setValue("");
+                        //if (JwtUtil.obtenerRol(token).equals("Instructor"))
+                        //    mLoginInstructor.setValue("");
+                        switch (JwtUtil.obtenerRol(token)){
+                            case "Instructor": mLoginInstructor.setValue("");
+                            break;
+                            case "Alumno": mLoginAlumno.setValue("");
+                            break;
+                            default:
+                        }
                     }else{
                         mMensaje.postValue("El usuario y/o la contraseña son incorrectos");
                     }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation2"
+    app:startDestination="@id/nav_inicio">
+    <fragment
+        android:id="@+id/nav_inicio"
+        android:name="com.example.kiwdy.ui.compartido.inicio.InicioFragment"
+        android:label="fragment_inicio"
+        tools:layout="@layout/fragment_inicio" >
+        <action
+            android:id="@+id/action_nav_inicio_to_detalleCursoFragment"
+            app:destination="@id/detalleCursoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_logout"
+        android:name="com.example.kiwdy.ui.compartido.logout.LogoutFragment"
+        android:label="@string/logout"
+        tools:layout="@layout/fragment_logout" />
+    <fragment
+        android:id="@+id/detalleCursoFragment"
+        android:name="com.example.kiwdy.ui.alumno.Inicio.DetalleCursoFragment"
+        android:label="fragment_detalle_curso"
+        tools:layout="@layout/fragment_detalle_curso" />
+    <fragment
+        android:id="@+id/cursosFragment"
+        android:name="com.example.kiwdy.ui.compartido.CursosFragment"
+        android:label="fragment_cursos"
+        tools:layout="@layout/fragment_cursos" >
+        <action
+            android:id="@+id/action_cursosFragment_to_detalleCursoFragment"
+            app:destination="@id/detalleCursoFragment" />
+    </fragment>
+</navigation>
