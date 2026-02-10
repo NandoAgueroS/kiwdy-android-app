@@ -12,6 +12,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.kiwdy.R;
+import com.example.kiwdy.ui.alumno.AlumnoActivity;
+import com.example.kiwdy.ui.compartido.UIDialogs;
 import com.example.kiwdy.ui.instructor.InstructorMainActivity;
 import com.example.kiwdy.ui.compartido.login.LoginActivity;
 
@@ -56,6 +58,16 @@ public class PantallaBienvenidaActivity extends AppCompatActivity {
             @Override
             public void onChanged(Boolean aBoolean) {
                 Intent intent = new Intent(PantallaBienvenidaActivity.this, InstructorMainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+
+        mViewModel.getmYaLogueadoAlumno().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Intent intent = new Intent(PantallaBienvenidaActivity.this, AlumnoActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

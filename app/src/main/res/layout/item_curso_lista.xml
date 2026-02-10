@@ -2,7 +2,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cvItemSeccionLista"
+    android:id="@+id/cvInscripcionLista"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="20dp"
@@ -14,7 +14,7 @@
         android:background="@drawable/fondo">
 
         <TextView
-            android:id="@+id/tvTituloCursoItem"
+            android:id="@+id/tvNombreAlumnoItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -35,10 +35,10 @@
             android:textColor="#545454"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btVerInscriptosItem"
             app:layout_constraintHorizontal_bias="0.17"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvTituloCursoItem"
+            app:layout_constraintTop_toBottomOf="@+id/tvNombreAlumnoItem"
             app:layout_constraintVertical_bias="0.0" />
 
         <ImageView
@@ -51,6 +51,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@tools:sample/avatars" />
+
+        <ImageButton
+            android:id="@+id/btVerInscriptosItem"
+            android:layout_width="53dp"
+            android:layout_height="59dp"
+            android:background="#00FFFFFF"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.652"
+            app:layout_constraintStart_toEndOf="@+id/tvNombreAlumnoItem"
+            app:layout_constraintTop_toBottomOf="@+id/ivPortadaCursoItem"
+            app:layout_constraintVertical_bias="0.534"
+            app:srcCompat="@drawable/ic_inscripciones" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

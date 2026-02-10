@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.alumno.Inicio.DetalleCursoFragment">
+    tools:context=".ui.alumno.cursos.DetalleCursoFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout"
@@ -43,15 +43,15 @@ app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
         android:id="@+id/btInscribirseDetalleCurso"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
         android:text="Inscribirse"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rvSeccionesDetalleCurso"
-        app:layout_constraintVertical_bias="0.787" />
+        app:layout_constraintVertical_bias="0.874" />
 
-<androidx.recyclerview.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
 android:id="@+id/rvSeccionesDetalleCurso"
 android:layout_width="409dp"
 android:layout_height="197dp"
@@ -69,4 +69,16 @@ app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@tools:sample/avatars" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/btVerSeccionesDetalle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="108dp"
+        android:text="Ver secciones"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintStart_toEndOf="@+id/btInscribirseDetalleCurso"
+        app:layout_constraintTop_toBottomOf="@+id/rvSeccionesDetalleCurso" />
+</androidx.constraintlayout.widget.ConstraintLayout>

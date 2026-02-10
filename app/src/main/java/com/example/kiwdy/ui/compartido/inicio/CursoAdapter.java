@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -58,6 +59,13 @@ public class CursoAdapter extends RecyclerView.Adapter<CursoAdapter.CursoViewHol
         bundle.putSerializable("idCurso", curso.getIdCurso());
         Log.d("TOKEN", SharedPreferencesUtil.leerToken(context));
         String rol = JwtUtil.obtenerRol(SharedPreferencesUtil.leerToken(context).replace("Bearer ", ""));
+        if (rol.equals("Instructor")) holder.btVerInscriptos.setVisibility(View.VISIBLE);
+        holder.btVerInscriptos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController((Activity) context, R.id.nav_host_fragment_content_main).navigate(R.id.inscripcionesFragment);
+            }
+        });
 
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,12 +91,14 @@ public class CursoAdapter extends RecyclerView.Adapter<CursoAdapter.CursoViewHol
         TextView tvTituloCurso;
         TextView tvDescripcionCurso;
         ImageView ivPortadaCurso;
+        ImageButton btVerInscriptos;
 
         public CursoViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvTituloCurso = itemView.findViewById(R.id.tvTituloCursoItem);
+            tvTituloCurso = itemView.findViewById(R.id.tvNombreAlumnoItem);
             tvDescripcionCurso = itemView.findViewById(R.id.tvDescripcionCursoItem);
             ivPortadaCurso = itemView.findViewById(R.id.ivPortadaCursoItem);
+            btVerInscriptos = itemView.findViewById(R.id.btVerInscriptosItem);
             item = itemView;
         }
     }

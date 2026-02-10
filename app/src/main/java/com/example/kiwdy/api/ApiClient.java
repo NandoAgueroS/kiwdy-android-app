@@ -5,7 +5,6 @@ import com.example.kiwdy.api.service.CursosService;
 import com.example.kiwdy.api.service.InscripcionesService;
 import com.example.kiwdy.api.service.SeccionesService;
 import com.example.kiwdy.api.service.UsuariosService;
-import com.example.kiwdy.ui.alumno.Inicio.DetalleCursoViewModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

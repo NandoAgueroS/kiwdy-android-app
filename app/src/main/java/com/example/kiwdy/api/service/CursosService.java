@@ -1,5 +1,6 @@
 package com.example.kiwdy.api.service;
 
+import com.example.kiwdy.api.dto.response.CursoInscripcionResponse;
 import com.example.kiwdy.api.dto.response.CursoResponse;
 
 import java.util.List;
@@ -32,5 +33,8 @@ public interface CursosService {
 
     @GET("cursos/{idCurso}")
     Call<CursoResponse> buscarCurso(@Header("Authorization") String token, @Path("idCurso") int idCurso);
+
+    @GET("cursos/{idCurso}/inscripcion-detalle")
+    Call<CursoInscripcionResponse> buscarCursoInscripcion(@Header("Authorization") String token, @Path("idCurso") int idCurso);
 
 }

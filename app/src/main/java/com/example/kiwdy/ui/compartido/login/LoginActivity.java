@@ -13,6 +13,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.kiwdy.ui.alumno.AlumnoActivity;
+import com.example.kiwdy.ui.compartido.UIDialogs;
+import com.example.kiwdy.ui.compartido.bienvenida.PantallaBienvenidaActivity;
 import com.example.kiwdy.ui.compartido.registro.RegistroActivity;
 import com.example.kiwdy.ui.instructor.InstructorMainActivity;
 import com.example.kiwdy.R;
@@ -90,6 +92,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onChanged(Boolean aBoolean) {
                 binding.tvError.setText("Su sesión expiró, ingrese nuevamente");
+                UIDialogs.error(LoginActivity.this, "Sesión expirada, inicie nuevamente");
             }
         });
         mv.verificarSesionExpirada(getIntent());

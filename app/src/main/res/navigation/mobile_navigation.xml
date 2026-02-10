@@ -34,4 +34,22 @@
         android:name="com.example.kiwdy.ui.compartido.logout.LogoutFragment"
         android:label="@string/logout"
         tools:layout="@layout/fragment_logout" />
+    <fragment
+        android:id="@+id/inscripcionesFragment"
+        android:name="com.example.kiwdy.ui.instructor.inscripciones.InscripcionesFragment"
+        android:label="fragment_inscripciones"
+        tools:layout="@layout/fragment_inscripciones" >
+        <action
+            android:id="@+id/action_inscripcionesFragment_to_progresoAlumnoFragment"
+            app:destination="@id/progresoAlumnoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/progresoAlumnoFragment"
+        android:name="com.example.kiwdy.ui.instructor.inscripciones.ProgresoAlumnoFragment"
+        android:label="fragment_progreso_alumno"
+        tools:layout="@layout/fragment_progreso_alumno" >
+        <action
+            android:id="@+id/action_progresoAlumnoFragment_to_inscripcionesFragment"
+            app:destination="@id/inscripcionesFragment" />
+    </fragment>
 </navigation>

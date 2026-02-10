@@ -1,5 +1,6 @@
-package com.example.kiwdy.ui.alumno.Inicio;
+package com.example.kiwdy.ui.alumno.cursos;
 
+import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -8,8 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.navigation.Navigation;
 
+import com.example.kiwdy.R;
 import com.example.kiwdy.api.ApiClient;
+import com.example.kiwdy.api.dto.response.CursoInscripcionResponse;
 import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.api.utils.SharedPreferencesUtil;
 
@@ -20,6 +24,9 @@ import retrofit2.Response;
 public class DetalleCursoViewModel extends AndroidViewModel {
 
     private MutableLiveData<CursoResponse> mCurso;
+    private MutableLiveData<CursoResponse> mNavegarASeccion;
+    private MutableLiveData<Boolean> mMostrarBtResumir;
+    private MutableLiveData<Boolean> mMostrarBtInscribir;
 
     public DetalleCursoViewModel(@NonNull Application application) {
         super(application);
@@ -32,6 +39,27 @@ public class DetalleCursoViewModel extends AndroidViewModel {
         return mCurso;
     }
 
+    public LiveData<CursoResponse> getmNavegarASeccion(){
+        if (mNavegarASeccion == null) {
+            mNavegarASeccion = new MutableLiveData<>();
+        }
+        return mNavegarASeccion;
+    }
+    public LiveData<Boolean> getmMostrarBtResumir(){
+        if (mMostrarBtResumir == null) {
+            mMostrarBtResumir = new MutableLiveData<>();
+        }
+        return mMostrarBtResumir;
+    }
+
+    public LiveData<Boolean> getmMostrarBtInscribir(){
+        if (mMostrarBtInscribir == null) {
+            mMostrarBtInscribir = new MutableLiveData<>();
+        }
+        return mMostrarBtInscribir;
+    }
+
+
     public void mostrarCurso(Bundle arguments){
         if (arguments == null) return;
         int idCurso = arguments.getInt("idCurso");
@@ -43,7 +71,14 @@ public class DetalleCursoViewModel extends AndroidViewModel {
         buscarCursoCall.enqueue(new Callback<CursoResponse>() {
             @Override
             public void onResponse(Call<CursoResponse> call, Response<CursoResponse> response) {
-               if (response.isSuccessful()) mCurso.postValue(response.body());
+               if (response.isSuccessful()) {
+                   mCurso.postValue(response.body());
+                   if (!response.body().isEstaInscripto()){
+                       mMostrarBtInscribir.postValue(true);
+                   }else if (!response.body().isEstaFinalizado()){
+                       mMostrarBtResumir.postValue(true);
+                   }
+               }
                else Toast.makeText(getApplication(), "Error al recuperar el curso: " + response.code(), Toast.LENGTH_LONG).show();
             }
 
@@ -74,5 +109,13 @@ public class DetalleCursoViewModel extends AndroidViewModel {
                 Toast.makeText(getApplication(), "Error en el servidor", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    public void mostrarSecciones() {
+        mNavegarASeccion.setValue(mCurso.getValue());
+    }
+
+    public void limpiarMutables() {
+        mNavegarASeccion = null;
     }
 }

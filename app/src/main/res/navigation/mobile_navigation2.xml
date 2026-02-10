@@ -20,7 +20,7 @@
         tools:layout="@layout/fragment_logout" />
     <fragment
         android:id="@+id/detalleCursoFragment"
-        android:name="com.example.kiwdy.ui.alumno.Inicio.DetalleCursoFragment"
+        android:name="com.example.kiwdy.ui.alumno.cursos.DetalleCursoFragment"
         android:label="fragment_detalle_curso"
         tools:layout="@layout/fragment_detalle_curso" />
     <fragment
@@ -32,4 +32,9 @@
             android:id="@+id/action_cursosFragment_to_detalleCursoFragment"
             app:destination="@id/detalleCursoFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/detalleSeccionFragment"
+        android:name="com.example.kiwdy.ui.alumno.cursos.DetalleSeccionFragment"
+        android:label="fragment_detalle_seccion"
+        tools:layout="@layout/fragment_detalle_seccion" />
 </navigation>

@@ -10,10 +10,12 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 
 public interface SeccionesService {
 
@@ -26,4 +28,7 @@ public interface SeccionesService {
                                        @Part("orden") RequestBody orden,
                                        @Part MultipartBody.Part video,
                                        @Part List<MultipartBody.Part> materialExtra);
+
+    @GET("secciones/{orden}/curso/{idCurso}")
+    Call<SeccionResponse> buscar(@Header("Authorization") String token, @Path("idCurso") int idCurso,@Path("orden") int ordenSeccion);
 }

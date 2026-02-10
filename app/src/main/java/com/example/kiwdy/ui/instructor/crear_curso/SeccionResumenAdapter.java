@@ -52,7 +52,7 @@ public class SeccionResumenAdapter extends RecyclerView.Adapter<SeccionResumenAd
         public SeccionResumenViewHolder(@NonNull View itemView) {
             super(itemView);
             orden = itemView.findViewById(R.id.tvOrdenSeccion);
-            titulo = itemView.findViewById(R.id.tvTituloCursoItem);
+            titulo = itemView.findViewById(R.id.tvNombreAlumnoItem);
         }
     }
 }

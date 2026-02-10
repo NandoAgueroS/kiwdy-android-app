@@ -8,18 +8,30 @@ public class SeccionResponse {
     private String contenido;
     private int orden;
     private String videoUrl;
-    private List<ArchivoSeccionResponse> archivos;
+    private List<ArchivoSeccionResponse> materiales;
+    private int idCurso;
+    private boolean completada;
 
     public SeccionResponse() {
     }
 
-    public SeccionResponse(int idSeccion, String titulo, String contenido, int orden, String videoUrl, List<ArchivoSeccionResponse> archivos) {
+    public SeccionResponse(int idSeccion, String titulo, String contenido, int orden, String videoUrl, List<ArchivoSeccionResponse> materiales, boolean completada, int idCurso) {
         this.idSeccion = idSeccion;
         this.titulo = titulo;
         this.contenido = contenido;
         this.orden = orden;
         this.videoUrl = videoUrl;
-        this.archivos = archivos;
+        this.materiales = materiales;
+        this.completada = completada;
+        this.idCurso = idCurso;
+    }
+
+    public int getIdCurso() {
+        return idCurso;
+    }
+
+    public void setIdCurso(int idCurso) {
+        this.idCurso = idCurso;
     }
 
     public int getOrden() {
@@ -62,11 +74,19 @@ public class SeccionResponse {
         this.contenido = contenido;
     }
 
-    public List<ArchivoSeccionResponse> getArchivos() {
-        return archivos;
+    public List<ArchivoSeccionResponse> getMateriales() {
+        return materiales;
     }
 
-    public void setArchivos(List<ArchivoSeccionResponse> archivos) {
-        this.archivos = archivos;
+    public void setMateriales(List<ArchivoSeccionResponse> materiales) {
+        this.materiales = materiales;
+    }
+
+    public boolean isCompletada() {
+        return completada;
+    }
+
+    public void setCompletada(boolean completada) {
+        this.completada = completada;
     }
 }

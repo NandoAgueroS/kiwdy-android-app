@@ -9,6 +9,8 @@ public class CursoResponse implements Serializable {
     private String descripcion;
     private String portadaUrl;
     private List<SeccionResponse> secciones;
+    private boolean estaInscripto;
+    private boolean estaFinalizado;
 
     public CursoResponse() {
     }
@@ -19,6 +21,22 @@ public class CursoResponse implements Serializable {
         this.descripcion = descripcion;
         this.portadaUrl = portadaUrl;
         this.secciones = secciones;
+    }
+
+    public boolean isEstaInscripto() {
+        return estaInscripto;
+    }
+
+    public void setEstaInscripto(boolean estaInscripto) {
+        this.estaInscripto = estaInscripto;
+    }
+
+    public boolean isEstaFinalizado() {
+        return estaFinalizado;
+    }
+
+    public void setEstaFinalizado(boolean estaFinalizado) {
+        this.estaFinalizado = estaFinalizado;
     }
 
     public String getPortadaUrl() {

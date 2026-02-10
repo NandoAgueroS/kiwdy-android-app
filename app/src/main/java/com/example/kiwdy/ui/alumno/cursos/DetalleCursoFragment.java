@@ -1,26 +1,27 @@
-package com.example.kiwdy.ui.alumno.Inicio;
+package com.example.kiwdy.ui.alumno.cursos;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 
 import com.bumptech.glide.Glide;
 import com.example.kiwdy.R;
 import com.example.kiwdy.api.ApiClient;
+import com.example.kiwdy.api.dto.response.CursoInscripcionResponse;
 import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.databinding.FragmentDetalleCursoBinding;
-import com.example.kiwdy.ui.compartido.inicio.CursoAdapter;
 
 public class DetalleCursoFragment extends Fragment {
 
@@ -56,6 +57,27 @@ public class DetalleCursoFragment extends Fragment {
             }
 
         });
+        mViewModel.getmMostrarBtInscribir().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                binding.btInscribirseDetalleCurso.setVisibility(View.VISIBLE);
+            }
+        });
+        mViewModel.getmMostrarBtResumir().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                binding.btVerSeccionesDetalle.setVisibility(View.VISIBLE);
+            }
+        });
+        mViewModel.getmNavegarASeccion().observe(getViewLifecycleOwner(), new Observer<CursoResponse>() {
+            @Override
+            public void onChanged(CursoResponse cursoResponse) {
+                Bundle bundle = new Bundle();
+                bundle.putInt("idCurso", cursoResponse.getIdCurso());
+                Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_alumno).navigate(R.id.detalleSeccionFragment, bundle);
+                mViewModel.limpiarMutables();
+            }
+        });
 
         mViewModel.mostrarCurso(getArguments());
 
@@ -65,9 +87,22 @@ public class DetalleCursoFragment extends Fragment {
                 mViewModel.inscribir();
             }
         });
+        binding.btVerSeccionesDetalle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewModel.mostrarSecciones();
+            }
+        });
 
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+        mViewModel = null;
     }
 
 }

@@ -146,12 +146,13 @@ public class CrearCursoViewModel extends AndroidViewModel {
 
             RequestBody videoField = RequestBody.create(MediaType.parse("video/mp4"), video);
             List<MultipartBody.Part> archivosPart = new ArrayList<>();
+            if (seccionLocal.getMaterialesExtra() != null){
             for (MaterialExtra materialExtra : seccionLocal.getMaterialesExtra()) {
                 byte[] bytes = transformarArchivo(materialExtra.getUri());
                 String formato = getApplication().getContentResolver().getType(materialExtra.getUri());
                 RequestBody archivoBody = RequestBody.create(MediaType.parse(formato), bytes);
                 archivosPart.add(MultipartBody.Part.createFormData("materialExtra", materialExtra.getNombre(), archivoBody));
-            }
+            }}
 
             MultipartBody.Part videoPart= MultipartBody.Part.createFormData("video", "video.mp4", videoField);
             Call<SeccionResponse> seccionCall = seccionesService.crearSeccion(token, idCursoField, tituloField, contenidoField, ordenField, videoPart, archivosPart);
@@ -190,6 +191,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
         if (mVideoUri.getValue() != null) seccionLocal.setVideoUri(mVideoUri.getValue());
         mCursoLocal.getValue().getSeccionLocalList().add(seccionLocal);
         mSeccionAgregada.setValue(true);
+        mMaterialesExtra.setValue(new LinkedList<>());
     }
 
     public void limpiarMutables() {

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.instructor.inscripciones.InscripcionesFragment">
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/btGroupInscripciones"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_marginTop="28dp"
+        android:paddingHorizontal="2dp"
+        android:paddingVertical="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.488"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:checkable="true"
+            android:checked="true"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:tag="0"
+            android:text="Solicitudes" />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:checkable="true"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:tag="1"
+            android:text="Cursando" />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:checkable="true"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:tag="2"
+            android:text="A Certificar" />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:checkable="true"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:tag="3"
+            android:text="Certificadas" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvInscripciones"
+        android:layout_width="409dp"
+        android:layout_height="641dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btGroupInscripciones" />
+</androidx.constraintlayout.widget.ConstraintLayout>

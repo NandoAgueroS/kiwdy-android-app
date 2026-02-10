@@ -49,7 +49,7 @@ public class MaterialExtraAdapter extends RecyclerView.Adapter<MaterialExtraAdap
 
         public MaterialExtraViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvNombreArchivo = itemView.findViewById(R.id.tvTituloCursoItem);
+            tvNombreArchivo = itemView.findViewById(R.id.tvNombreArchivoItem);
         }
     }
 }
