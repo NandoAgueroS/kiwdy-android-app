@@ -95,7 +95,7 @@ public class CursoAdapter extends RecyclerView.Adapter<CursoAdapter.CursoViewHol
 
         public CursoViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvTituloCurso = itemView.findViewById(R.id.tvNombreAlumnoItem);
+            tvTituloCurso = itemView.findViewById(R.id.tvAlumnoExamenItem);
             tvDescripcionCurso = itemView.findViewById(R.id.tvDescripcionCursoItem);
             ivPortadaCurso = itemView.findViewById(R.id.ivPortadaCursoItem);
             btVerInscriptos = itemView.findViewById(R.id.btVerInscriptosItem);

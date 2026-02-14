@@ -54,7 +54,7 @@ public class InscripcionesFragment extends Fragment {
                 mViewModel.listarInscripciones(button.getTag().toString(), b);
             }
         });
-        mViewModel.listarInscripciones("Solicitada", true);
+        mViewModel.listarInscripciones("0", true);
 
         return binding.getRoot();
     }

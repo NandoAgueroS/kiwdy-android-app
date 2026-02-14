@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,7 +74,9 @@ public class ProgresoAlumnoFragment extends Fragment {
                 binding.btAgendarExamenProgreso.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("inscripcion", inscripcionResponse);
+                        Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.agendarExamenFragment, bundle);
                     }
                 });
                 binding.btCertificarProgreso.setVisibility(View.VISIBLE);

@@ -1,8 +1,9 @@
 package com.example.kiwdy.api.dto.response;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class InscripcionResponse {
+public class InscripcionResponse implements Serializable {
     private int idInscripcion;
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaFin;

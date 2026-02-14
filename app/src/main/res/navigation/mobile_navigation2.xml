@@ -22,7 +22,14 @@
         android:id="@+id/detalleCursoFragment"
         android:name="com.example.kiwdy.ui.alumno.cursos.DetalleCursoFragment"
         android:label="fragment_detalle_curso"
-        tools:layout="@layout/fragment_detalle_curso" />
+        tools:layout="@layout/fragment_detalle_curso" >
+        <action
+            android:id="@+id/action_detalleCursoFragment_to_cursosFragment"
+            app:destination="@id/cursosFragment" />
+        <action
+            android:id="@+id/action_detalleCursoFragment_to_nav_inicio"
+            app:destination="@id/nav_inicio" />
+    </fragment>
     <fragment
         android:id="@+id/cursosFragment"
         android:name="com.example.kiwdy.ui.compartido.CursosFragment"
@@ -31,10 +38,22 @@
         <action
             android:id="@+id/action_cursosFragment_to_detalleCursoFragment"
             app:destination="@id/detalleCursoFragment" />
+        <action
+            android:id="@+id/action_cursosFragment_to_detalleSeccionFragment"
+            app:destination="@id/detalleSeccionFragment" />
     </fragment>
     <fragment
         android:id="@+id/detalleSeccionFragment"
         android:name="com.example.kiwdy.ui.alumno.cursos.DetalleSeccionFragment"
         android:label="fragment_detalle_seccion"
-        tools:layout="@layout/fragment_detalle_seccion" />
+        tools:layout="@layout/fragment_detalle_seccion" >
+        <action
+            android:id="@+id/action_detalleSeccionFragment_to_cursosFragment"
+            app:destination="@id/cursosFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_examenes"
+        android:name="com.example.kiwdy.ui.compartido.examenes.ExamenesFragment"
+        android:label="Exámenes"
+        tools:layout="@layout/fragment_examenes" />
 </navigation>

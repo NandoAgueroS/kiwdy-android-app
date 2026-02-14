@@ -14,7 +14,7 @@
         android:background="@drawable/fondo">
 
         <TextView
-            android:id="@+id/tvNombreAlumnoItem"
+            android:id="@+id/tvAlumnoExamenItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -38,7 +38,7 @@
             app:layout_constraintEnd_toStartOf="@+id/btVerInscriptosItem"
             app:layout_constraintHorizontal_bias="0.17"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvNombreAlumnoItem"
+            app:layout_constraintTop_toBottomOf="@+id/tvAlumnoExamenItem"
             app:layout_constraintVertical_bias="0.0" />
 
         <ImageView
@@ -61,7 +61,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.652"
-            app:layout_constraintStart_toEndOf="@+id/tvNombreAlumnoItem"
+            app:layout_constraintStart_toEndOf="@+id/tvAlumnoExamenItem"
             app:layout_constraintTop_toBottomOf="@+id/ivPortadaCursoItem"
             app:layout_constraintVertical_bias="0.534"
             app:srcCompat="@drawable/ic_inscripciones" />

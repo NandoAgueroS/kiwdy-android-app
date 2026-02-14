@@ -14,7 +14,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kiwdy.R;
-import com.example.kiwdy.api.dto.EstadoInscripcion;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
 
 import java.util.List;
@@ -79,8 +78,8 @@ public class InscripcionAdapter extends RecyclerView.Adapter<InscripcionAdapter.
 
         public InscripcionViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvNombreAlumno= itemView.findViewById(R.id.tvNombreAlumnoItem);
-            btAccion = itemView.findViewById(R.id.btAccionInscriptoItem);
+            tvNombreAlumno= itemView.findViewById(R.id.tvAlumnoExamenItem);
+            btAccion = itemView.findViewById(R.id.btFinalizarExamenItem);
         }
     }
 }

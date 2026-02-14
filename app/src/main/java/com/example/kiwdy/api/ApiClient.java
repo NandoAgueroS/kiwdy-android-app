@@ -2,11 +2,14 @@ package com.example.kiwdy.api;
 
 import com.example.kiwdy.BuildConfig;
 import com.example.kiwdy.api.service.CursosService;
+import com.example.kiwdy.api.service.ExamenesService;
 import com.example.kiwdy.api.service.InscripcionesService;
 import com.example.kiwdy.api.service.SeccionesService;
 import com.example.kiwdy.api.service.UsuariosService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.time.LocalDateTime;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -19,7 +22,8 @@ public class ApiClient {
     private static Retrofit getRetrofit(){
         if (retrofit == null) {
             Gson gson = new GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
                     .setLenient()
                     .create();
             retrofit = new Retrofit.Builder()
@@ -44,5 +48,9 @@ public class ApiClient {
 
     public static InscripcionesService getInscripcionesService() {
         return getRetrofit().create(InscripcionesService.class);
+    }
+
+    public static ExamenesService getExamenesService() {
+        return getRetrofit().create(ExamenesService.class);
     }
 }
