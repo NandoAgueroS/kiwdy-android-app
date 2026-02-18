@@ -20,8 +20,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.kiwdy.api.ApiClient;
-import com.example.kiwdy.api.dto.request.CrearCursoRequest;
-import com.example.kiwdy.api.dto.request.CrearSeccionRequest;
 import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.api.dto.response.SeccionResponse;
 import com.example.kiwdy.api.service.SeccionesService;
@@ -29,12 +27,14 @@ import com.example.kiwdy.api.utils.SharedPreferencesUtil;
 import com.example.kiwdy.model.CursoLocal;
 import com.example.kiwdy.model.MaterialExtra;
 import com.example.kiwdy.model.SeccionLocal;
-import com.example.kiwdy.ui.instructor.InstructorMainActivity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,6 +55,8 @@ public class CrearCursoViewModel extends AndroidViewModel {
     private MutableLiveData<Uri> mImagenUri;
     private MutableLiveData<List<MaterialExtra>> mMaterialesExtra;
     private List<MaterialExtra> materialesExtra = new LinkedList<>();
+    private MutableLiveData<Double> mMostrarNotaInput;
+    private MutableLiveData<Double> mOcultarNotaInput;
 
     public CrearCursoViewModel(@NonNull Application application) {
         super(application);
@@ -89,28 +91,68 @@ public class CrearCursoViewModel extends AndroidViewModel {
         if (mMaterialesExtra== null) mMaterialesExtra= new MutableLiveData<>();
         return mMaterialesExtra;
     }
-
-    public void guardarProgresoCurso(String titulo, String descripcion){
-        if(mCursoLocal.getValue() == null) mCursoLocal.setValue(new CursoLocal());
-       mCursoLocal.getValue().setTitulo(titulo);
-        mCursoLocal.getValue().setDescripcion(descripcion);
+    public LiveData<Double> getmMostrarNotaInput(){
+        if (mMostrarNotaInput == null) {
+            mMostrarNotaInput = new MutableLiveData<>();
+        }
+        return mMostrarNotaInput;
     }
-    public void guardarCurso(String titulo, String descripcion) {
-        //validar campos
 
+    public LiveData<Double> getmOcultarNotaInput(){
+        if (mOcultarNotaInput == null) {
+            mOcultarNotaInput = new MutableLiveData<>();
+        }
+        return mOcultarNotaInput;
+    }
+
+    public void mostrarNotaAprobacionInput(boolean checked){
+        if (checked){
+            double nota = 0;
+            if (mCursoLocal.isInitialized() && mCursoLocal.getValue().getNotaAprobacion() != -1.0){
+                nota = mCursoLocal.getValue().getNotaAprobacion();
+            }
+            mMostrarNotaInput.setValue(nota);
+        }else{
+            mOcultarNotaInput.setValue(-1.0);
+        }
+    }
+    public CursoLocal validarCampos(String titulo, String descripcion, String precio, String notaAprobacion){
+        if(mCursoLocal.getValue() == null) mCursoLocal.setValue(new CursoLocal());
+        CursoLocal cursoLocal = mCursoLocal.getValue();
+        cursoLocal.setTitulo(titulo);
+        cursoLocal.setDescripcion(descripcion);
+        try{
+            float precioFloat = Float.parseFloat(precio);
+            double notaDouble = Double.parseDouble(notaAprobacion);
+            cursoLocal.setPrecio(precioFloat);
+            cursoLocal.setNotaAprobacion(notaDouble);
+        }catch (NumberFormatException e){
+            e.printStackTrace();
+        }
+        return cursoLocal;
+    }
+    public void guardarProgresoCurso(String titulo, String descripcion, String precio, String notaAprobacion){
+
+        validarCampos(titulo, descripcion, precio, notaAprobacion);
+    }
+    public void guardarCurso(String titulo, String descripcion, String precio, String notaAprobacion) {
+        //validar campos
+        CursoLocal cursoLocal = validarCampos(titulo, descripcion, precio, notaAprobacion);
 
         String token = SharedPreferencesUtil.leerToken(getApplication());
 
-        RequestBody tituloField = RequestBody.create(MediaType.parse("text/plain"), titulo);
-        RequestBody descripcionField = RequestBody.create(MediaType.parse("text/plain"), descripcion);
-        RequestBody precioField = RequestBody.create(MediaType.parse("text/plain"), "20");
+        RequestBody tituloField = RequestBody.create(MediaType.parse("text/plain"), cursoLocal.getTitulo());
+        RequestBody descripcionField = RequestBody.create(MediaType.parse("text/plain"), cursoLocal.getDescripcion());
+        RequestBody precioField = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(cursoLocal.getPrecio()));
+        RequestBody notaAprobacionField = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(cursoLocal.getNotaAprobacion()));
+
 
         byte[] portada = transformarImagen();
 
         RequestBody portadaField= RequestBody.create(MediaType.parse("image/jpeg"), portada);
 
         MultipartBody.Part portadaPart = MultipartBody.Part.createFormData("portada", "imagen.jpg", portadaField);
-        Call<CursoResponse> crearCursoCall = ApiClient.getCursosService().crearCurso(token, tituloField, descripcionField, precioField, portadaPart);
+        Call<CursoResponse> crearCursoCall = ApiClient.getCursosService().crearCurso(token, tituloField, descripcionField, precioField, notaAprobacionField, portadaPart);
         crearCursoCall.enqueue(new Callback<CursoResponse>() {
             @Override
             public void onResponse(Call<CursoResponse> call, Response<CursoResponse> response) {
@@ -142,7 +184,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
             RequestBody contenidoField= RequestBody.create(MediaType.parse("text/plain"), seccionLocal.getContenido());
             RequestBody ordenField= RequestBody.create(MediaType.parse("text/plain"), seccionLocal.getOrden() + "");
 
-            byte[] video = transformarVideo(seccionLocal.getVideoUri());
+            File video = copiarUriAFile(seccionLocal.getVideoUri());
 
             RequestBody videoField = RequestBody.create(MediaType.parse("video/mp4"), video);
             List<MultipartBody.Part> archivosPart = new ArrayList<>();
@@ -154,13 +196,14 @@ public class CrearCursoViewModel extends AndroidViewModel {
                 archivosPart.add(MultipartBody.Part.createFormData("materialExtra", materialExtra.getNombre(), archivoBody));
             }}
 
-            MultipartBody.Part videoPart= MultipartBody.Part.createFormData("video", "video.mp4", videoField);
+            MultipartBody.Part videoPart= MultipartBody.Part.createFormData("video", video.getName(), videoField);
             Call<SeccionResponse> seccionCall = seccionesService.crearSeccion(token, idCursoField, tituloField, contenidoField, ordenField, videoPart, archivosPart);
             seccionCall.enqueue(new Callback<SeccionResponse>() {
                 @Override
                 public void onResponse(Call<SeccionResponse> call, Response<SeccionResponse> response) {
                     if (response.isSuccessful()){
                         Toast.makeText(getApplication(),"Seccion creada", Toast.LENGTH_LONG).show();
+                        video.delete();
                     }else{
                         try {
                             Toast.makeText(getApplication(),"Error al crear el curso", Toast.LENGTH_LONG).show();
@@ -186,12 +229,17 @@ public class CrearCursoViewModel extends AndroidViewModel {
         SeccionLocal seccionLocal = new SeccionLocal();
         seccionLocal.setTitulo(titulo);
         seccionLocal.setContenido(contenido);
-        seccionLocal.setOrden(mCursoLocal.getValue().getSeccionLocalList().size() + 1);
-        seccionLocal.setMaterialesExtra(mMaterialesExtra.getValue());
+        List<SeccionLocal> seccionLocalList = mCursoLocal.getValue().getSeccionLocalList();
+        if (seccionLocalList == null) {
+           seccionLocalList = new LinkedList<>();
+        }
+        seccionLocal.setOrden(seccionLocalList.size() + 1);
+        if (mMaterialesExtra.isInitialized()) seccionLocal.setMaterialesExtra(List.copyOf(mMaterialesExtra.getValue()));
         if (mVideoUri.getValue() != null) seccionLocal.setVideoUri(mVideoUri.getValue());
         mCursoLocal.getValue().getSeccionLocalList().add(seccionLocal);
         mSeccionAgregada.setValue(true);
-        mMaterialesExtra.setValue(new LinkedList<>());
+        //mMaterialesExtra.setValue(new LinkedList<>());
+        materialesExtra.clear();
     }
 
     public void limpiarMutables() {
@@ -206,22 +254,30 @@ public class CrearCursoViewModel extends AndroidViewModel {
             mVideoUri.setValue(uri);
         }
     }
-    private byte[] transformarVideo(Uri uri) {
+    private File copiarUriAFile(Uri uri) {
+        File file = null;
         try {
-            InputStream inputStream = getApplication().getContentResolver().openInputStream(uri);
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            file = File.createTempFile("video", ".mp4",getApplication().getCacheDir());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try (
+                InputStream inputStream = getApplication()
+                    .getContentResolver()
+                    .openInputStream(uri);
+                OutputStream outputStream = new FileOutputStream(file)){
 
-            byte[] buffer = new byte[4096];
-            int bytesLeidos;
+                byte[] buffer = new byte[8192];
+                int length;
 
-            while((bytesLeidos = inputStream.read(buffer))!=-1){
-                byteArrayOutputStream.write(buffer, 0, bytesLeidos);
+            while((length = inputStream.read(buffer)) > 0){
+                outputStream.write(buffer, 0, length);
             }
 
-            return byteArrayOutputStream.toByteArray();
+            return file;
         } catch (
                 FileNotFoundException er) {
-            return new byte[]{};
+            return null;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

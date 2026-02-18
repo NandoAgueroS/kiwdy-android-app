@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import com.example.kiwdy.R;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.databinding.FragmentInscripcionesBinding;
+import com.example.kiwdy.ui.compartido.UIDialogs;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
@@ -37,6 +38,18 @@ public class InscripcionesFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(InscripcionesViewModel.class);
         binding = FragmentInscripcionesBinding.inflate(inflater, container, false);
 
+        mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                UIDialogs.error(requireContext(), s);
+            }
+        });
+        mViewModel.getmIdCurso().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mViewModel.listarInscripciones("0", true);
+            }
+        });
         mViewModel.getmInscripciones().observe(getViewLifecycleOwner(), new Observer<List<InscripcionResponse>>() {
             @Override
             public void onChanged(List<InscripcionResponse> inscripcionResponses) {
@@ -54,7 +67,7 @@ public class InscripcionesFragment extends Fragment {
                 mViewModel.listarInscripciones(button.getTag().toString(), b);
             }
         });
-        mViewModel.listarInscripciones("0", true);
+        mViewModel.recuperarIdCurso(getArguments());
 
         return binding.getRoot();
     }

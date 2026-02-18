@@ -1,7 +1,14 @@
 package com.example.kiwdy.ui.alumno.cursos;
 
 import android.app.Application;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,9 +24,18 @@ import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.api.dto.response.SeccionResponse;
 import com.example.kiwdy.api.utils.SharedPreferencesUtil;
+import com.example.kiwdy.model.MaterialDescargado;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,6 +48,8 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
     private MutableLiveData<String> mError;
     private MutableLiveData<Boolean> mMostrarBotonSiguiente;
     private MutableLiveData<Boolean> mMostrarBotonAnterior;
+    private MutableLiveData<MaterialDescargado> mAbrirArchivoDescargado;
+    private MutableLiveData<String> mArchivoDescargado;
     private int ordenActual = 0;
 
     public DetalleSeccionViewModel(@NonNull Application application) {
@@ -78,6 +96,20 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
         return mError;
     }
 
+    public LiveData<MaterialDescargado> getmAbrirArchivoDescargado(){
+        if (mAbrirArchivoDescargado == null) {
+            mAbrirArchivoDescargado = new MutableLiveData<>();
+        }
+        return mAbrirArchivoDescargado;
+    }
+
+    public LiveData<String> getmArchivoDescargado(){
+        if (mArchivoDescargado == null) {
+            mArchivoDescargado = new MutableLiveData<>();
+        }
+        return mArchivoDescargado;
+    }
+
     public void recuperarCurso(Bundle arguments){
         if (arguments == null) return;
         int idCurso = arguments.getInt("idCurso", -1);
@@ -116,7 +148,8 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
         if (bundle != null && bundle.containsKey("orden")){
             ordenActual = bundle.getInt("orden");
         }else if (ordenActual == 0) {
-                ordenActual= mInscripcion.getValue().getUltimaSeccionCompletada();
+                ordenActual= mInscripcion.getValue().getUltimaSeccionCompletada() + 1;
+               // ordenActual = ordenActual == 0 ? 1 : ordenActual;
         }
         mostrarSeccion(ordenActual);
     }
@@ -189,5 +222,80 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
 
             }
         });
+    }
+    public void descargarArchivo(int idArchivo, String nombreArchivo){
+        String token = SharedPreferencesUtil.leerToken(getApplication());
+
+        Call<ResponseBody> archivoCall = ApiClient.getSeccionesService().descargarMaterial(token, idArchivo);
+
+        archivoCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()){
+                    ResponseBody body = response.body();
+                    InputStream input = body.byteStream();
+                    OutputStream output;
+                    Uri uri;
+                    String mime;
+
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        ContentValues values = new ContentValues();
+                        values.put(MediaStore.MediaColumns.DISPLAY_NAME, nombreArchivo);
+                            mime = URLConnection.guessContentTypeFromName(nombreArchivo);
+                            if (mime == null){
+                                mime = "application/octet-stream";
+                            }
+                        values.put(MediaStore.MediaColumns.MIME_TYPE, mime);
+                        values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+
+                        ContentResolver contentResolver = getApplication().getContentResolver();
+                            uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                            if (uri == null) {
+                                mError.postValue("Error al guardar el archivo");
+                                return;
+                            }
+                            output = contentResolver.openOutputStream(uri);
+                            escribirArchivo(output, input);
+                            mAbrirArchivoDescargado.postValue(new MaterialDescargado(uri, mime));
+                        }else{
+                            File file = new File(
+                                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                                    nombreArchivo
+                            );
+                            output = new FileOutputStream(file);
+                            escribirArchivo(output, input);
+                            mArchivoDescargado.postValue("Archivo guardado en Descargas");
+                        }
+
+                    } catch (IOException e) {
+                        mError.postValue("Ocurrió un error al descargar el material");
+                        Log.d("ERROR", "Error al descargar el archivo", e);
+                    } catch (Exception e) {
+                        Log.d("ERROR", "Error al descargar el archivo", e);
+                    }
+
+                }else {
+                    mError.postValue("Ocurrió un error al descargar el material");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+    public void escribirArchivo(OutputStream output, InputStream input) throws IOException{
+        byte[] buffer = new byte[4096];
+        int read;
+
+        while ((read = input.read(buffer)) != -1) {
+            output.write(buffer, 0, read);
+        }
+
+        output.flush();
+        output.close();
+        input.close();
     }
 }

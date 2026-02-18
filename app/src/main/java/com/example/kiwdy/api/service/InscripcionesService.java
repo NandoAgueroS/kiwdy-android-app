@@ -5,6 +5,7 @@ import com.example.kiwdy.api.dto.response.InscripcionResponse;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -18,10 +19,13 @@ public interface InscripcionesService {
     @POST("inscripciones/curso/{idCurso}")
     Call<Void> inscribir(@Header("Authorization") String token, @Path("idCurso") int idCurso);
     @GET("inscripciones")
-    Call<List<InscripcionResponse>> listarInscripciones(@Header("Authorization") String token, @Query("estado") int estado);
+    Call<List<InscripcionResponse>> listarInscripciones(@Header("Authorization") String token, @Query("estado") int estado, @Query("idCurso") int idCurso);
 
     @GET("inscripciones/{idInscripcion}")
     Call<InscripcionResponse> buscarInscripcion(@Header("Authorization") String token, @Path("idInscripcion") int idInscripcion);
+
+    @GET("inscripciones/{idInscripcion}/certificado")
+    Call<ResponseBody> buscarCertificado(@Header("Authorization") String token, @Path("idInscripcion") int idInscripcion);
 
     @GET("inscripciones/curso/{idCurso}")
     Call<InscripcionResponse> buscarInscripcionPorCurso(@Header("Authorization") String token, @Path("idCurso") int idCurso);

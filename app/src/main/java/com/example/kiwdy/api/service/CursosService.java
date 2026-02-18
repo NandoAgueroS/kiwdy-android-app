@@ -23,6 +23,7 @@ public interface CursosService {
                                    @Part("titulo") RequestBody titulo,
                                    @Part("descripcion") RequestBody descripcion,
                                    @Part("precio") RequestBody precio,
+                                   @Part("notaAprobacion") RequestBody notaAprobacion,
                                    @Part MultipartBody.Part portada);
 
     @GET("cursos/listar")

@@ -63,7 +63,7 @@ public class CursoAdapter extends RecyclerView.Adapter<CursoAdapter.CursoViewHol
         holder.btVerInscriptos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController((Activity) context, R.id.nav_host_fragment_content_main).navigate(R.id.inscripcionesFragment);
+                Navigation.findNavController((Activity) context, R.id.nav_host_fragment_content_main).navigate(R.id.inscripcionesFragment, bundle);
             }
         });
 

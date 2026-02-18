@@ -36,8 +36,11 @@
             android:id="@+id/etContenidoSeccion"
             android:layout_width="match_parent"
             android:layout_height="190dp"
+            android:gravity="start|top"
             android:hint="Contenido de la sección"
-            android:minHeight="300dp" />
+            android:inputType="textMultiLine"
+            android:minHeight="300dp"
+            android:minLines="5" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.recyclerview.widget.RecyclerView

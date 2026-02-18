@@ -3,6 +3,8 @@ package com.example.kiwdy.ui.alumno.cursos;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,7 +25,11 @@ import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.api.dto.response.SeccionResponse;
 import com.example.kiwdy.databinding.FragmentDetalleSeccionBinding;
+import com.example.kiwdy.model.MaterialDescargado;
 import com.example.kiwdy.ui.compartido.UIDialogs;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import io.noties.markwon.Markwon;
 
 public class DetalleSeccionFragment extends Fragment {
 
@@ -68,7 +74,9 @@ public class DetalleSeccionFragment extends Fragment {
             @Override
             public void onChanged(SeccionResponse seccionResponse) {
                 binding.tvTituloSeccionDetalle.setText(seccionResponse.getTitulo());
-                binding.tvContenidoSeccionDetalle.setText(seccionResponse.getContenido());
+
+                Markwon markwon = Markwon.create(requireContext());
+                markwon.setMarkdown(binding.tvContenidoSeccionDetalle,seccionResponse.getContenido());
                 VideoView videoView = binding.vvSeccionDetalle;
                 videoView.setVideoPath("" + seccionResponse.getVideoUrl());
                 MediaController mediaController = new MediaController(requireContext());
@@ -78,7 +86,12 @@ public class DetalleSeccionFragment extends Fragment {
                 binding.btMarcarCompletadaDetalle.setEnabled(true);
                 //videoView.start();
 
-                DetalleArchivosSeccionAdapter adapter =  new DetalleArchivosSeccionAdapter(seccionResponse.getMateriales(), requireContext(),inflater);
+                DetalleArchivosSeccionAdapter adapter =  new DetalleArchivosSeccionAdapter(seccionResponse.getMateriales(), requireContext(), inflater, new DetalleArchivosSeccionAdapter.OnClickListener() {
+                    @Override
+                    public void onClick(int idMaterial, String nombreMaterial) {
+                        mViewModel.descargarArchivo(idMaterial, nombreMaterial);
+                    }
+                });
                 GridLayoutManager layoutManager = new GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false);
                 binding.rvMaterialesExtraDetalle.setLayoutManager(layoutManager);
                 binding.rvMaterialesExtraDetalle.setAdapter(adapter);
@@ -90,6 +103,35 @@ public class DetalleSeccionFragment extends Fragment {
             @Override
             public void onChanged(Boolean aBoolean) {
                 binding.btMarcarCompletadaDetalle.setEnabled(aBoolean);
+            }
+        });
+        mViewModel.getmAbrirArchivoDescargado().observe(getViewLifecycleOwner(), new Observer<MaterialDescargado>() {
+            @Override
+            public void onChanged(MaterialDescargado materialDescargado) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Descarga completada")
+                        .setMessage("Material descargado correctamente")
+                        .setNegativeButton("Cerrar", null)
+                        .setPositiveButton("Abrir", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setDataAndType(materialDescargado.getUri(), materialDescargado.getMime());
+                                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                startActivity(intent);
+                            }
+                        })
+                        .show();
+            }
+        });
+        mViewModel.getmArchivoDescargado().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Descarga completada")
+                        .setMessage("Material descargado correctamente")
+                        .setPositiveButton("Ok", null)
+                        .show();
             }
         });
 

@@ -18,11 +18,13 @@ public class DetalleArchivosSeccionAdapter extends RecyclerView.Adapter<DetalleA
     private List<ArchivoSeccionResponse> archivos;
     private Context context;
     private LayoutInflater layoutInflater;
+    private DetalleArchivosSeccionAdapter.OnClickListener onClickListener;
 
-    public DetalleArchivosSeccionAdapter(List<ArchivoSeccionResponse> archivos, Context context, LayoutInflater layoutInflater) {
+    public DetalleArchivosSeccionAdapter(List<ArchivoSeccionResponse> archivos, Context context, LayoutInflater layoutInflater, DetalleArchivosSeccionAdapter.OnClickListener onClickListener) {
         this.archivos = archivos;
         this.context = context;
         this.layoutInflater = layoutInflater;
+        this.onClickListener = onClickListener;
     }
 
     @NonNull
@@ -37,6 +39,14 @@ public class DetalleArchivosSeccionAdapter extends RecyclerView.Adapter<DetalleA
 
         ArchivoSeccionResponse archivo = archivos.get(position);
         holder.tvNombreArchivo.setText(archivo.getNombre());
+        holder.itemView.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onClickListener.onClick(archivo.getIdMaterial(), archivo.getNombre());
+                    }
+                }
+        );
     }
 
     @Override
@@ -51,5 +61,9 @@ public class DetalleArchivosSeccionAdapter extends RecyclerView.Adapter<DetalleA
             super(itemView);
             tvNombreArchivo = itemView.findViewById(R.id.tvNombreArchivoItem);
         }
+    }
+
+    public interface OnClickListener {
+        void onClick(int idMaterial, String nombreMaterial);
     }
 }

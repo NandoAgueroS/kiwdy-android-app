@@ -22,11 +22,16 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import com.example.kiwdy.R;
 import com.example.kiwdy.databinding.FragmentCrearCursoBinding;
 import com.example.kiwdy.model.CursoLocal;
 import com.example.kiwdy.ui.instructor.InstructorMainActivity;
+
+import io.noties.markwon.Markwon;
+import io.noties.markwon.editor.MarkwonEditor;
+import io.noties.markwon.editor.MarkwonEditorTextWatcher;
 
 public class CrearCursoFragment extends Fragment {
 
@@ -34,6 +39,8 @@ public class CrearCursoFragment extends Fragment {
     private FragmentCrearCursoBinding binding;
     private ActivityResultLauncher<Intent> arl;
     private Intent intent;
+    private Markwon markwon;
+    private MarkwonEditor editor;
 
 
     public static CrearCursoFragment newInstance() {
@@ -45,6 +52,11 @@ public class CrearCursoFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(requireActivity()).get(CrearCursoViewModel.class);
         binding = FragmentCrearCursoBinding.inflate(inflater, container, false);
+
+        markwon = Markwon.create(requireContext());
+        editor = MarkwonEditor.create(markwon);
+
+        binding.etDescripcion.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(editor));
 
         abrirGaleria();
         binding.btAgregarImagen.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +78,9 @@ public class CrearCursoFragment extends Fragment {
             public void onClick(View v) {
                 mViewModel.guardarCurso(
                         binding.etTitulo.getText().toString(),
-                        binding.etDescripcion.getText().toString()
+                        binding.etDescripcion.getText().toString(),
+                        binding.etPrecio.getText().toString(),
+                        binding.etNotaAprobacion.getText().toString()
                 );
             }
         });
@@ -89,12 +103,35 @@ public class CrearCursoFragment extends Fragment {
             public void onClick(View v) {
                 mViewModel.guardarProgresoCurso(
                         binding.etTitulo.getText().toString(),
-                        binding.etDescripcion.getText().toString()
+                        binding.etDescripcion.getText().toString(),
+                        binding.etPrecio.getText().toString(),
+                        binding.etNotaAprobacion.getText().toString()
                 );
                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.crearSeccionFragment);
             }
         });
+        mViewModel.getmMostrarNotaInput().observe(getViewLifecycleOwner(), new Observer<Double>() {
+            @Override
+            public void onChanged(Double aDouble) {
+                binding.etNotaAprobacion.setVisibility(View.VISIBLE);
+                binding.etNotaAprobacion.setText(String.valueOf(aDouble));
+            }
+        });
 
+        mViewModel.getmOcultarNotaInput().observe(getViewLifecycleOwner(), new Observer<Double>() {
+            @Override
+            public void onChanged(Double aDouble) {
+                binding.etNotaAprobacion.setVisibility(View.GONE);
+                binding.etNotaAprobacion.setText(String.valueOf(aDouble));
+            }
+        });
+
+        binding.cbRequiereExamen.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
+                mViewModel.mostrarNotaAprobacionInput(isChecked);
+            }
+        });
         mViewModel.restaurarCurso(getArguments());
         return binding.getRoot();
     }

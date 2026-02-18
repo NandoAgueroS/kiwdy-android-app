@@ -53,8 +53,11 @@ dependencies {
     implementation(libs.java.jwt)
     implementation(libs.legacy.support.v4)
     implementation(libs.recyclerview)
+    implementation(libs.core)
+    implementation(libs.editor)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("com.github.ybq:Android-SpinKit:1.4.0")
+    implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.3")
 }

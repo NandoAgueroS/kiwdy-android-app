@@ -1,6 +1,9 @@
 package com.example.kiwdy.ui.compartido.login;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -31,6 +34,8 @@ public class LoginActivity extends AppCompatActivity {
 
         mv = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(LoginActivityViewModel.class);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
+
+        pedirPermisos();
 
         EdgeToEdge.enable(this);
 
@@ -106,5 +111,14 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void pedirPermisos(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1000);
+
+        }
     }
 }

@@ -6,79 +6,69 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.alumno.cursos.DetalleCursoFragment">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
-        android:hint="Título"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivPortadaCursoDetalleCurso">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etTituloDetalleCurso"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-<com.google.android.material.textfield.TextInputLayout
-android:id="@+id/textInputLayout2"
-android:layout_width="match_parent"
-android:layout_height="186dp"
-android:layout_marginTop="24dp"
-app:layout_constraintEnd_toEndOf="parent"
-app:layout_constraintHorizontal_bias="1.0"
-app:layout_constraintStart_toStartOf="parent"
-app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
-
-<com.google.android.material.textfield.TextInputEditText
-    android:id="@+id/etDescripcionDetalleCurso"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:hint="Descripción" />
-</com.google.android.material.textfield.TextInputLayout>
-
     <Button
         android:id="@+id/btInscribirseDetalleCurso"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
+        android:layout_marginStart="60dp"
         android:text="Inscribirse"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvSeccionesDetalleCurso"
-        app:layout_constraintVertical_bias="0.874" />
-
-    <androidx.recyclerview.widget.RecyclerView
-android:id="@+id/rvSeccionesDetalleCurso"
-android:layout_width="409dp"
-android:layout_height="197dp"
-app:layout_constraintEnd_toEndOf="parent"
-app:layout_constraintStart_toStartOf="parent"
-app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
-
-    <ImageView
-        android:id="@+id/ivPortadaCursoDetalleCurso"
-        android:layout_width="185dp"
-        android:layout_height="88dp"
-        android:visibility="visible"
-        app:layout_constraintEnd_toStartOf="@+id/btAgregarImagen"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars" />
+        app:layout_constraintTop_toBottomOf="@+id/nestedScrollView" />
 
     <Button
         android:id="@+id/btVerSeccionesDetalle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="108dp"
+        android:layout_marginTop="8dp"
         android:text="Ver secciones"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintHorizontal_bias="0.296"
         app:layout_constraintStart_toEndOf="@+id/btInscribirseDetalleCurso"
-        app:layout_constraintTop_toBottomOf="@+id/rvSeccionesDetalleCurso" />
+        app:layout_constraintTop_toBottomOf="@+id/nestedScrollView" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="701dp"
+        android:fillViewport="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/ivPortadaCursoDetalleCurso"
+                android:layout_width="185dp"
+                android:layout_height="88dp"
+                android:visibility="visible"
+                tools:src="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/etTituloDetalleCurso"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="36dp" />
+
+            <TextView
+                android:id="@+id/etDescripcionDetalleCurso"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvSeccionesDetalleCurso"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

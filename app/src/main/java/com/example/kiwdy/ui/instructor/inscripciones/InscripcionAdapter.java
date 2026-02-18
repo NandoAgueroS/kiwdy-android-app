@@ -41,7 +41,7 @@ public class InscripcionAdapter extends RecyclerView.Adapter<InscripcionAdapter.
 
         InscripcionResponse inscripcion = inscripciones.get(position);
         holder.tvNombreAlumno.setText(inscripcion.getUsuarioAlumno().getNombre() + " " + inscripcion.getUsuarioAlumno().getApellido());
-        if (inscripcion.getFechaInicio() != null) holder.tvFecha.setText(inscripcion.getFechaInicio().toString());
+   //     if (inscripcion.getFechaInicio() != null) holder.tvFecha.setText(inscripcion.getFechaInicio().toString());
         String estado = inscripcion.getEstado();
 
         switch (estado){

@@ -1,12 +1,12 @@
 package com.example.kiwdy.api.dto.response;
 
 public class ArchivoSeccionResponse{
-    private int idArchivo;
+    private int idMaterial;
     private String nombre;
     private String url;
 
-    public ArchivoSeccionResponse(int idArchivo, String nombre, String url) {
-        this.idArchivo = idArchivo;
+    public ArchivoSeccionResponse(int idMaterial, String nombre, String url) {
+        this.idMaterial = idMaterial;
         this.nombre = nombre;
         this.url = url;
     }
@@ -14,12 +14,12 @@ public class ArchivoSeccionResponse{
     public ArchivoSeccionResponse() {
     }
 
-    public int getIdArchivo() {
-        return idArchivo;
+    public int getIdMaterial() {
+        return idMaterial;
     }
 
-    public void setIdArchivo(int idArchivo) {
-        this.idArchivo = idArchivo;
+    public void setIdMaterial(int idMaterial) {
+        this.idMaterial = idMaterial;
     }
 
     public String getNombre() {

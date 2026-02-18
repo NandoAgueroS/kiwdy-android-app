@@ -31,6 +31,10 @@ import com.example.kiwdy.model.MaterialExtra;
 
 import java.util.List;
 
+import io.noties.markwon.Markwon;
+import io.noties.markwon.editor.MarkwonEditor;
+import io.noties.markwon.editor.MarkwonEditorTextWatcher;
+
 public class CrearSeccionFragment extends Fragment {
 
     private CrearCursoViewModel mViewModel;
@@ -39,6 +43,8 @@ public class CrearSeccionFragment extends Fragment {
     private ActivityResultLauncher<Intent> arlArchivo;
     private Intent intentVideo;
     private Intent intentArchivo;
+    private Markwon markwon;
+    private MarkwonEditor editor;
 
 
     public static CrearSeccionFragment newInstance() {
@@ -50,6 +56,11 @@ public class CrearSeccionFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentCrearSeccionBinding.inflate(inflater, container, false);
         mViewModel = new ViewModelProvider(requireActivity()).get(CrearCursoViewModel.class);
+
+        markwon = Markwon.create(requireContext());
+        editor = MarkwonEditor.create(markwon);
+
+        binding.etContenidoSeccion.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(editor));
 
         abrirGaleria();
         abrirArchivos();

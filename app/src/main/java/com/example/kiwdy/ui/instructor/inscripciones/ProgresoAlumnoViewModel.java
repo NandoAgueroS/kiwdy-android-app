@@ -13,6 +13,13 @@ import com.example.kiwdy.api.ApiClient;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.api.utils.SharedPreferencesUtil;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -23,6 +30,7 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
     private MutableLiveData<InscripcionResponse> mEstadoPendienteCertificacion;
     private MutableLiveData<InscripcionResponse> mEstadoCertificada;
     private MutableLiveData<Integer> mProgreso;
+    private MutableLiveData<File> mCertificadoPdf;
 
     public ProgresoAlumnoViewModel(@NonNull Application application) {
         super(application);
@@ -63,6 +71,13 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
         return mProgreso;
     }
 
+    public LiveData<File> getmCertificadoPdf(){
+        if (mCertificadoPdf == null) {
+            mCertificadoPdf = new MutableLiveData<>();
+        }
+        return mCertificadoPdf;
+    }
+
     public void buscarInscripcion(Bundle arguments){
         if (arguments == null || !arguments.containsKey("idInscripcion")) return;
 
@@ -85,9 +100,14 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
                             mProgreso.postValue(calcularProgreso(response.body()));
                     }
                             break;
-                        case "PendienteCertificacion": mEstadoPendienteCertificacion.postValue(response.body());
+                        case "PendienteCertificacion":
+                            mEstadoPendienteCertificacion.postValue(response.body());
+                            mProgreso.postValue(100);
                             break;
-                        case "Certificada": mEstadoCertificada.postValue(response.body());
+                        case "Certificada": {
+                            mEstadoCertificada.postValue(response.body());
+                            obtenerCertificado(idInscripcion);
+                        }
                             break;
                     }
             }
@@ -104,6 +124,50 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
         float result = (( (float) ultimaSeccionCompletada / totalSecciones) * 100);
         return (int) result;
 
+    }
+    public void obtenerCertificado(int idInscripcion){
+        String token = SharedPreferencesUtil.leerToken(getApplication());
+
+        Call<ResponseBody> certificadoCall = ApiClient.getInscripcionesService().buscarCertificado(token, idInscripcion);
+
+        certificadoCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()){
+                    File certificado = guardarCertificadoEnCache(response.body());
+                    mCertificadoPdf.postValue(certificado);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private File guardarCertificadoEnCache(ResponseBody body){
+        try{
+            File file = new File(getApplication().getCacheDir(), "certificado_"+System.currentTimeMillis()+".pdf");
+            InputStream inputStream = body.byteStream();
+            FileOutputStream outputStream = new FileOutputStream(file);
+
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(buffer)) != -1){
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            outputStream.flush();
+            outputStream.close();
+            inputStream.close();
+           return file;
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void aceptarInscripcion() {

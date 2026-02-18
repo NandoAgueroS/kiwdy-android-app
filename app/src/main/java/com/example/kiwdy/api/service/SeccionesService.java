@@ -8,6 +8,7 @@ import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -31,4 +32,7 @@ public interface SeccionesService {
 
     @GET("secciones/{orden}/curso/{idCurso}")
     Call<SeccionResponse> buscar(@Header("Authorization") String token, @Path("idCurso") int idCurso,@Path("orden") int ordenSeccion);
+
+    @GET("secciones/material/{idMaterial}")
+    Call<ResponseBody> descargarMaterial(@Header("Authorization") String token, @Path("idMaterial") int idMaterial);
 }

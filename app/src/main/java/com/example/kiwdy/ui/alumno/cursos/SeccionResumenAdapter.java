@@ -22,11 +22,17 @@ public class SeccionResumenAdapter extends RecyclerView.Adapter<SeccionResumenAd
     private List<SeccionResponse> secciones;
     private Context context;
     private LayoutInflater inflater;
+    private boolean onClickHabilitado;
 
-    public SeccionResumenAdapter(List<SeccionResponse> secciones, Context context, LayoutInflater inflater) {
+    public SeccionResumenAdapter(List<SeccionResponse> secciones, Context context, LayoutInflater inflater, boolean onClickHabilitado) {
         this.secciones = secciones;
         this.context = context;
         this.inflater = inflater;
+        this.onClickHabilitado = onClickHabilitado;
+    }
+
+    public void setOnClickHabilitado(boolean onClickHabilitado){
+        this.onClickHabilitado = onClickHabilitado;
     }
 
     @NonNull
@@ -41,6 +47,7 @@ public class SeccionResumenAdapter extends RecyclerView.Adapter<SeccionResumenAd
         SeccionResponse seccion = secciones.get(position);
         holder.orden.setText(String.valueOf(seccion.getOrden()));
         holder.titulo.setText(seccion.getTitulo());
+        if (onClickHabilitado){
         Bundle bundle = new Bundle();
         bundle.putInt("orden", seccion.getOrden());
         bundle.putInt("idCurso", seccion.getIdCurso());
@@ -49,7 +56,7 @@ public class SeccionResumenAdapter extends RecyclerView.Adapter<SeccionResumenAd
             public void onClick(View v) {
                 Navigation.findNavController((Activity) context, R.id.nav_host_fragment_content_alumno).navigate(R.id.detalleSeccionFragment, bundle);
             }
-        });
+        });}
     }
 
     @Override

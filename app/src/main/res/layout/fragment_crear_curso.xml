@@ -7,6 +7,23 @@
     tools:context=".ui.instructor.crear_curso.CrearCursoFragment" >
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout4"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:hint="Precio"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPrecio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout"
         android:layout_width="409dp"
         android:layout_height="wrap_content"
@@ -14,7 +31,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btAgregarImagen">
+        app:layout_constraintTop_toBottomOf="@+id/ivCurso">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etTitulo"
@@ -23,9 +40,27 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nota de aprobación"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cbRequiereExamen">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etNotaAprobacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:visibility="gone" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout2"
         android:layout_width="match_parent"
-        android:layout_height="186dp"
+        android:layout_height="100dp"
         android:layout_marginTop="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -36,7 +71,10 @@
             android:id="@+id/etDescripcion"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Descripción" />
+            android:gravity="start|top"
+            android:hint="Descripción"
+            android:inputType="textMultiLine"
+            android:minLines="5" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
@@ -44,49 +82,60 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="+ Sección"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.039"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvSecciones"
-        app:layout_constraintVertical_bias="0.787" />
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSecciones"
         android:layout_width="409dp"
         android:layout_height="197dp"
+        android:layout_marginTop="180dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
+        app:layout_constraintTop_toTopOf="@+id/textInputLayout4" />
 
     <Button
         android:id="@+id/btGuardarCurso"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="Guardar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.948"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/rvSecciones" />
 
     <ImageView
         android:id="@+id/ivCurso"
-        android:layout_width="185dp"
-        android:layout_height="88dp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/btAgregarImagen"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="276dp"
+        android:layout_height="83dp"
+        android:layout_marginTop="24dp"
+        android:scaleType="centerCrop"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@tools:sample/avatars" />
 
     <Button
         android:id="@+id/btAgregarImagen"
+        android:layout_width="122dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="36dp"
+        android:text="Agregar imágen"
+        app:layout_constraintEnd_toStartOf="@+id/ivCurso"
+        app:layout_constraintHorizontal_bias="0.076"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <CheckBox
+        android:id="@+id/cbRequiereExamen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Agregar imágen"
+        android:text="Requiere exámen"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.131"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivCurso" />
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" />
 </androidx.constraintlayout.widget.ConstraintLayout>

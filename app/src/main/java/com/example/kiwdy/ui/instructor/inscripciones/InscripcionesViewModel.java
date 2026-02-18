@@ -1,6 +1,7 @@
 package com.example.kiwdy.ui.instructor.inscripciones;
 
 import android.app.Application;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,8 @@ import retrofit2.Response;
 public class InscripcionesViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<InscripcionResponse>> mInscripciones;
+    private MutableLiveData<Integer> mIdCurso;
+    private MutableLiveData<String> mError;
 
     public InscripcionesViewModel(@NonNull Application application) {
         super(application);
@@ -33,6 +36,25 @@ public class InscripcionesViewModel extends AndroidViewModel {
         }
         return mInscripciones;
     }
+    public LiveData<Integer> getmIdCurso(){
+        if (mIdCurso == null) {
+            mIdCurso = new MutableLiveData<>();
+        }
+        return mIdCurso;
+    }
+
+    public LiveData<String> getmError(){
+        if (mError == null) {
+            mError = new MutableLiveData<>();
+        }
+        return mError;
+    }
+
+    public void recuperarIdCurso(Bundle arguments){
+        if (arguments != null && arguments.containsKey("idCurso")){
+            mIdCurso.setValue(arguments.getInt("idCurso"));
+        }
+    }
 
     public void listarInscripciones(String estado, boolean seleccionado){
         if (!seleccionado) return;
@@ -40,16 +62,18 @@ public class InscripcionesViewModel extends AndroidViewModel {
         int estadoInt = Integer.parseInt(estado);
         Log.d("INSCRIPCION", estado);
 
-        Call<List<InscripcionResponse>> inscripcionesCall = ApiClient.getInscripcionesService().listarInscripciones(token, estadoInt);
+        Call<List<InscripcionResponse>> inscripcionesCall = ApiClient.getInscripcionesService().listarInscripciones(token, estadoInt, mIdCurso.getValue());
         inscripcionesCall.enqueue(new Callback<List<InscripcionResponse>>() {
             @Override
             public void onResponse(Call<List<InscripcionResponse>> call, Response<List<InscripcionResponse>> response) {
                 if (response.isSuccessful()) mInscripciones.postValue(response.body());
+                else mError.postValue("Error al obtener las inscripciones: " + response.code());
             }
 
             @Override
             public void onFailure(Call<List<InscripcionResponse>> call, Throwable t) {
-
+                mError.postValue("Ocurrió un error inesperado al obtener las inscripciones");
+                Log.d("API_ERROR", "Error al obtener las inscripciones", t);
             }
         });
     }

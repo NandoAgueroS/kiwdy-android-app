@@ -4,25 +4,47 @@ import java.time.LocalDateTime;
 
 public class CrearExamenRequest {
 
-    public int modalidad;
+    private int modalidad;
 
-    public LocalDateTime fechaYHora;
+    private LocalDateTime fechaYHora;
 
-    public String link;
+    private String link;
 
-    public String direccion;
+    private String direccion;
 
-    public int idInscripcion;
+    private float precio;
+
+    private double notaAprobacion;
+
+    private int idInscripcion;
 
     public CrearExamenRequest() {
     }
 
-    public CrearExamenRequest(int modalidad, LocalDateTime fechaYHora, String link, String direccion, int idInscripcion) {
+    public CrearExamenRequest(int modalidad, LocalDateTime fechaYHora, String link, String direccion, float precio, double notaAprobacion, int idInscripcion) {
         this.modalidad = modalidad;
         this.fechaYHora = fechaYHora;
         this.link = link;
         this.direccion = direccion;
+        this.precio = precio;
+        this.notaAprobacion = notaAprobacion;
         this.idInscripcion = idInscripcion;
+    }
+
+    public float getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(float precio) {
+        this.precio = precio;
+    }
+
+    public double getNotaAprobacion() {
+        return notaAprobacion;
+    }
+
+    public void setNotaAprobacion(double notaAprobacion) {
+        this.notaAprobacion = notaAprobacion;
     }
 
     public int getModalidad() {

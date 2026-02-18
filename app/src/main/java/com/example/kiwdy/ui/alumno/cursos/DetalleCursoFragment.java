@@ -23,10 +23,13 @@ import com.example.kiwdy.api.dto.response.CursoInscripcionResponse;
 import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.databinding.FragmentDetalleCursoBinding;
 
+import io.noties.markwon.Markwon;
+
 public class DetalleCursoFragment extends Fragment {
 
     private DetalleCursoViewModel mViewModel;
     private FragmentDetalleCursoBinding binding;
+    private SeccionResumenAdapter adapter;
 
     public static DetalleCursoFragment newInstance() {
         return new DetalleCursoFragment();
@@ -41,15 +44,16 @@ public class DetalleCursoFragment extends Fragment {
         mViewModel.getmCurso().observe(getViewLifecycleOwner(), new Observer<CursoResponse>() {
             @Override
             public void onChanged(CursoResponse cursoResponse) {
+                Markwon markwon = Markwon.create(requireContext());
                 binding.etTituloDetalleCurso.setText(cursoResponse.getTitulo());
-                binding.etDescripcionDetalleCurso.setText(cursoResponse.getDescripcion());
+                markwon.setMarkdown(binding.etDescripcionDetalleCurso, cursoResponse.getDescripcion());
 
                 Glide.with(requireContext())
                         .load(ApiClient.URL_BASE + cursoResponse.getPortadaUrl())
                         .placeholder(R.drawable.fondo)
                         .error(R.drawable.fondo)
                         .into(binding.ivPortadaCursoDetalleCurso);
-                SeccionResumenAdapter adapter = new SeccionResumenAdapter(cursoResponse.getSecciones(), requireContext(), getLayoutInflater());
+                adapter = new SeccionResumenAdapter(cursoResponse.getSecciones(), requireContext(), getLayoutInflater(), false);
                 GridLayoutManager layoutManager = new GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false);
                 binding.rvSeccionesDetalleCurso.setLayoutManager(layoutManager);
                 binding.rvSeccionesDetalleCurso.setAdapter(adapter);
@@ -67,6 +71,7 @@ public class DetalleCursoFragment extends Fragment {
             @Override
             public void onChanged(Boolean aBoolean) {
                 binding.btVerSeccionesDetalle.setVisibility(View.VISIBLE);
+                adapter.setOnClickHabilitado(true);
             }
         });
         mViewModel.getmNavegarASeccion().observe(getViewLifecycleOwner(), new Observer<CursoResponse>() {
