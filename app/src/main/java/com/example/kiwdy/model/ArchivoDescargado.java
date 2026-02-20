@@ -2,14 +2,14 @@ package com.example.kiwdy.model;
 
 import android.net.Uri;
 
-public class MaterialDescargado {
+public class ArchivoDescargado {
     private Uri uri;
     private String mime;
 
-    public MaterialDescargado() {
+    public ArchivoDescargado() {
     }
 
-    public MaterialDescargado(Uri uri, String mime) {
+    public ArchivoDescargado(Uri uri, String mime) {
         this.uri = uri;
         this.mime = mime;
     }

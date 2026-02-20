@@ -184,9 +184,16 @@ public class CrearCursoViewModel extends AndroidViewModel {
             RequestBody contenidoField= RequestBody.create(MediaType.parse("text/plain"), seccionLocal.getContenido());
             RequestBody ordenField= RequestBody.create(MediaType.parse("text/plain"), seccionLocal.getOrden() + "");
 
-            File video = copiarUriAFile(seccionLocal.getVideoUri());
+            MultipartBody.Part videoPart = null;
+            File video;
+            if (seccionLocal.getVideoUri() != null) {
+                video = copiarUriAFile(seccionLocal.getVideoUri());
 
-            RequestBody videoField = RequestBody.create(MediaType.parse("video/mp4"), video);
+                RequestBody videoField = RequestBody.create(MediaType.parse("video/mp4"), video);
+                videoPart= MultipartBody.Part.createFormData("video", video.getName(), videoField);
+            }else{
+                video = null;
+            }
             List<MultipartBody.Part> archivosPart = new ArrayList<>();
             if (seccionLocal.getMaterialesExtra() != null){
             for (MaterialExtra materialExtra : seccionLocal.getMaterialesExtra()) {
@@ -196,14 +203,15 @@ public class CrearCursoViewModel extends AndroidViewModel {
                 archivosPart.add(MultipartBody.Part.createFormData("materialExtra", materialExtra.getNombre(), archivoBody));
             }}
 
-            MultipartBody.Part videoPart= MultipartBody.Part.createFormData("video", video.getName(), videoField);
             Call<SeccionResponse> seccionCall = seccionesService.crearSeccion(token, idCursoField, tituloField, contenidoField, ordenField, videoPart, archivosPart);
             seccionCall.enqueue(new Callback<SeccionResponse>() {
                 @Override
                 public void onResponse(Call<SeccionResponse> call, Response<SeccionResponse> response) {
                     if (response.isSuccessful()){
                         Toast.makeText(getApplication(),"Seccion creada", Toast.LENGTH_LONG).show();
-                        video.delete();
+                        if (video != null){
+                            video.delete();
+                        }
                     }else{
                         try {
                             Toast.makeText(getApplication(),"Error al crear el curso", Toast.LENGTH_LONG).show();

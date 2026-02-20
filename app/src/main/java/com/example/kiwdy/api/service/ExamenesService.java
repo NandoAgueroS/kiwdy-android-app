@@ -33,6 +33,9 @@ public interface ExamenesService {
     @GET("examenes")
     public Call<List<ExamenResponse>> listar(@Header("Authorization") String token, @Query("rendido") boolean rendido);
 
+    @GET("examenes/inscripcion/{idInscripcion}")
+    public Call<List<ExamenResponse>> listarPorInscripcion(@Header("Authorization") String token, @Path("idInscripcion") int idInscripcion);
+
     @GET("examenes/{idExamen}")
     public Call<ExamenResponse> buscar(@Header("Authorization") String token, @Path("idExamen") int idExamen);
 

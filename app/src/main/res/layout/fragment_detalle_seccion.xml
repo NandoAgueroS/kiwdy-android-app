@@ -44,7 +44,7 @@
                 android:id="@+id/flVideoSeccionDetalle"
                 android:layout_width="407dp"
                 android:layout_height="230dp"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <VideoView
                     android:id="@+id/vvSeccionDetalle"

@@ -1,7 +1,10 @@
 package com.example.kiwdy.ui.compartido;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 
+import com.example.kiwdy.model.ArchivoDescargado;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 
@@ -39,6 +42,21 @@ public final class UIDialogs {
         new MaterialAlertDialogBuilder(context)
                 .setTitle("Datos inválidos")
                 .setMessage(mensaje)
+                .setPositiveButton("Ok", null)
+                .show();
+    }
+    public static void archivoDescargadoDialog(Context context, DialogInterface.OnClickListener positiveListener){
+        new MaterialAlertDialogBuilder(context)
+                .setTitle("Descarga completada")
+                .setMessage("Archivo descargado correctamente")
+                .setNegativeButton("Cerrar", null)
+                .setPositiveButton("Abrir", positiveListener)
+                .show();
+    }
+    public static void archivoDescargadoLegacy(Context context) {
+        new MaterialAlertDialogBuilder(context)
+                .setTitle("Descarga completada")
+                .setMessage("Archivo descargado correctamente")
                 .setPositiveButton("Ok", null)
                 .show();
     }

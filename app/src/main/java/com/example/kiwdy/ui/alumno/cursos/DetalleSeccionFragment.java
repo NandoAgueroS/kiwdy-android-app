@@ -15,17 +15,14 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
-import com.example.kiwdy.R;
-import com.example.kiwdy.api.dto.response.CursoInscripcionResponse;
-import com.example.kiwdy.api.dto.response.CursoResponse;
+import com.example.kiwdy.BuildConfig;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.api.dto.response.SeccionResponse;
 import com.example.kiwdy.databinding.FragmentDetalleSeccionBinding;
-import com.example.kiwdy.model.MaterialDescargado;
+import com.example.kiwdy.model.ArchivoDescargado;
 import com.example.kiwdy.ui.compartido.UIDialogs;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -77,11 +74,6 @@ public class DetalleSeccionFragment extends Fragment {
 
                 Markwon markwon = Markwon.create(requireContext());
                 markwon.setMarkdown(binding.tvContenidoSeccionDetalle,seccionResponse.getContenido());
-                VideoView videoView = binding.vvSeccionDetalle;
-                videoView.setVideoPath("" + seccionResponse.getVideoUrl());
-                MediaController mediaController = new MediaController(requireContext());
-                mediaController.setAnchorView(videoView);
-                videoView.setMediaController(mediaController);
 
                 binding.btMarcarCompletadaDetalle.setEnabled(true);
                 //videoView.start();
@@ -98,6 +90,17 @@ public class DetalleSeccionFragment extends Fragment {
 
             }
         });
+        mViewModel.getmMostrarVideo().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                VideoView videoView = binding.vvSeccionDetalle;
+                binding.flVideoSeccionDetalle.setVisibility(View.VISIBLE);
+                videoView.setVideoPath(BuildConfig.URL_BASE_API + s);
+                MediaController mediaController = new MediaController(requireContext());
+                mediaController.setAnchorView(videoView);
+                videoView.setMediaController(mediaController);
+            }
+        });
 
         mViewModel.getmMostrarBotonMarcarCompletada().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
@@ -105,33 +108,24 @@ public class DetalleSeccionFragment extends Fragment {
                 binding.btMarcarCompletadaDetalle.setEnabled(aBoolean);
             }
         });
-        mViewModel.getmAbrirArchivoDescargado().observe(getViewLifecycleOwner(), new Observer<MaterialDescargado>() {
+        mViewModel.getmAbrirArchivoDescargado().observe(getViewLifecycleOwner(), new Observer<ArchivoDescargado>() {
             @Override
-            public void onChanged(MaterialDescargado materialDescargado) {
-                new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Descarga completada")
-                        .setMessage("Material descargado correctamente")
-                        .setNegativeButton("Cerrar", null)
-                        .setPositiveButton("Abrir", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                intent.setDataAndType(materialDescargado.getUri(), materialDescargado.getMime());
-                                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                startActivity(intent);
-                            }
-                        })
-                        .show();
+            public void onChanged(ArchivoDescargado archivoDescargado) {
+                UIDialogs.archivoDescargadoDialog(requireContext(), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setDataAndType(archivoDescargado.getUri(), archivoDescargado.getMime());
+                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            startActivity(intent);
+                        }
+                    });
             }
         });
         mViewModel.getmArchivoDescargado().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
-                new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Descarga completada")
-                        .setMessage("Material descargado correctamente")
-                        .setPositiveButton("Ok", null)
-                        .show();
+                UIDialogs.archivoDescargadoLegacy(requireContext());
             }
         });
 

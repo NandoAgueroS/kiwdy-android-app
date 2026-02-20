@@ -15,16 +15,13 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.kiwdy.api.ApiClient;
 import com.example.kiwdy.api.dto.request.MarcarSeccionCompletadaRequest;
-import com.example.kiwdy.api.dto.response.CursoInscripcionResponse;
-import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.api.dto.response.SeccionResponse;
 import com.example.kiwdy.api.utils.SharedPreferencesUtil;
-import com.example.kiwdy.model.MaterialDescargado;
+import com.example.kiwdy.model.ArchivoDescargado;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,9 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLConnection;
-import java.util.ArrayList;
 
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,8 +43,9 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
     private MutableLiveData<String> mError;
     private MutableLiveData<Boolean> mMostrarBotonSiguiente;
     private MutableLiveData<Boolean> mMostrarBotonAnterior;
-    private MutableLiveData<MaterialDescargado> mAbrirArchivoDescargado;
+    private MutableLiveData<ArchivoDescargado> mAbrirArchivoDescargado;
     private MutableLiveData<String> mArchivoDescargado;
+    private MutableLiveData<String> mMostrarVideo;
     private int ordenActual = 0;
 
     public DetalleSeccionViewModel(@NonNull Application application) {
@@ -96,7 +92,7 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
         return mError;
     }
 
-    public LiveData<MaterialDescargado> getmAbrirArchivoDescargado(){
+    public LiveData<ArchivoDescargado> getmAbrirArchivoDescargado(){
         if (mAbrirArchivoDescargado == null) {
             mAbrirArchivoDescargado = new MutableLiveData<>();
         }
@@ -108,6 +104,13 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
             mArchivoDescargado = new MutableLiveData<>();
         }
         return mArchivoDescargado;
+    }
+
+    public LiveData<String> getmMostrarVideo(){
+        if (mMostrarVideo == null) {
+            mMostrarVideo = new MutableLiveData<>();
+        }
+        return mMostrarVideo;
     }
 
     public void recuperarCurso(Bundle arguments){
@@ -175,6 +178,7 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
         String token = SharedPreferencesUtil.leerToken(getApplication());
         SeccionResponse seccion = mInscripcion.getValue().getCurso().getSecciones().stream().filter(s -> s.getOrden() == ordenSeccion).findFirst().orElse(null);
         mSeccion.setValue(seccion);
+        if (seccion.getVideoUrl() != null) mMostrarVideo.setValue(seccion.getVideoUrl());
 
         Call<SeccionResponse> seccionCall = ApiClient.getSeccionesService().buscar(token, idCurso, ordenSeccion);
 /*
@@ -257,7 +261,7 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
                             }
                             output = contentResolver.openOutputStream(uri);
                             escribirArchivo(output, input);
-                            mAbrirArchivoDescargado.postValue(new MaterialDescargado(uri, mime));
+                            mAbrirArchivoDescargado.postValue(new ArchivoDescargado(uri, mime));
                         }else{
                             File file = new File(
                                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
