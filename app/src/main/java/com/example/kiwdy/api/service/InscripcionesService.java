@@ -17,12 +17,22 @@ import retrofit2.http.Query;
 
 public interface InscripcionesService {
     @POST("inscripciones/curso/{idCurso}")
-    Call<Void> inscribir(@Header("Authorization") String token, @Path("idCurso") int idCurso);
+    Call<InscripcionResponse> inscribir(@Header("Authorization") String token, @Path("idCurso") int idCurso);
+
     @GET("inscripciones")
     Call<List<InscripcionResponse>> listarInscripciones(@Header("Authorization") String token, @Query("estado") int estado, @Query("idCurso") int idCurso);
 
+    @GET("inscripciones")
+    Call<List<InscripcionResponse>> listarInscripciones(@Header("Authorization") String token, @Query("estado") int estado);
+
     @GET("inscripciones/{idInscripcion}")
     Call<InscripcionResponse> buscarInscripcion(@Header("Authorization") String token, @Path("idInscripcion") int idInscripcion);
+
+    @GET("inscripciones/alumno")
+    Call<List<InscripcionResponse>> listarInscripcionesDelAlumno(@Header("Authorization") String token);
+
+    @GET("inscripciones/alumno")
+    Call<List<InscripcionResponse>> listarInscripcionesDelAlumnoPorTituloDelCurso(@Header("Authorization") String token, @Query("tituloCurso") String tituloCurso);
 
     @GET("inscripciones/{idInscripcion}/certificado")
     Call<ResponseBody> buscarCertificado(@Header("Authorization") String token, @Path("idInscripcion") int idInscripcion);
@@ -34,5 +44,5 @@ public interface InscripcionesService {
     Call<Void> actualizarEstado(@Header("Authorization") String token, @Path("idInscripcion") int idInscripcion,@Path("estado") int i);
 
     @POST("inscripciones/{idInscripcion}/secciones")
-    Call<Void> marcarSeccionCompletada(@Header("Authorization") String token, @Path("idInscripcion") int idInscripcion, @Body MarcarSeccionCompletadaRequest seccion);
+    Call<InscripcionResponse> marcarSeccionCompletada(@Header("Authorization") String token, @Path("idInscripcion") int idInscripcion, @Body MarcarSeccionCompletadaRequest seccion);
 }

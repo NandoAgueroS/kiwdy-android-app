@@ -17,11 +17,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.kiwdy.api.ApiClient;
+import com.example.kiwdy.api.dto.EstadoInscripcion;
 import com.example.kiwdy.api.dto.request.MarcarSeccionCompletadaRequest;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.api.dto.response.SeccionResponse;
 import com.example.kiwdy.api.utils.SharedPreferencesUtil;
 import com.example.kiwdy.model.ArchivoDescargado;
+import com.example.kiwdy.model.CursoFinalizadoMensaje;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,6 +48,7 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
     private MutableLiveData<ArchivoDescargado> mAbrirArchivoDescargado;
     private MutableLiveData<String> mArchivoDescargado;
     private MutableLiveData<String> mMostrarVideo;
+    private MutableLiveData<CursoFinalizadoMensaje> mSeccionesFinalizadas;
     private int ordenActual = 0;
 
     public DetalleSeccionViewModel(@NonNull Application application) {
@@ -112,6 +115,12 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
         }
         return mMostrarVideo;
     }
+    public LiveData<CursoFinalizadoMensaje> getmSeccionesFinalizadas(){
+        if (mSeccionesFinalizadas == null) {
+            mSeccionesFinalizadas = new MutableLiveData<>();
+        }
+        return mSeccionesFinalizadas;
+    }
 
     public void recuperarCurso(Bundle arguments){
         if (arguments == null) return;
@@ -151,8 +160,12 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
         if (bundle != null && bundle.containsKey("orden")){
             ordenActual = bundle.getInt("orden");
         }else if (ordenActual == 0) {
-                ordenActual= mInscripcion.getValue().getUltimaSeccionCompletada() + 1;
-               // ordenActual = ordenActual == 0 ? 1 : ordenActual;
+            InscripcionResponse inscripcion = mInscripcion.getValue();
+            if (inscripcion.getUltimaSeccionCompletada() == inscripcion.getCurso().getSecciones().size()){
+                ordenActual = inscripcion.getUltimaSeccionCompletada();
+            }else {
+                ordenActual = inscripcion.getUltimaSeccionCompletada() + 1;
+            }
         }
         mostrarSeccion(ordenActual);
     }
@@ -206,14 +219,21 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
         MarcarSeccionCompletadaRequest seccion = new MarcarSeccionCompletadaRequest(mSeccion.getValue().getIdSeccion());
         int idInscripcion = mInscripcion.getValue().getIdInscripcion();
 
-        Call<Void> seccionCompletadaCall = ApiClient.getInscripcionesService().marcarSeccionCompletada(token, idInscripcion, seccion);
+        Call<InscripcionResponse> seccionCompletadaCall = ApiClient.getInscripcionesService().marcarSeccionCompletada(token, idInscripcion, seccion);
 
-        seccionCompletadaCall.enqueue(new Callback<Void>() {
+        seccionCompletadaCall.enqueue(new Callback<InscripcionResponse>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(Call<InscripcionResponse> call, Response<InscripcionResponse> response) {
                 if (response.isSuccessful()) {
                     mMostrarBotonMarcarCompletada.setValue(false);
                     mInscripcion.getValue().setUltimaSeccionCompletada(ordenActual);
+                    InscripcionResponse inscripcionResponse = response.body();
+                    switch (inscripcionResponse.getEstado()){
+                        case "PendienteCertificacion": mSeccionesFinalizadas.postValue(new CursoFinalizadoMensaje("Felicidades! ha finalizado todas las secciones. \n Ahora espere a que su instructor le asigne una fecha de exámen", mInscripcion.getValue().getCurso().getIdCurso()));
+                        break;
+                        case "Certificada": mSeccionesFinalizadas.postValue(new CursoFinalizadoMensaje("Felicidades! ha finalizado el curso. \n Ahora puede ver su certificado en la sección de progreso", mInscripcion.getValue().getCurso().getIdCurso()));
+                            break;
+                    }
                 }
                 else {
                     mError.postValue("Error al completar la seccion");
@@ -221,7 +241,7 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<InscripcionResponse> call, Throwable t) {
                 Toast.makeText(getApplication(), "Error" + t.getMessage(), Toast.LENGTH_LONG).show();
 
             }

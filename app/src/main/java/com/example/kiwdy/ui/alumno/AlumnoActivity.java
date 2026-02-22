@@ -43,7 +43,7 @@ public class AlumnoActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_inicio, R.id.nav_logout, R.id.nav_examenes)
+                R.id.nav_inicio, R.id.nav_logout,R.id.nav_cursos, R.id.nav_mis_inscripciones, R.id.nav_examenes)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_alumno);

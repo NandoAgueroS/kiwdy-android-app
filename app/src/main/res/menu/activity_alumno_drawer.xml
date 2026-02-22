@@ -9,6 +9,14 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/inicio" />
         <item
+            android:id="@+id/nav_mis_inscripciones"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/mis_inscripciones" />
+        <item
+            android:id="@+id/nav_cursos"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/cursos" />
+        <item
             android:id="@+id/nav_examenes"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/agenda_de_examenes" />

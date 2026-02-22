@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
-        android:text="Fecha finalizaión:"
+        android:text="Fecha finalización:"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvFechaInscriptoLabelProgreso" />
 
@@ -61,6 +62,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="28dp"
         android:text="Fecha de inicio:"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvNombreApellidoAlumnoProgreso" />
 
@@ -93,25 +95,24 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btAgendarExamenProgreso"
         android:layout_width="120dp"
-        android:layout_height="33dp"
-        android:layout_marginEnd="288dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:text="Agendar exámen"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btDescargarCertificadoProgreso"
-        app:layout_constraintVertical_bias="0.026"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pdfViewCertificadoProgreso"
         tools:visibility="invisible" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btDescargarCertificadoProgreso"
         android:layout_width="141dp"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="Descargar certificado"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toEndOf="@+id/btAgendarExamenProgreso"
         app:layout_constraintTop_toBottomOf="@+id/pdfViewCertificadoProgreso"
         tools:visibility="invisible" />
 
@@ -140,85 +141,90 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressBarProgreso" />
 
-    <TextView
-        android:id="@+id/tvProximoExamenLabelProgreso"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btAgendarExamenProgreso" />
-
-    <TextView
-        android:id="@+id/tvExamenesInfoProgreso"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Aún no hay exámenes agendados"
-        android:textSize="24sp"
-        android:textStyle="italic"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvProximoExamenLabelProgreso" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clSeccionExamenesProgreso"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="411dp"
+        android:layout_height="239dp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvProximoExamenLabelProgreso">
+        app:layout_constraintTop_toBottomOf="@+id/btAgendarExamenProgreso">
+
+        <TextView
+            android:id="@+id/tvProximoExamenLabelProgreso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Exámenes"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvExamenesInfoProgreso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Aún no hay exámenes agendados"
+            android:textSize="24sp"
+            android:textStyle="italic"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/rvExamenesProgreso" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvExamenesProgreso"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="161dp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvNotaAprobaciónProgreso"
+            app:layout_constraintTop_toBottomOf="@+id/tvProximoExamenLabelProgreso"
             app:layout_constraintVertical_bias="1.0" />
-
-        <TextView
-            android:id="@+id/tvEstadoUltimoExamenLabelProgreso"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Último exámen"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tvEstadoUltimoExamenProgreso"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:text="TextView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="0.038"
             app:layout_constraintStart_toEndOf="@+id/tvEstadoUltimoExamenLabelProgreso"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvNotaAprobaciónLabelProgreso"
+            android:id="@+id/tvEstadoUltimoExamenLabelProgreso"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Último exámen:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvNotaAprobacionProgreso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.04"
+            app:layout_constraintStart_toEndOf="@+id/tvNotaAprobacionLabelProgreso"
+            app:layout_constraintTop_toBottomOf="@+id/tvEstadoUltimoExamenProgreso" />
+
+        <TextView
+            android:id="@+id/tvNotaAprobacionLabelProgreso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="Nota mínima:"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvEstadoUltimoExamenLabelProgreso" />
-
-        <TextView
-            android:id="@+id/tvNotaAprobaciónProgreso"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.041"
-            app:layout_constraintStart_toEndOf="@+id/tvNotaAprobaciónLabelProgreso"
-            app:layout_constraintTop_toBottomOf="@+id/tvEstadoUltimoExamenProgreso" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

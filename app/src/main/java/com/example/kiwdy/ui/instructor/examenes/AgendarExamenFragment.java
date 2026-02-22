@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.example.kiwdy.R;
 import com.example.kiwdy.api.dto.response.ExamenResponse;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
+import com.example.kiwdy.api.dto.response.UsuarioResponse;
 import com.example.kiwdy.databinding.FragmentAgendarExamenBinding;
 import com.example.kiwdy.ui.compartido.UIDialogs;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -66,6 +67,9 @@ mViewModel.getmInscripcion().observe(getViewLifecycleOwner(), new Observer<Inscr
     @Override
     public void onChanged(InscripcionResponse inscripcionResponse) {
         binding.btAgendarExamen.setEnabled(true);
+        UsuarioResponse alumno = inscripcionResponse.getUsuarioAlumno();
+        binding.tvNombreApellidoAlumnoAgendarExamen.setText(alumno.getNombre() + " " + alumno.getApellido());
+        binding.tvFechaInscriptoAgendarExamen.setText(inscripcionResponse.getFechaInicio().toLocalDate().toString());
     }
 });
 

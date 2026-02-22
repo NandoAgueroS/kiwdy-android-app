@@ -26,6 +26,7 @@ import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.api.dto.response.UsuarioResponse;
 import com.example.kiwdy.databinding.FragmentProgresoAlumnoBinding;
 import com.example.kiwdy.model.ArchivoDescargado;
+import com.example.kiwdy.model.InscripcionExamenes;
 import com.example.kiwdy.ui.compartido.UIDialogs;
 import com.example.kiwdy.ui.compartido.examenes.ExamenAdapter;
 import com.github.barteksc.pdfviewer.PDFView;
@@ -67,7 +68,7 @@ public class ProgresoAlumnoFragment extends Fragment {
             }
         });
 
-        mViewModel.getmEstadoSolicitada().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
+        mViewModel.getmEstadoSolicitadaInstructor().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
             @Override
             public void onChanged(InscripcionResponse inscripcionResponse) {
                 UsuarioResponse alumno = inscripcionResponse.getUsuarioAlumno();
@@ -82,16 +83,16 @@ public class ProgresoAlumnoFragment extends Fragment {
             }
         });
 
-        mViewModel.getmEstadoEnCurso().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
+        mViewModel.getmEstadoEnCursoInstructor().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
             @Override
             public void onChanged(InscripcionResponse inscripcionResponse) {
                 btAceptarInscripcion.setVisibility(View.GONE);
-                tvFechaInscriptoLabel.setVisibility(View.GONE);
+                tvFechaInscriptoLabel.setVisibility(View.VISIBLE);
                 tvFechaInscripto.setVisibility(View.VISIBLE);
                 tvProgresoLabel.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
 
-                //tvFechaInscripto.setText(inscripcionResponse.getFechaInicio().toLocalDate().toString());
+                tvFechaInscripto.setText(inscripcionResponse.getFechaInicio().toLocalDate().toString());
                 UsuarioResponse alumno = inscripcionResponse.getUsuarioAlumno();
                 tvNombreApellidoAlumno.setText(alumno.getNombre() + " " + alumno.getApellido());
             }
@@ -103,7 +104,7 @@ public class ProgresoAlumnoFragment extends Fragment {
             }
         });
 
-        mViewModel.getmEstadoPendienteCertificacion().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
+        mViewModel.getmEstadoPendienteCertificacionInstructor().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
             @Override
             public void onChanged(InscripcionResponse inscripcionResponse) {
                 tvProgresoLabel.setVisibility(View.VISIBLE);
@@ -127,7 +128,74 @@ public class ProgresoAlumnoFragment extends Fragment {
             }
         });
 
-        mViewModel.getmEstadoCertificada().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
+        mViewModel.getmEstadoCertificadaInstructor().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
+            @Override
+            public void onChanged(InscripcionResponse inscripcionResponse) {
+                tvFechaInscripto.setVisibility(View.VISIBLE);
+                tvFechaInscriptoLabel.setVisibility(View.VISIBLE);
+                tvFechaFinalizado.setVisibility(View.VISIBLE);
+                tvFechaFinalizadoLabel.setVisibility(View.VISIBLE);
+                pdfViewCertificado.setVisibility(View.VISIBLE);
+
+                tvFechaInscripto.setText(inscripcionResponse.getFechaInicio().toLocalDate().toString());
+                tvFechaFinalizado.setText(inscripcionResponse.getFechaFin().toLocalDate().toString());
+                UsuarioResponse alumno = inscripcionResponse.getUsuarioAlumno();
+                tvNombreApellidoAlumno.setText(alumno.getNombre() + " " + alumno.getApellido());
+
+                btAgendarExamen.setVisibility(View.INVISIBLE);
+
+                btDescargarCertificado.setVisibility(View.VISIBLE);
+                btDescargarCertificado.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mViewModel.guardarCertificadoEnDescargas();
+                    }
+                });
+            }
+        });
+        mViewModel.getmEstadoSolicitadaAlumno().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
+            @Override
+            public void onChanged(InscripcionResponse inscripcionResponse) {
+                UsuarioResponse alumno = inscripcionResponse.getUsuarioAlumno();
+                tvNombreApellidoAlumno.setText(alumno.getNombre() + " " + alumno.getApellido());
+            }
+        });
+
+        mViewModel.getmEstadoEnCursoAlumno().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
+            @Override
+            public void onChanged(InscripcionResponse inscripcionResponse) {
+                tvFechaInscriptoLabel.setVisibility(View.VISIBLE);
+                tvFechaInscripto.setVisibility(View.VISIBLE);
+                tvProgresoLabel.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
+
+                tvFechaInscripto.setText(inscripcionResponse.getFechaInicio().toLocalDate().toString());
+                UsuarioResponse alumno = inscripcionResponse.getUsuarioAlumno();
+                tvNombreApellidoAlumno.setText(alumno.getNombre() + " " + alumno.getApellido());
+            }
+        });
+        mViewModel.getmProgreso().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                progressBar.setProgress(integer);
+            }
+        });
+
+        mViewModel.getmEstadoPendienteCertificacionAlumno().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
+            @Override
+            public void onChanged(InscripcionResponse inscripcionResponse) {
+                tvProgresoLabel.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
+                tvFechaInscripto.setVisibility(View.VISIBLE);
+                tvFechaInscriptoLabel.setVisibility(View.VISIBLE);
+
+                tvFechaInscripto.setText(inscripcionResponse.getFechaInicio().toLocalDate().toString());
+                UsuarioResponse alumno = inscripcionResponse.getUsuarioAlumno();
+                tvNombreApellidoAlumno.setText(alumno.getNombre() + " " + alumno.getApellido());
+            }
+        });
+
+        mViewModel.getmEstadoCertificadaAlumno().observe(getViewLifecycleOwner(), new Observer<InscripcionResponse>() {
             @Override
             public void onChanged(InscripcionResponse inscripcionResponse) {
                 tvFechaInscripto.setVisibility(View.VISIBLE);
@@ -183,10 +251,10 @@ public class ProgresoAlumnoFragment extends Fragment {
             }
         });
 
-        mViewModel.getmExamenes().observe(getViewLifecycleOwner(), new Observer<List<ExamenResponse>>() {
+        mViewModel.getmExamenes().observe(getViewLifecycleOwner(), new Observer<InscripcionExamenes>() {
             @Override
-            public void onChanged(List<ExamenResponse> examenResponses) {
-                ExamenAdapter adapter = new ExamenAdapter(examenResponses, requireContext(), inflater, new ExamenAdapter.OnClickListener() {
+            public void onChanged(InscripcionExamenes inscripcionExamenes) {
+                ExamenAdapter adapter = new ExamenAdapter(inscripcionExamenes.getExamenResponses(), requireContext(), inflater, new ExamenAdapter.OnClickListener() {
                     @Override
                     public void onClickGuardarNota(Button bt, int idExamen, String nota) {
                         mViewModel.getmMostrarBotonFinalizar().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
@@ -202,6 +270,10 @@ public class ProgresoAlumnoFragment extends Fragment {
                 binding.clSeccionExamenesProgreso.setVisibility(View.VISIBLE);
                 binding.rvExamenesProgreso.setLayoutManager(layoutManager);
                 binding.rvExamenesProgreso.setAdapter(adapter);
+                InscripcionResponse inscripcionResponse = inscripcionExamenes.getInscripcionResponse();
+                binding.tvNotaAprobacionProgreso.setText("" + inscripcionResponse.getCurso().getNotaAprobacion());
+                binding.tvEstadoUltimoExamenProgreso.setText(inscripcionExamenes.getEstadoAprobacion());
+
             }
         });
 

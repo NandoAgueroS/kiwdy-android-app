@@ -9,7 +9,7 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/inicio" />
         <item
-            android:id="@+id/nav_cursos"
+            android:id="@+id/nav_mis_cursos"
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/mis_cursos" />
         <item
@@ -20,5 +20,9 @@
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/logout" />
+        <item
+            android:id="@+id/nav_inscripciones"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/inscripciones" />
     </group>
 </menu>

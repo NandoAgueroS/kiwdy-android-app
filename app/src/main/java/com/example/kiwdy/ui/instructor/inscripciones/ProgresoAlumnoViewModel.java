@@ -23,6 +23,7 @@ import com.example.kiwdy.api.dto.response.ExamenResponse;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.api.utils.SharedPreferencesUtil;
 import com.example.kiwdy.model.ArchivoDescargado;
+import com.example.kiwdy.model.InscripcionExamenes;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,16 +40,20 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ProgresoAlumnoViewModel extends AndroidViewModel {
-    private MutableLiveData<InscripcionResponse> mEstadoSolicitada;
-    private MutableLiveData<InscripcionResponse> mEstadoEnCurso;
-    private MutableLiveData<InscripcionResponse> mEstadoPendienteCertificacion;
-    private MutableLiveData<InscripcionResponse> mEstadoCertificada;
+    private MutableLiveData<InscripcionResponse> mEstadoSolicitadaInstructor;
+    private MutableLiveData<InscripcionResponse> mEstadoEnCursoInstructor;
+    private MutableLiveData<InscripcionResponse> mEstadoPendienteCertificacionInstructor;
+    private MutableLiveData<InscripcionResponse> mEstadoCertificadaInstructor;
+    private MutableLiveData<InscripcionResponse> mEstadoSolicitadaAlumno;
+    private MutableLiveData<InscripcionResponse> mEstadoEnCursoAlumno;
+    private MutableLiveData<InscripcionResponse> mEstadoPendienteCertificacionAlumno;
+    private MutableLiveData<InscripcionResponse> mEstadoCertificadaAlumno;
     private MutableLiveData<Integer> mProgreso;
     private MutableLiveData<File> mCertificadoPdf;
     private MutableLiveData<String> mError;
     private MutableLiveData<ArchivoDescargado> mCertificadoGuardado;
     private MutableLiveData<Boolean> mCertificadoGuardadoLegacy;
-    private MutableLiveData<List<ExamenResponse>> mExamenes;
+    private MutableLiveData<InscripcionExamenes> mExamenes;
     private MutableLiveData<String> mErrorValidacion;
     private MutableLiveData<Boolean> mMostrarBotonFinalizar;
     private int idInscripcion;
@@ -57,34 +62,61 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
         super(application);
     }
 
-   public LiveData<InscripcionResponse> getmEstadoSolicitada(){
-       if (mEstadoSolicitada == null) {
-          mEstadoSolicitada = new MutableLiveData<>();
+   public LiveData<InscripcionResponse> getmEstadoSolicitadaInstructor(){
+       if (mEstadoSolicitadaInstructor == null) {
+          mEstadoSolicitadaInstructor = new MutableLiveData<>();
        }
-       return mEstadoSolicitada;
+       return mEstadoSolicitadaInstructor;
    }
 
-    public LiveData<InscripcionResponse> getmEstadoEnCurso(){
-        if (mEstadoEnCurso == null) {
-            mEstadoEnCurso = new MutableLiveData<>();
+    public LiveData<InscripcionResponse> getmEstadoEnCursoInstructor(){
+        if (mEstadoEnCursoInstructor == null) {
+            mEstadoEnCursoInstructor = new MutableLiveData<>();
         }
-        return mEstadoEnCurso;
+        return mEstadoEnCursoInstructor;
     }
 
-    public LiveData<InscripcionResponse> getmEstadoPendienteCertificacion(){
-        if (mEstadoPendienteCertificacion == null) {
-            mEstadoPendienteCertificacion = new MutableLiveData<>();
+    public LiveData<InscripcionResponse> getmEstadoPendienteCertificacionInstructor(){
+        if (mEstadoPendienteCertificacionInstructor == null) {
+            mEstadoPendienteCertificacionInstructor = new MutableLiveData<>();
         }
-        return mEstadoPendienteCertificacion;
+        return mEstadoPendienteCertificacionInstructor;
     }
 
-    public LiveData<InscripcionResponse> getmEstadoCertificada(){
-        if (mEstadoCertificada == null) {
-            mEstadoCertificada = new MutableLiveData<>();
+    public LiveData<InscripcionResponse> getmEstadoCertificadaInstructor(){
+        if (mEstadoCertificadaInstructor == null) {
+            mEstadoCertificadaInstructor = new MutableLiveData<>();
         }
-        return mEstadoCertificada;
+        return mEstadoCertificadaInstructor;
     }
 
+    public LiveData<InscripcionResponse> getmEstadoSolicitadaAlumno(){
+        if (mEstadoSolicitadaAlumno == null) {
+            mEstadoSolicitadaAlumno = new MutableLiveData<>();
+        }
+        return mEstadoSolicitadaAlumno;
+    }
+
+    public LiveData<InscripcionResponse> getmEstadoEnCursoAlumno(){
+        if (mEstadoEnCursoAlumno == null) {
+            mEstadoEnCursoAlumno = new MutableLiveData<>();
+        }
+        return mEstadoEnCursoAlumno;
+    }
+
+    public LiveData<InscripcionResponse> getmEstadoPendienteCertificacionAlumno(){
+        if (mEstadoPendienteCertificacionAlumno == null) {
+            mEstadoPendienteCertificacionAlumno = new MutableLiveData<>();
+        }
+        return mEstadoPendienteCertificacionAlumno;
+    }
+
+    public LiveData<InscripcionResponse> getmEstadoCertificadaAlumno(){
+        if (mEstadoCertificadaAlumno == null) {
+            mEstadoCertificadaAlumno = new MutableLiveData<>();
+        }
+        return mEstadoCertificadaAlumno;
+    }
     public LiveData<Integer> getmProgreso(){
         if (mProgreso == null) {
             mProgreso = new MutableLiveData<>();
@@ -120,7 +152,7 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
         return mCertificadoGuardadoLegacy;
     }
 
-    public LiveData<List<ExamenResponse>> getmExamenes(){
+    public LiveData<InscripcionExamenes> getmExamenes(){
         if (mExamenes == null) {
             mExamenes = new MutableLiveData<>();
         }
@@ -142,12 +174,71 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
     }
 
     public void buscarInscripcion(Bundle arguments){
-        if (arguments == null || !arguments.containsKey("idInscripcion")) return;
+        if (arguments == null) return;
 
-        idInscripcion = arguments.getInt("idInscripcion");
-        buscarInscripcion(idInscripcion);
+        String desde = arguments.getString("Desde");
+        switch (desde){
+            case "Inscripciones":{
+                idInscripcion = arguments.getInt("idInscripcion");
+                buscarInscripcion(idInscripcion);
+            }
+            break;
+            case "DetalleCurso":{
+                buscarInscripcionPorCurso(arguments.getInt("idCurso"));
+            }
+            break;
+            case "DetalleSeccion": {
+                buscarInscripcionPorCurso(arguments.getInt("idCurso"));
+            }
+            break;
+
+        }
     }
 
+    private void buscarInscripcionPorCurso(int idCurso){
+        String token = SharedPreferencesUtil.leerToken(getApplication());
+
+        Call<InscripcionResponse> inscripcionCall = ApiClient.getInscripcionesService().buscarInscripcionPorCurso(token, idCurso);
+
+        inscripcionCall.enqueue(new Callback<InscripcionResponse>() {
+            @Override
+            public void onResponse(Call<InscripcionResponse> call, Response<InscripcionResponse> response) {
+                if (response.isSuccessful()) {
+                    idInscripcion = response.body().getIdInscripcion();
+                    switch (response.body().getEstado()) {
+                        case "Solicitada":
+                            mEstadoSolicitadaAlumno.postValue(response.body());
+                            break;
+                        case "EnCurso": {
+                            mEstadoEnCursoAlumno.postValue(response.body());
+
+                            mProgreso.postValue(calcularProgreso(response.body()));
+                        }
+                        break;
+                        case "PendienteCertificacion":
+                            mEstadoPendienteCertificacionAlumno.postValue(response.body());
+                            mProgreso.postValue(100);
+                            listarExamenes(response.body());
+                            break;
+                        case "Certificada": {
+                            mEstadoCertificadaAlumno.postValue(response.body());
+                            obtenerCertificado(idInscripcion);
+                            if (response.body().getCurso().getNotaAprobacion() != -1) {
+                                listarExamenes(response.body());
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<InscripcionResponse> call, Throwable t) {
+                mError.postValue("Ocurrió error al recuperar la inscripcion");
+                Log.d("API_ERROR", "Error al recuperar la inscripción", t);
+            }
+        });
+    }
     private void buscarInscripcion(int idInscripcion){
         String token = SharedPreferencesUtil.leerToken(getApplication());
 
@@ -158,23 +249,23 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
             public void onResponse(Call<InscripcionResponse> call, Response<InscripcionResponse> response) {
                 if (response.isSuccessful())
                     switch (response.body().getEstado()){
-                        case "Solicitada": mEstadoSolicitada.postValue(response.body());
+                        case "Solicitada": mEstadoSolicitadaInstructor.postValue(response.body());
                             break;
                         case "EnCurso": {
-                            mEstadoEnCurso.postValue(response.body());
+                            mEstadoEnCursoInstructor.postValue(response.body());
 
                             mProgreso.postValue(calcularProgreso(response.body()));
                             }
                             break;
                         case "PendienteCertificacion":
-                            mEstadoPendienteCertificacion.postValue(response.body());
+                            mEstadoPendienteCertificacionInstructor.postValue(response.body());
                             mProgreso.postValue(100);
-                            listarExamenes(idInscripcion);
+                            listarExamenes(response.body());
                             break;
                         case "Certificada": {
-                            mEstadoCertificada.postValue(response.body());
+                            mEstadoCertificadaInstructor.postValue(response.body());
                             obtenerCertificado(idInscripcion);
-                            listarExamenes(idInscripcion);
+                            listarExamenes(response.body());
                         }
                             break;
                     }
@@ -221,7 +312,7 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
         });
     }
 
-    public void listarExamenes(int idInscripcion){
+    public void listarExamenes(InscripcionResponse inscripcionResponse){
         String token = SharedPreferencesUtil.leerToken(getApplication());
 
         Call<List<ExamenResponse>> listarExamenesCall = ApiClient.getExamenesService().listarPorInscripcion(token, idInscripcion);
@@ -230,7 +321,8 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
             @Override
             public void onResponse(Call<List<ExamenResponse>> call, Response<List<ExamenResponse>> response) {
                 if (response.isSuccessful()) {
-                    mExamenes.postValue(response.body());
+                    String estadoAprobacion = calcularEstado(inscripcionResponse, response.body());
+                    mExamenes.postValue(new InscripcionExamenes(inscripcionResponse, response.body(), estadoAprobacion));
                 }else{
                     mError.postValue("Ocurrió un error al recuperar los exámenes");
                 }
@@ -243,7 +335,18 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
             }
         });
     }
+    private String calcularEstado(InscripcionResponse inscripcion, List<ExamenResponse> examenes){
+        if (examenes == null || examenes.size() == 0 || inscripcion.getCurso().getNotaAprobacion() == -1) return "";
+        double ultimaNota = examenes.get(0).getNota();
+        if (ultimaNota == -1){
+            return "Aún no rindió exámenes";
+        }else if (ultimaNota >= inscripcion.getCurso().getNotaAprobacion()){
+            return "Aprobado";
+        }else{
+            return "Desaprobado";
+        }
 
+    }
     private File guardarCertificadoEnCache(ResponseBody body){
         try{
             File file = new File(getApplication().getCacheDir(), "certificado_"+System.currentTimeMillis()+".pdf");
@@ -345,13 +448,14 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
     public void aceptarInscripcion() {
         String token = SharedPreferencesUtil.leerToken(getApplication());
 
-        Call<Void> actualizarEstadoCall = ApiClient.getInscripcionesService().actualizarEstado(token, mEstadoSolicitada.getValue().getIdInscripcion(), 1);
+        Call<Void> actualizarEstadoCall = ApiClient.getInscripcionesService().actualizarEstado(token, mEstadoSolicitadaInstructor.getValue().getIdInscripcion(), 1);
 
         actualizarEstadoCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 Toast.makeText(getApplication(), "Inscripción aceptada", Toast.LENGTH_LONG).show();
-                mEstadoEnCurso.postValue(mEstadoSolicitada.getValue());
+                //mEstadoEnCursoInstructor.postValue(mEstadoSolicitadaInstructor.getValue());
+                buscarInscripcion(mEstadoSolicitadaInstructor.getValue().getIdInscripcion());
             }
 
             @Override

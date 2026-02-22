@@ -33,6 +33,7 @@ public class SeccionResumenAdapter extends RecyclerView.Adapter<SeccionResumenAd
 
     public void setOnClickHabilitado(boolean onClickHabilitado){
         this.onClickHabilitado = onClickHabilitado;
+        notifyDataSetChanged();
     }
 
     @NonNull

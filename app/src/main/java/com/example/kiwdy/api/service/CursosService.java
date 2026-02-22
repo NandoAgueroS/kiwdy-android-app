@@ -14,6 +14,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface CursosService {
 
@@ -28,6 +29,9 @@ public interface CursosService {
 
     @GET("cursos/listar")
     Call<List<CursoResponse>> listarCursos(@Header("Authorization") String token);
+
+    @GET("cursos/listar")
+    Call<List<CursoResponse>> listarCursosPorTitulo(@Header("Authorization") String token, @Query("tituloCurso") String tituloCurso);
 
     @GET("cursos/listar/populares")
     Call<List<CursoResponse>> listarCursosPopulares(@Header("Authorization") String token);

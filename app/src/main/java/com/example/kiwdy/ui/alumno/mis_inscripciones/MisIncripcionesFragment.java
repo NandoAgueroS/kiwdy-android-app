@@ -1,4 +1,4 @@
-package com.example.kiwdy.ui.compartido;
+package com.example.kiwdy.ui.alumno.mis_inscripciones;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -18,26 +18,26 @@ import android.view.ViewGroup;
 
 import com.example.kiwdy.R;
 import com.example.kiwdy.api.dto.response.CursoResponse;
-import com.example.kiwdy.databinding.FragmentCursosBinding;
+import com.example.kiwdy.databinding.FragmentMisIncripcionesBinding;
+import com.example.kiwdy.ui.compartido.UIDialogs;
 import com.example.kiwdy.ui.compartido.inicio.CursoAdapter;
-import com.example.kiwdy.ui.compartido.inicio.InicioViewModel;
 
 import java.util.List;
 
-public class CursosFragment extends Fragment {
+public class MisIncripcionesFragment extends Fragment {
 
-    private CursosViewModel mViewModel;
-    private FragmentCursosBinding binding;
+    private MisIncripcionesViewModel mViewModel;
+    private FragmentMisIncripcionesBinding binding;
 
-    public static CursosFragment newInstance() {
-        return new CursosFragment();
+    public static MisIncripcionesFragment newInstance() {
+        return new MisIncripcionesFragment();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        binding = FragmentCursosBinding.inflate(inflater, container, false);
-        mViewModel = new ViewModelProvider(this).get(CursosViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(MisIncripcionesViewModel.class);
+        binding = FragmentMisIncripcionesBinding.inflate(inflater, container, false);
 
         mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -45,20 +45,21 @@ public class CursosFragment extends Fragment {
                 UIDialogs.error(requireContext(), s);
             }
         });
+
         mViewModel.getmCursos().observe(getViewLifecycleOwner(), new Observer<List<CursoResponse>>() {
             @Override
             public void onChanged(List<CursoResponse> cursoResponses) {
-                CursoAdapter adapter = new CursoAdapter(cursoResponses, requireContext(), getLayoutInflater());
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), 2);
-                binding.rvCursos.setLayoutManager(gridLayoutManager);
-                binding.rvCursos.setAdapter(adapter);
+                CursoAdapter adapter = new CursoAdapter(cursoResponses, requireContext(), inflater);
+
+                GridLayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
+
+                binding.rvCursosMisInscripciones.setLayoutManager(layoutManager);
+                binding.rvCursosMisInscripciones.setAdapter(adapter);
             }
         });
-
-        binding.etBuscarTituloCursoCursos.addTextChangedListener(new TextWatcher() {
+        binding.etBuscarTituloCursoMisInscripciones.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-
             }
 
             @Override
@@ -68,11 +69,11 @@ public class CursosFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-mViewModel.buscarCursosPorTitulo(s.toString());
+                mViewModel.buscarInscripcionesPorTitulo(s.toString());
             }
         });
+        mViewModel.buscarInscripcionesPorTitulo("");
 
-        mViewModel.buscarCursosPorTitulo("");
 
         return binding.getRoot();
     }
@@ -86,6 +87,6 @@ mViewModel.buscarCursosPorTitulo(s.toString());
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        mViewModel.buscarCursosPorTitulo(binding.etBuscarTituloCursoCursos.getText().toString());
+        mViewModel.buscarInscripcionesPorTitulo(binding.etBuscarTituloCursoMisInscripciones.getText().toString());
     }
 }

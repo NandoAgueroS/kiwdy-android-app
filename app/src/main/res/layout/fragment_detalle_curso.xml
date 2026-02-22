@@ -10,10 +10,9 @@
         android:id="@+id/btInscribirseDetalleCurso"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
+        android:layout_marginTop="120dp"
         android:text="Inscribirse"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nestedScrollView" />
 
@@ -21,18 +20,18 @@
         android:id="@+id/btVerSeccionesDetalle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="120dp"
         android:text="Ver secciones"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.296"
-        app:layout_constraintStart_toEndOf="@+id/btInscribirseDetalleCurso"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/btProgresoDetalleCurso"
         app:layout_constraintTop_toBottomOf="@+id/nestedScrollView" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
-        android:layout_height="701dp"
+        android:layout_height="550dp"
         android:fillViewport="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,8 +44,9 @@
 
             <ImageView
                 android:id="@+id/ivPortadaCursoDetalleCurso"
-                android:layout_width="185dp"
-                android:layout_height="88dp"
+                android:layout_width="match_parent"
+                android:layout_height="117dp"
+                android:scaleType="fitCenter"
                 android:visibility="visible"
                 tools:src="@tools:sample/avatars" />
 
@@ -54,7 +54,9 @@
                 android:id="@+id/etTituloDetalleCurso"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="36dp" />
+                android:layout_marginTop="36dp"
+                android:textSize="30sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/etDescripcionDetalleCurso"
@@ -70,5 +72,57 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <Button
+        android:id="@+id/btProgresoDetalleCurso"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="120dp"
+        android:text="Ver progreso"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/btInscribirseDetalleCurso"
+        app:layout_constraintTop_toBottomOf="@+id/nestedScrollView" />
+
+    <TextView
+        android:id="@+id/tvPrecioLabelDetalleCurso"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Precio:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvRequiereExamenDetalleCurso" />
+
+    <TextView
+        android:id="@+id/tvPrecioDetalleCurso"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.023"
+        app:layout_constraintStart_toEndOf="@+id/tvPrecioLabelDetalleCurso"
+        app:layout_constraintTop_toBottomOf="@+id/tvRequiereExamenDetalleCurso" />
+
+    <TextView
+        android:id="@+id/tvInfoInscripcionDetalleCurso"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="TextView"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvPrecioLabelDetalleCurso" />
+
+    <TextView
+        android:id="@+id/tvRequiereExamenDetalleCurso"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nestedScrollView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

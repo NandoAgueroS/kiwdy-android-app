@@ -13,6 +13,12 @@
         <action
             android:id="@+id/action_nav_inicio_to_crearCursoFragment"
             app:destination="@id/crearCursoFragment" />
+        <action
+            android:id="@+id/action_nav_inicio_to_inscripcionesFragment"
+            app:destination="@id/inscripcionesFragment" />
+        <action
+            android:id="@+id/action_nav_inicio_to_inscripcionesFragment2"
+            app:destination="@id/inscripcionesFragment" />
     </fragment>
     <fragment
         android:id="@+id/crearCursoFragment"
@@ -24,7 +30,7 @@
             app:destination="@id/crearSeccionFragment" />
         <action
             android:id="@+id/action_crearCursoFragment_to_nav_cursos"
-            app:destination="@id/nav_cursos" />
+            app:destination="@id/nav_mis_cursos" />
     </fragment>
     <fragment
         android:id="@+id/crearSeccionFragment"
@@ -36,7 +42,7 @@
             app:destination="@id/crearCursoFragment" />
     </fragment>
     <fragment
-        android:id="@+id/nav_cursos"
+        android:id="@+id/nav_mis_cursos"
         android:name="com.example.kiwdy.ui.compartido.CursosFragment"
         android:label="fragment_cursos"
         tools:layout="@layout/fragment_cursos" >
@@ -50,12 +56,21 @@
         android:label="@string/logout"
         tools:layout="@layout/fragment_logout" />
     <fragment
-        android:id="@+id/inscripcionesFragment"
+        android:id="@+id/nav_inscripciones"
         android:name="com.example.kiwdy.ui.instructor.inscripciones.InscripcionesFragment"
         android:label="fragment_inscripciones"
         tools:layout="@layout/fragment_inscripciones" >
         <action
             android:id="@+id/action_inscripcionesFragment_to_progresoAlumnoFragment"
+            app:destination="@id/progresoAlumnoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/inscripcionesFragment"
+        android:name="com.example.kiwdy.ui.instructor.inscripciones.InscripcionesFragment"
+        android:label="fragment_inscripciones"
+        tools:layout="@layout/fragment_inscripciones" >
+        <action
+            android:id="@+id/action_inscripcionesFragment_to_progresoAlumnoFragment2"
             app:destination="@id/progresoAlumnoFragment" />
     </fragment>
     <fragment
@@ -69,6 +84,9 @@
         <action
             android:id="@+id/action_progresoAlumnoFragment_to_agendarExamenFragment2"
             app:destination="@id/agendarExamenFragment" />
+        <action
+            android:id="@+id/action_progresoAlumnoFragment_to_nav_inscripciones"
+            app:destination="@id/nav_inscripciones" />
     </fragment>
     <fragment
         android:id="@+id/agendarExamenFragment"

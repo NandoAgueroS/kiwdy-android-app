@@ -25,13 +25,16 @@
         tools:layout="@layout/fragment_detalle_curso" >
         <action
             android:id="@+id/action_detalleCursoFragment_to_cursosFragment"
-            app:destination="@id/cursosFragment" />
+            app:destination="@id/nav_cursos" />
         <action
             android:id="@+id/action_detalleCursoFragment_to_nav_inicio"
             app:destination="@id/nav_inicio" />
+        <action
+            android:id="@+id/action_detalleCursoFragment_to_progresoAlumnoFragment2"
+            app:destination="@id/progresoAlumnoFragment" />
     </fragment>
     <fragment
-        android:id="@+id/cursosFragment"
+        android:id="@+id/nav_cursos"
         android:name="com.example.kiwdy.ui.compartido.CursosFragment"
         android:label="fragment_cursos"
         tools:layout="@layout/fragment_cursos" >
@@ -49,11 +52,25 @@
         tools:layout="@layout/fragment_detalle_seccion" >
         <action
             android:id="@+id/action_detalleSeccionFragment_to_cursosFragment"
-            app:destination="@id/cursosFragment" />
+            app:destination="@id/nav_cursos" />
     </fragment>
     <fragment
         android:id="@+id/nav_examenes"
         android:name="com.example.kiwdy.ui.compartido.examenes.ExamenesFragment"
         android:label="Exámenes"
         tools:layout="@layout/fragment_examenes" />
+    <fragment
+        android:id="@+id/progresoAlumnoFragment"
+        android:name="com.example.kiwdy.ui.instructor.inscripciones.ProgresoAlumnoFragment"
+        android:label="fragment_progreso_alumno"
+        tools:layout="@layout/fragment_progreso_alumno" >
+        <action
+            android:id="@+id/action_progresoAlumnoFragment2_to_detalleCursoFragment"
+            app:destination="@id/detalleCursoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_mis_inscripciones"
+        android:name="com.example.kiwdy.ui.alumno.mis_inscripciones.MisIncripcionesFragment"
+        android:label="fragment_mis_incripciones"
+        tools:layout="@layout/fragment_mis_incripciones" />
 </navigation>

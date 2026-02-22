@@ -56,7 +56,8 @@ public class CursoAdapter extends RecyclerView.Adapter<CursoAdapter.CursoViewHol
                 .error(R.drawable.fondo)
                 .into(holder.ivPortadaCurso);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("idCurso", curso.getIdCurso());
+        bundle.putInt("idCurso", curso.getIdCurso());
+        bundle.putString("tituloCurso", curso.getTitulo());
         Log.d("TOKEN", SharedPreferencesUtil.leerToken(context));
         String rol = JwtUtil.obtenerRol(SharedPreferencesUtil.leerToken(context).replace("Bearer ", ""));
         if (rol.equals("Instructor")) holder.btVerInscriptos.setVisibility(View.VISIBLE);

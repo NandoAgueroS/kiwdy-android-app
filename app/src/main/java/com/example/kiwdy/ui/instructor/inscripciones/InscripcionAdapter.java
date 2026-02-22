@@ -41,12 +41,17 @@ public class InscripcionAdapter extends RecyclerView.Adapter<InscripcionAdapter.
 
         InscripcionResponse inscripcion = inscripciones.get(position);
         holder.tvNombreAlumno.setText(inscripcion.getUsuarioAlumno().getNombre() + " " + inscripcion.getUsuarioAlumno().getApellido());
-   //     if (inscripcion.getFechaInicio() != null) holder.tvFecha.setText(inscripcion.getFechaInicio().toString());
+        if (!inscripcion.getEstado().equals("Solicitada")){
+            holder.tvFechaInscripto.setText(inscripcion.getFechaInicio().toLocalDate().toString());
+        }else{
+            holder.tvFechaInscripto.setText("Pendiente");
+        }
+        holder.tvTituloCurso.setText(inscripcion.getCurso().getTitulo());
         String estado = inscripcion.getEstado();
 
         switch (estado){
             case "Solicitada" : holder.btAccion.setText("Aceptar");
-            break;
+                break;
             case "EnCurso" : holder.btAccion.setText("Ver");
                 break;
             case "PendienteCertificacion" : holder.btAccion.setText("Certificar");
@@ -57,6 +62,7 @@ public class InscripcionAdapter extends RecyclerView.Adapter<InscripcionAdapter.
 
         Bundle bundle = new Bundle();
         bundle.putInt("idInscripcion", inscripcion.getIdInscripcion());
+        bundle.putString("Desde", "Inscripciones");
         holder.btAccion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,14 +78,15 @@ public class InscripcionAdapter extends RecyclerView.Adapter<InscripcionAdapter.
     }
 
     public class InscripcionViewHolder extends RecyclerView.ViewHolder{
-        TextView tvNombreAlumno;
-        TextView tvFecha;
+        TextView tvNombreAlumno, tvFechaInscripto, tvTituloCurso;
         Button btAccion;
 
         public InscripcionViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvNombreAlumno= itemView.findViewById(R.id.tvAlumnoExamenItem);
-            btAccion = itemView.findViewById(R.id.btFinalizarExamenItem);
+            tvNombreAlumno = itemView.findViewById(R.id.tvAlumnoInscripcionItem);
+            tvFechaInscripto = itemView.findViewById(R.id.tvFechaInscriptoInscripcionItem);
+            tvTituloCurso = itemView.findViewById(R.id.tvTituloCursoInscripcionItem);
+            btAccion = itemView.findViewById(R.id.btAccionInscripcionItem);
         }
     }
 }

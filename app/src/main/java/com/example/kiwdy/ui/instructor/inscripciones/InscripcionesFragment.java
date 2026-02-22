@@ -60,6 +60,22 @@ public class InscripcionesFragment extends Fragment {
             }
         });
 
+        mViewModel.getmMostrandoInscripcionesPorCurso().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                binding.tvCursoLabelInscripciones.setText("Inscripciones del curso:");
+                binding.tvCursoInscripciones.setVisibility(View.VISIBLE);
+                binding.tvCursoInscripciones.setText(s);
+            }
+        });
+        mViewModel.getmMostrandoTodasLasInscripciones().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                binding.tvCursoLabelInscripciones.setText("Todas las inscripciones");
+                mViewModel.listarInscripciones("0", true);
+            }
+        });
+
         binding.btGroupInscripciones.addOnButtonCheckedListener(new MaterialButtonToggleGroup.OnButtonCheckedListener() {
             @Override
             public void onButtonChecked(MaterialButtonToggleGroup materialButtonToggleGroup, int i, boolean b) {
@@ -72,4 +88,9 @@ public class InscripcionesFragment extends Fragment {
         return binding.getRoot();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

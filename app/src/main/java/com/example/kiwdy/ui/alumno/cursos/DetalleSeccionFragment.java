@@ -10,6 +10,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import android.view.LayoutInflater;
@@ -19,10 +20,12 @@ import android.widget.MediaController;
 import android.widget.VideoView;
 
 import com.example.kiwdy.BuildConfig;
+import com.example.kiwdy.R;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.api.dto.response.SeccionResponse;
 import com.example.kiwdy.databinding.FragmentDetalleSeccionBinding;
 import com.example.kiwdy.model.ArchivoDescargado;
+import com.example.kiwdy.model.CursoFinalizadoMensaje;
 import com.example.kiwdy.ui.compartido.UIDialogs;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -126,6 +129,26 @@ public class DetalleSeccionFragment extends Fragment {
             @Override
             public void onChanged(String s) {
                 UIDialogs.archivoDescargadoLegacy(requireContext());
+            }
+        });
+
+        mViewModel.getmSeccionesFinalizadas().observe(getViewLifecycleOwner(), new Observer<CursoFinalizadoMensaje>() {
+            @Override
+            public void onChanged(CursoFinalizadoMensaje cursoFinalizadoMensaje) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Fin del curso")
+                        .setMessage(cursoFinalizadoMensaje.getMensaje())
+                        .setPositiveButton("Ver detalles", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Bundle bundle = new Bundle();
+                                bundle.putInt("idCurso", cursoFinalizadoMensaje.getIdCurso());
+                                bundle.putString("Desde", "DetalleSeccion");
+                                Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_alumno).navigate(R.id.progresoAlumnoFragment, bundle);
+                            }
+                        })
+                        .setNegativeButton("Cerrar", null)
+                        .show();
             }
         });
 
