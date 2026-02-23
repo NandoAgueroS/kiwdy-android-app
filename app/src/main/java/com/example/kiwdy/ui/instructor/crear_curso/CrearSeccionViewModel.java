@@ -40,6 +40,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +54,9 @@ import retrofit2.Response;
 
 public class CrearSeccionViewModel extends AndroidViewModel {
 
+    private MutableLiveData<String> mError;
+    private MutableLiveData<String> mErrorDeValidacion;
+    private MutableLiveData<String> mMensaje;
     private MutableLiveData<Integer> mIdCurso;
     private MutableLiveData<SeccionLocal> mSeccionLocal;
     private MutableLiveData<Boolean> mSeccionAgregada;
@@ -66,6 +70,26 @@ public class CrearSeccionViewModel extends AndroidViewModel {
 
     public CrearSeccionViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<String> getmError(){
+        if (mError == null) {
+            mError = new MutableLiveData<>();
+        }
+        return mError;
+    }
+
+    public LiveData<String> getmErrorDeValidacion(){
+        if (mErrorDeValidacion == null) {
+            mErrorDeValidacion = new MutableLiveData<>();
+        }
+        return mErrorDeValidacion;
+    }
+    public LiveData<String> getmMensaje() {
+        if (mMensaje == null) {
+            mMensaje = new MutableLiveData<>();
+        }
+        return  mMensaje;
     }
 
     public LiveData<Integer> getmIdCurso() {
@@ -107,29 +131,74 @@ public class CrearSeccionViewModel extends AndroidViewModel {
         return mOcultarVistaPrevia;
     }
 
-    public void guardarProgresoSeccion(String titulo, String contenido) {
+    private SeccionLocal validarCampos(String titulo, String contenidoVar, String contenidoEditText, boolean modoVistaPrevia){
 
-        SeccionLocal seccionLocal;
-        List<SeccionLocal> seccionLocalList = cursoLocal.getSeccionLocalList();
-        if (seccionLocalList == null) {
-            seccionLocalList = new LinkedList<>();
-        }
-        if (mSeccionLocal.isInitialized()){
-            seccionLocal = mSeccionLocal.getValue();
+        String contenido;
+        String video = null;
+        if (modoVistaPrevia){
+            contenido = contenidoVar;
         }else{
-            seccionLocal = new SeccionLocal();
-            seccionLocal.setOrden(seccionLocalList.size() + 1);
+            contenido = contenidoEditText;
         }
-        seccionLocal.setTitulo(titulo);
-        seccionLocal.setContenido(contenido);
-        if (mMaterialesExtra.isInitialized()) seccionLocal.setMaterialesExtra(List.copyOf(mMaterialesExtra.getValue()));
-        if (mVideoUri.getValue() != null) seccionLocal.setVideoUri(mVideoUri.getValue().toString());
 
-        if (!mSeccionLocal.isInitialized()) cursoLocal.getSeccionLocalList().add(seccionLocal);
+        StringBuilder mensajes = new StringBuilder();
+
+        boolean valido = true;
+
+        if (titulo.isBlank()){
+            mensajes.append("Debe ingresar un título \n");
+            valido = false;
+        }
+        if (contenido.isBlank()){
+            mensajes.append("Debe ingresar un contenido \n");
+            valido = false;
+        }
+        if (!valido){
+            mErrorDeValidacion.setValue("Datos inválidos, revise los campos e intente nuevamente");
+            mMensaje.setValue(mensajes.toString());
+            return null;
+        }else {
+            mMensaje.setValue("");
+            SeccionLocal seccionLocal;
+            List<SeccionLocal> seccionLocalList = cursoLocal.getSeccionLocalList();
+            if (seccionLocalList == null) {
+                seccionLocalList = new LinkedList<>();
+            }
+
+
+            if (!mSeccionLocal.isInitialized()) {
+                seccionLocal = new SeccionLocal();
+                seccionLocal.setOrden(seccionLocalList.size() + 1);
+                cursoLocal.getSeccionLocalList().add(seccionLocal);
+            }else{
+                seccionLocal = mSeccionLocal.getValue();
+            }
+
+            if (mMaterialesExtra.isInitialized() && !mMaterialesExtra.getValue().isEmpty()) {
+                seccionLocal.setMaterialesExtra(List.copyOf(mMaterialesExtra.getValue()));
+            }else{
+                seccionLocal.setMaterialesExtra(new LinkedList<>());
+            }
+            //if (mSeccionLocal.getValue() == null) mSeccionLocal.setValue(new SeccionLocal());
+
+            if (video != null){
+                seccionLocal.setVideoUri(video);
+            }
+            seccionLocal.setTitulo(titulo);
+            seccionLocal.setContenido(contenido);
+            return seccionLocal;
+        }
+    }
+
+
+    public void guardarProgresoSeccion(String titulo, String contenidoVar, String contenidoEditText, boolean modoVistaPrevia) {
+
 
         //mMaterialesExtra.setValue(new LinkedList<>());
-        materialesExtra.clear();
-        guardarLocalmente(cursoLocal);
+        if (validarCampos(titulo, contenidoVar, contenidoEditText, modoVistaPrevia) != null){
+            materialesExtra.clear();
+            guardarLocalmente(cursoLocal);
+        }
     }
 
     public void alternarVistaPreviaDescripcion(boolean isChecked){
@@ -193,7 +262,14 @@ public class CrearSeccionViewModel extends AndroidViewModel {
             Intent data = result.getData();
             File file = copiarUriAFile(data.getData(), "video");
             Uri uri = Uri.fromFile(file);
-            mVideoUri.setValue(uri);
+            MediaType mediaType = MediaType.parse(URLConnection.guessContentTypeFromName(file.getName()));
+            if (mediaType == null){
+                mError.setValue("Ocurrió un error al leer el formato del video");
+            }else if (!mediaType.toString().equals("video/mp4")) {
+                mErrorDeValidacion.setValue("Solo se permiten videos con formato mp4");
+            }else{
+                mVideoUri.setValue(uri);
+            }
         }
     }
     private File copiarUriAFile(Uri uri, String prefijo) {
@@ -241,14 +317,16 @@ public class CrearSeccionViewModel extends AndroidViewModel {
     public void recibirArchivo(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK){
             Intent data = result.getData();
-            Uri uri = data.getData();
+            Uri uriOriginal = data.getData();
+            File file = copiarUriAFile(uriOriginal, "archivo_extra");
+            Uri uriCopia = Uri.fromFile(file);
 
-            Cursor cursor = getApplication().getContentResolver().query(uri, null, null, null, null);
+            Cursor cursor = getApplication().getContentResolver().query(uriOriginal, null, null, null, null);
             int nombreIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
             cursor.moveToFirst();
             String nombre = cursor.getString(nombreIndex);
             cursor.close();
-            MaterialExtra materialExtra = new MaterialExtra(nombre, uri);
+            MaterialExtra materialExtra = new MaterialExtra(nombre, uriCopia.toString());
             materialesExtra.add(materialExtra);
             mMaterialesExtra.setValue(materialesExtra);
         }

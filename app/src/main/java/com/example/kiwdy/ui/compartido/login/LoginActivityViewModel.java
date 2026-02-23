@@ -24,6 +24,8 @@ import retrofit2.Response;
 
 public class LoginActivityViewModel extends AndroidViewModel {
 
+    private MutableLiveData<String> mError;
+    private MutableLiveData<String> mErrorDeValidacion;
     private MutableLiveData<String> mLoginInstructor;
     private MutableLiveData<String> mLoginAlumno;
     private MutableLiveData<String> mMensaje;
@@ -32,6 +34,20 @@ public class LoginActivityViewModel extends AndroidViewModel {
 
     public LoginActivityViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<String> getmError(){
+        if (mError == null) {
+            mError = new MutableLiveData<>();
+        }
+        return mError;
+    }
+
+    public LiveData<String> getmErrorDeValidacion(){
+        if (mErrorDeValidacion == null) {
+            mErrorDeValidacion = new MutableLiveData<>();
+        }
+        return mErrorDeValidacion;
     }
 
     public LiveData<String> getmLoginInstructor() {
@@ -83,8 +99,6 @@ public class LoginActivityViewModel extends AndroidViewModel {
                     if (response.isSuccessful()){
                         String token = response.body();
                         SharedPreferencesUtil.guardarToken(getApplication(), token);
-                        //if (JwtUtil.obtenerRol(token).equals("Instructor"))
-                        //    mLoginInstructor.setValue("");
                         switch (JwtUtil.obtenerRol(token)){
                             case "Instructor": mLoginInstructor.setValue("");
                             break;
@@ -94,13 +108,15 @@ public class LoginActivityViewModel extends AndroidViewModel {
                         }
                     }else{
                         mMensaje.postValue("El usuario y/o la contraseña son incorrectos");
+                        mError.postValue("El usuario y/o la contraseña son incorrectos");
                     }
                 }
 
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
                     mMensaje.postValue("Logueo incorrecto");
-                    Log.d("API_ERROR", t.getMessage());
+                    mError.postValue("Ocurrió un error inesperado al iniciar sesión");
+                    Log.d("API_ERROR", "Error inesperado al iniciar sesión" ,t);
                 }
             });
         }
@@ -112,19 +128,19 @@ public class LoginActivityViewModel extends AndroidViewModel {
         Matcher matcher = pattern.matcher(email);
 
         if (email.isBlank() && clave.isBlank()){
-            mMensaje.setValue("Debe ingresar un email y una clave");
+            mErrorDeValidacion.setValue("Debe ingresar un email y una clave");
             return false;
         }else if (!matcher.matches() && clave.isBlank()){
-            mMensaje.setValue("Debe ingresar un email válido y una clave");
+            mErrorDeValidacion.setValue("Debe ingresar un email válido y una clave");
             return false;
         }else if (email.isBlank()){
-            mMensaje.setValue("Debe ingresar un email");
+            mErrorDeValidacion.setValue("Debe ingresar un email");
             return false;
         }else if (clave.isBlank()){
-            mMensaje.setValue("Debe ingresar una clave");
+            mErrorDeValidacion.setValue("Debe ingresar una clave");
             return false;
         }else if (!matcher.matches()){
-            mMensaje.setValue("Debe ingresar un email válido");
+            mErrorDeValidacion.setValue("Debe ingresar un email válido");
             return false;
         }
         return true;

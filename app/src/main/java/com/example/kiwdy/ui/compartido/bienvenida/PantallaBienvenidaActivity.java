@@ -1,5 +1,6 @@
 package com.example.kiwdy.ui.compartido.bienvenida;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -16,6 +17,7 @@ import com.example.kiwdy.ui.alumno.AlumnoActivity;
 import com.example.kiwdy.ui.compartido.UIDialogs;
 import com.example.kiwdy.ui.instructor.InstructorMainActivity;
 import com.example.kiwdy.ui.compartido.login.LoginActivity;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class PantallaBienvenidaActivity extends AppCompatActivity {
 
@@ -35,6 +37,22 @@ public class PantallaBienvenidaActivity extends AppCompatActivity {
         if (getSupportActionBar() != null){
             getSupportActionBar().hide();
         }
+        mViewModel.getmError().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                new MaterialAlertDialogBuilder(PantallaBienvenidaActivity.this)
+                        .setTitle("Error")
+                        .setMessage(s)
+                        .setPositiveButton("Salir", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .show();
+            }
+        });
+
         mViewModel.getmSesionInvalida().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {

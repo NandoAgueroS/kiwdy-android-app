@@ -22,10 +22,19 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class BorradoresViewModel extends AndroidViewModel {
+    private MutableLiveData<String> mError;
+
     private MutableLiveData<List<CursoLocal>> mBorradores;
 
     public BorradoresViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<String> getmError(){
+        if (mError == null) {
+            mError = new MutableLiveData<>();
+        }
+        return mError;
     }
 
     public LiveData<List<CursoLocal>> getmBorradores(){
@@ -56,7 +65,7 @@ public class BorradoresViewModel extends AndroidViewModel {
 
         File dir = new File(getApplication().getFilesDir(), "borradores");
         if (!dir.exists()){
-            mBorradores.postValue(new ArrayList<>());
+            mError.setValue("Ocurrió un error al recuperar los borradores");
             return;
         }
         File[] files = dir.listFiles();
@@ -77,8 +86,8 @@ public class BorradoresViewModel extends AndroidViewModel {
             FileReader reader = new FileReader(file);
             return gson.fromJson(reader, CursoLocal.class);
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            mError.setValue("Ocurrió un error al recuperar los borradores");
+            return null;
         }
     }
-    // TODO: Implement the ViewModel
 }

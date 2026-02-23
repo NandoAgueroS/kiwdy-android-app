@@ -46,6 +46,21 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        mv.getmError().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                binding.spinKit.setVisibility(View.GONE);
+                UIDialogs.error(LoginActivity.this, s);
+            }
+        });
+        mv.getmErrorDeValidacion().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                UIDialogs.validacion(LoginActivity.this, s);
+                binding.spinKit.setVisibility(View.GONE);
+                binding.tvError.setText(s);
+            }
+        });
 
         mv.getmLoginInstructor().observe(this, new Observer<String>() {
             @Override

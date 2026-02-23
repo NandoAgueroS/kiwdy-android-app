@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.example.kiwdy.R;
 import com.example.kiwdy.ui.compartido.login.LoginActivity;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class LogoutFragment extends Fragment {
 
@@ -42,7 +43,21 @@ public class LogoutFragment extends Fragment {
             }
         });
 
-        new AlertDialog.Builder(requireContext())
+        viewModel.getmNavegarAInicioAlumno().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_alumno).navigate(R.id.nav_inicio);
+            }
+        });
+
+        viewModel.getmNavegarAInicioInstructor().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.nav_inicio);
+            }
+        });
+
+        new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Salir")
                 .setMessage("¿Seguro que quiere salir?")
                 .setPositiveButton("Salir", new DialogInterface.OnClickListener() {
@@ -54,8 +69,7 @@ public class LogoutFragment extends Fragment {
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.nav_inicio);
-
+                        viewModel.navegarAInicio();
                     }
                 })
                 .show();

@@ -40,6 +40,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +54,9 @@ import retrofit2.Response;
 
 public class CrearCursoViewModel extends AndroidViewModel {
 
+    private MutableLiveData<String> mError;
+    private MutableLiveData<String> mErrorDeValidacion;
+    private MutableLiveData<String> mMensaje;
     private MutableLiveData<CursoLocal> mCursoLocal;
     private MutableLiveData<Boolean> mSeccionAgregada = new MutableLiveData<>();
     private MutableLiveData<String> mNavegarACrearSeccion;
@@ -67,6 +71,27 @@ public class CrearCursoViewModel extends AndroidViewModel {
 
     public CrearCursoViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<String> getmError(){
+        if (mError == null) {
+            mError = new MutableLiveData<>();
+        }
+        return mError;
+    }
+
+    public LiveData<String> getmErrorDeValidacion(){
+        if (mErrorDeValidacion == null) {
+            mErrorDeValidacion = new MutableLiveData<>();
+        }
+        return mErrorDeValidacion;
+    }
+
+    public LiveData<String> getmMensaje(){
+        if (mMensaje == null) {
+            mMensaje = new MutableLiveData<>();
+        }
+        return mMensaje;
     }
 
     public LiveData<CursoLocal> getmCursoLocal(){
@@ -132,38 +157,95 @@ public class CrearCursoViewModel extends AndroidViewModel {
         }
     }
 
-    public void navegarAFragmentCrearSeccion(){
-        mNavegarACrearSeccion.setValue(mCursoLocal.getValue().getNombreArchivoBorrador());
-    }
-    public CursoLocal validarCampos(String titulo, String descripcion, String precio, String notaAprobacion, boolean requiereExamen){
-        if(mCursoLocal.getValue() == null) mCursoLocal.setValue(new CursoLocal());
-        CursoLocal cursoLocal = mCursoLocal.getValue();
-        cursoLocal.setTitulo(titulo);
-        cursoLocal.setDescripcion(descripcion);
-        cursoLocal.setPortadaUri(mImagenUri.getValue().toString());
-        try{
-            float precioFloat = Float.parseFloat(precio);
-            if (requiereExamen) {
-                double notaDouble = Double.parseDouble(notaAprobacion);
-                cursoLocal.setNotaAprobacion(notaDouble);
-            }else{
-                cursoLocal.setNotaAprobacion(-1);
-            }
-            cursoLocal.setRequiereExamen(requiereExamen);
-            cursoLocal.setPrecio(precioFloat);
-        }catch (NumberFormatException e){
-            e.printStackTrace();
+    public CursoLocal validarCampos(String titulo, String descripcionVar, String descripcionEditText, String precio, String notaAprobacion, boolean requiereExamen, boolean modoVistaPrevia){
+        String descripcion;
+        float precioFloat = -1;
+        double notaDouble = -1;
+        if (modoVistaPrevia){
+            descripcion = descripcionVar;
+        }else{
+            descripcion = descripcionEditText;
         }
-        return cursoLocal;
+
+        StringBuilder mensajes = new StringBuilder();
+
+        boolean valido = true;
+
+        if (titulo.isBlank()){
+            mensajes.append("Debe ingresar un título\n");
+            valido = false;
+        }
+        if (descripcion.isBlank()){
+            mensajes.append("Debe ingresar una descripcion \n");
+            valido = false;
+        }
+        try {
+            precioFloat = Float.parseFloat(precio);
+            if (precioFloat < 0){
+                mensajes.append("Debe ingresar un precio válido \n");
+                valido = false;
+            }
+        } catch (NumberFormatException e) {
+            mensajes.append("Debe ingresar un precio numérico \n");
+            valido = false;
+        }
+        if (requiereExamen){
+            try {
+                notaDouble = Double.parseDouble(notaAprobacion);
+                if (notaDouble <= 0){
+                    mensajes.append("Debe ingresar una nota mayor a 0 \n");
+                    valido = false;
+                }
+            }catch (NumberFormatException e){
+                mensajes.append("Debe ingresar una nota válida \n");
+                valido = false;
+            }
+        }else{
+            notaDouble = -1;
+        }
+        if (!mImagenUri.isInitialized()) {
+            mensajes.append("Debe cargar una imágen de portada \n");
+            valido = false;
+        }else if (mImagenUri.getValue() == null){
+            mensajes.append("Debe cargar una imágen de portada \n");
+            valido = false;
+        }
+        if (!valido){
+            mErrorDeValidacion.setValue("Datos inválidos, revise los campos e intente nuevamente");
+            mMensaje.setValue(mensajes.toString());
+            return null;
+        }else{
+            mMensaje.setValue("");
+            if(mCursoLocal.getValue() == null) mCursoLocal.setValue(new CursoLocal());
+            CursoLocal cursoLocal = mCursoLocal.getValue();
+            cursoLocal.setPortadaUri(mImagenUri.getValue().toString());
+            cursoLocal.setTitulo(titulo);
+            cursoLocal.setDescripcion(descripcion);
+            cursoLocal.setPrecio(precioFloat);
+            cursoLocal.setNotaAprobacion(notaDouble);
+            cursoLocal.setRequiereExamen(requiereExamen);
+            return cursoLocal;
+        }
     }
 
-    public void guardarProgresoCurso(String titulo, String descripcion, String precio, String notaAprobacion, boolean requiereExamen){
-        guardarLocalmente(validarCampos(titulo, descripcion, precio, notaAprobacion, requiereExamen));
+    public void guardarProgresoCurso(String titulo, String descripcionVar, String descripcionEditText, String precio, String notaAprobacion, boolean requiereExamen, boolean modoVistaPrevia, boolean navegarACrearSeccion, int ordenSeccion){
+        CursoLocal cursoLocal = validarCampos(titulo, descripcionVar, descripcionEditText, precio, notaAprobacion, requiereExamen, modoVistaPrevia);
+        if (cursoLocal != null){
+            guardarLocalmente(cursoLocal);
+            if (navegarACrearSeccion){
+                mNavegarACrearSeccion.setValue(nombreArchivoBorrador);
+            }
+        }
     }
 
-    public void guardarCurso(String titulo, String descripcion, String precio, String notaAprobacion, boolean requiereExamen) {
+    public void guardarCurso(String titulo, String descripcionVar, String descripcionEditText, String precio, String notaAprobacion, boolean requiereExamen, boolean modoVistaPrevia) {
         //validar campos
-        CursoLocal cursoLocal = validarCampos(titulo, descripcion, precio, notaAprobacion, requiereExamen);
+        CursoLocal cursoLocal = validarCampos(titulo, descripcionVar, descripcionEditText, precio, notaAprobacion, requiereExamen, modoVistaPrevia);
+        if (cursoLocal == null) return;
+        if (cursoLocal.getSeccionLocalList() == null || cursoLocal.getSeccionLocalList().isEmpty()){
+            mErrorDeValidacion.setValue("El curso debe tener al menos una sección");
+            return;
+        }
 
         String token = SharedPreferencesUtil.leerToken(getApplication());
 
@@ -215,7 +297,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
             MultipartBody.Part videoPart = null;
             File video;
             if (seccionLocal.getVideoUri() != null) {
-                video = copiarUriAFile(Uri.parse(seccionLocal.getVideoUri()), "video", ".mp4");
+                video = leerVideoLocal(seccionLocal.getVideoUri().substring(seccionLocal.getVideoUri().lastIndexOf("/") + 1));
 
                 RequestBody videoField = RequestBody.create(MediaType.parse("video/mp4"), video);
                 videoPart= MultipartBody.Part.createFormData("video", video.getName(), videoField);
@@ -225,9 +307,11 @@ public class CrearCursoViewModel extends AndroidViewModel {
             List<MultipartBody.Part> archivosPart = new ArrayList<>();
             if (seccionLocal.getMaterialesExtra() != null){
             for (MaterialExtra materialExtra : seccionLocal.getMaterialesExtra()) {
-                byte[] bytes = transformarArchivo(materialExtra.getUri());
-                String formato = getApplication().getContentResolver().getType(materialExtra.getUri());
-                RequestBody archivoBody = RequestBody.create(MediaType.parse(formato), bytes);
+                Uri uri = Uri.parse(materialExtra.getUri());
+                String uriString = uri.toString();
+                File archivo = leerVideoLocal(uriString.substring(uriString.lastIndexOf("/") + 1));
+                String formato = URLConnection.guessContentTypeFromName(archivo.getName());
+                RequestBody archivoBody = RequestBody.create(MediaType.parse(formato), archivo);
                 archivosPart.add(MultipartBody.Part.createFormData("materialExtra", materialExtra.getNombre(), archivoBody));
             }}
 
@@ -274,6 +358,14 @@ public class CrearCursoViewModel extends AndroidViewModel {
         }
     }
 
+    public File leerVideoLocal(String nombreVideo){
+        File file = new File(getApplication().getFilesDir(), nombreVideo);
+        if (file.exists()){
+            return file;
+        }else{
+            return null;
+        }
+    }
     public void leerLocal(String nombreArchivoBorrador){
         if (nombreArchivoBorrador != null){
             this.nombreArchivoBorrador = nombreArchivoBorrador;
@@ -327,6 +419,8 @@ public class CrearCursoViewModel extends AndroidViewModel {
         mActivarCheckRequiereExamen = null;
         mMostrarNotaInput = null;
         mOcultarNotaInput = null;
+        mError = null;
+        mErrorDeValidacion = null;
     }
 
     private File copiarUriAFile(Uri uri, String prefijo, String extencion) {
@@ -403,8 +497,8 @@ public class CrearCursoViewModel extends AndroidViewModel {
         if (arguments != null){
             nombreArchivoBorrador = arguments.getString("nombreArchivoBorrador");
             leerLocal(nombreArchivoBorrador);
-        }else{
-
+        }else if (nombreArchivoBorrador != null){
+            leerLocal(nombreArchivoBorrador);
         }
     }
 

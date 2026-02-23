@@ -14,9 +14,10 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Kiwdy">
+        android:theme="@style/Theme.Kiwdy.NoActionBar">
         <activity
             android:name=".ui.compartido.registro.RegistroActivity"
+            android:theme="@style/Theme.Kiwdy.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".ui.alumno.AlumnoActivity"

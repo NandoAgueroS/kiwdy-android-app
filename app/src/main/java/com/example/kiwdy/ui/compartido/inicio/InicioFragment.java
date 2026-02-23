@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import com.example.kiwdy.R;
 import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.databinding.FragmentInicioBinding;
+import com.example.kiwdy.ui.compartido.UIDialogs;
 
 import java.util.List;
 
@@ -42,6 +43,14 @@ public class InicioFragment extends Fragment {
                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.crearCursoFragment);
             }
         });
+
+        mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                UIDialogs.error(requireContext(), s);
+            }
+        });
+
 
         mViewModel.getmCursos().observe(getViewLifecycleOwner(), new Observer<List<CursoResponse>>() {
             @Override

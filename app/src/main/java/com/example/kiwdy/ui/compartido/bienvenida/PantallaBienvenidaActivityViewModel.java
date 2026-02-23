@@ -20,14 +20,24 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PantallaBienvenidaActivityViewModel extends AndroidViewModel {
+
+    private MutableLiveData<String> mError;
     private MutableLiveData<Boolean> mYaLogueadoInstructor;
     private MutableLiveData<Boolean> mYaLogueadoAlumno;
     private MutableLiveData<Boolean> mSesionInvalida;
     private MutableLiveData<Boolean> mSinToken;
 
+
     public PantallaBienvenidaActivityViewModel(@NonNull Application application) {
         super(application);
     }
+    public LiveData<String> getmError(){
+        if (mError == null) {
+            mError = new MutableLiveData<>();
+        }
+        return mError;
+    }
+
     public LiveData<Boolean> getmYaLogueadoInstructor(){
         if (mYaLogueadoInstructor == null) {
            mYaLogueadoInstructor = new MutableLiveData<>();
@@ -78,16 +88,15 @@ public class PantallaBienvenidaActivityViewModel extends AndroidViewModel {
                             }
                     } else if (response.code() == 401) {
                         sesionInvalida();
-                        Toast.makeText(getApplication(), "Sesión expirada", Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(getApplication(), "Error al iniciar sesión", Toast.LENGTH_LONG).show();
+                        mError.postValue("Ocurrió un error al verificar la sesión");
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    Log.d("API_ERROR", t.getMessage());
-                    Toast.makeText(getApplication(), "Error al iniciar sesión", Toast.LENGTH_LONG).show();
+                    mError.postValue("Ocurrió un error inesperado al verificar la sesión");
+                    Log.d("API_ERROR", "Error al verificar la sesión", t);
                 }
             });
         } else {

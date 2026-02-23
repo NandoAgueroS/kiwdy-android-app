@@ -29,12 +29,15 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.example.kiwdy.R;
 import com.example.kiwdy.databinding.FragmentCrearSeccionBinding;
 import com.example.kiwdy.model.MaterialExtra;
 import com.example.kiwdy.model.SeccionLocal;
+import com.example.kiwdy.ui.compartido.UIDialogs;
+import com.google.android.material.materialswitch.MaterialSwitch;
 
 import java.util.List;
 
@@ -63,7 +66,7 @@ public class CrearSeccionFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentCrearSeccionBinding.inflate(inflater, container, false);
-        mViewModel = new ViewModelProvider(requireActivity()).get(CrearSeccionViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(CrearSeccionViewModel.class);
 
         markwon = Markwon.create(requireContext());
         editor = MarkwonEditor.create(markwon);
@@ -72,13 +75,33 @@ public class CrearSeccionFragment extends Fragment {
 
         EditText etTituloSeccion = binding.etTituloSeccion;
         EditText etContenidoSeccion = binding.etContenidoSeccion;
+        TextView tvError = binding.tvErrorCrearSeccion;
         Button btGuardarSeccion = binding.btGuardarSeccion;
         Button btAgregarArchivo = binding.btAgregarArchivo;
         Button btAgregarVideo = binding.btAgregarVideo;
         VideoView vvSeccion = binding.vvSeccion;
         FrameLayout flVideoSeccion = binding.flVideoSeccion;
         RecyclerView rvMaterialesExtra = binding.rvMaterialesExtra;
-        Switch stVistaPreviaContenido = binding.stVistaPreviaContenidoSeccion;
+        MaterialSwitch stVistaPreviaContenido = binding.stVistaPreviaContenidoSeccion;
+
+        mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                UIDialogs.error(requireContext(), s);
+            }
+        });
+        mViewModel.getmErrorDeValidacion().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                UIDialogs.validacion(requireContext(), s);
+            }
+        });
+        mViewModel.getmMensaje().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                tvError.setText(s);
+            }
+        });
 
         abrirGaleria();
         abrirArchivos();
@@ -121,6 +144,8 @@ public class CrearSeccionFragment extends Fragment {
         mViewModel.getmSeccionAgregada().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
+                Bundle bundle = new Bundle();
+
                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigateUp();
                 mViewModel.limpiarMutables();
             }
@@ -166,7 +191,9 @@ public class CrearSeccionFragment extends Fragment {
             public void onClick(View v) {
                 mViewModel.guardarProgresoSeccion(
                         etTituloSeccion.getText().toString(),
-                        contenidoSeccionTextoPlano
+                        contenidoSeccionTextoPlano,
+                        etContenidoSeccion.getText().toString(),
+                        stVistaPreviaContenido.isChecked()
                 );
             }
         });

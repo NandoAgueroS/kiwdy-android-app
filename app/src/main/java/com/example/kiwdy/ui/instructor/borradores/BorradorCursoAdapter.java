@@ -26,7 +26,7 @@ import com.example.kiwdy.model.CursoLocal;
 
 import java.util.List;
 
-public class BorradorCursoAdapter extends RecyclerView.Adapter<BorradorCursoAdapter.CursoViewHolder>{
+public class BorradorCursoAdapter extends RecyclerView.Adapter<BorradorCursoAdapter.BorradorCursoViewHolder>{
 
     private List<CursoLocal> cursos;
     private Context context;
@@ -40,13 +40,13 @@ public class BorradorCursoAdapter extends RecyclerView.Adapter<BorradorCursoAdap
 
     @NonNull
     @Override
-    public CursoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public BorradorCursoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = layoutInflater.inflate(R.layout.item_curso_lista, parent, false);
-        return new CursoViewHolder(itemView);
+        return new BorradorCursoViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CursoViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BorradorCursoViewHolder holder, int position) {
         CursoLocal curso = cursos.get(position);
 
         holder.tvTituloCurso.setText(curso.getTitulo());
@@ -71,14 +71,14 @@ public class BorradorCursoAdapter extends RecyclerView.Adapter<BorradorCursoAdap
         return cursos.size();
     }
 
-    public class CursoViewHolder extends RecyclerView.ViewHolder{
+    public class BorradorCursoViewHolder extends RecyclerView.ViewHolder{
         View item;
         TextView tvTituloCurso;
         TextView tvDescripcionCurso;
         ImageView ivPortadaCurso;
         ImageButton btVerInscriptos;
 
-        public CursoViewHolder(@NonNull View itemView) {
+        public BorradorCursoViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTituloCurso = itemView.findViewById(R.id.tvAlumnoExamenItem);
             tvDescripcionCurso = itemView.findViewById(R.id.tvDescripcionCursoItem);

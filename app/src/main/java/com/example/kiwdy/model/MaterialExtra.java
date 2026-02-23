@@ -6,12 +6,12 @@ import java.io.Serializable;
 
 public class MaterialExtra implements Serializable {
     private String nombre;
-    private Uri uri;
+    private String uri;
 
     public MaterialExtra() {
     }
 
-    public MaterialExtra(String nombre, Uri uri) {
+    public MaterialExtra(String nombre, String uri) {
         this.nombre = nombre;
         this.uri = uri;
     }
@@ -24,11 +24,11 @@ public class MaterialExtra implements Serializable {
         this.nombre = nombre;
     }
 
-    public Uri getUri() {
+    public String getUri() {
         return uri;
     }
 
-    public void setUri(Uri uri) {
+    public void setUri(String uri) {
         this.uri = uri;
     }
 }

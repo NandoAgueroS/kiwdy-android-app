@@ -1,6 +1,7 @@
 package com.example.kiwdy.ui.compartido.inicio;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -21,12 +22,20 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class InicioViewModel extends AndroidViewModel {
+    private MutableLiveData<String> mError;
+
     private MutableLiveData<List<CursoResponse>> mCursos;
     private MutableLiveData<Boolean> mAlumnoNavigation;
     private MutableLiveData<Boolean> mInstructorNavigation;
 
     public InicioViewModel(@NonNull Application application) {
         super(application);
+    }
+    public LiveData<String> getmError(){
+        if (mError == null) {
+            mError = new MutableLiveData<>();
+        }
+        return mError;
     }
 
     public LiveData<List<CursoResponse>> getmCursos(){
@@ -59,13 +68,15 @@ public class InicioViewModel extends AndroidViewModel {
             public void onResponse(Call<List<CursoResponse>> call, Response<List<CursoResponse>> response) {
                 if (response.isSuccessful()){
                     mCursos.setValue(response.body());
+                }else{
+                    mError.postValue("Ocurrió un error al recuperar los cursos");
                 }
-
             }
 
             @Override
             public void onFailure(Call<List<CursoResponse>> call, Throwable t) {
-
+                mError.postValue("Ocurrió un error inesperado al recuperar los cursos");
+                Log.d("API_ERROR", "Error al recuperar los cursos", t);
             }
         });
     }

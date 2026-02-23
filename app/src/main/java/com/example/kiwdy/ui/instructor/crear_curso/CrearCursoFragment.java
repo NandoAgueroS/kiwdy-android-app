@@ -32,11 +32,14 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.example.kiwdy.R;
 import com.example.kiwdy.databinding.FragmentCrearCursoBinding;
 import com.example.kiwdy.model.CursoLocal;
+import com.example.kiwdy.ui.compartido.UIDialogs;
 import com.example.kiwdy.ui.instructor.InstructorMainActivity;
+import com.google.android.material.materialswitch.MaterialSwitch;
 
 import io.noties.markwon.Markwon;
 import io.noties.markwon.editor.MarkwonEditor;
@@ -60,7 +63,7 @@ public class CrearCursoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(requireActivity()).get(CrearCursoViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(CrearCursoViewModel.class);
         binding = FragmentCrearCursoBinding.inflate(inflater, container, false);
 
         markwon = Markwon.create(requireContext());
@@ -72,12 +75,32 @@ public class CrearCursoFragment extends Fragment {
         EditText etDescripcion = binding.etDescripcion;
         EditText etPrecio = binding.etPrecio;
         EditText etNotaAprobacion = binding.etNotaAprobacion;
+        TextView tvError = binding.tvErrorCrearCurso;
         CheckBox cbRequiereExamen = binding.cbRequiereExamen;
         ImageView ivCurso = binding.ivCurso;
-        Switch stVistaPreviaDescripcion = binding.stVistaPreviaDescripcionCurso;
+        MaterialSwitch stVistaPreviaDescripcion = binding.stVistaPreviaDescripcionCurso;
         Button btAgregarSeccion = binding.btAgregarSeccion;
         Button btGuardarCurso = binding.btGuardarCurso;
         RecyclerView rvSecciones = binding.rvSecciones;
+
+        mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                UIDialogs.error(requireContext(), s);
+            }
+        });
+        mViewModel.getmErrorDeValidacion().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                UIDialogs.validacion(requireContext(), s);
+            }
+        });
+        mViewModel.getmMensaje().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                tvError.setText(s);
+            }
+        });
 
         abrirGaleria();
         ivCurso.setOnClickListener(new View.OnClickListener() {
@@ -100,9 +123,11 @@ public class CrearCursoFragment extends Fragment {
                 mViewModel.guardarCurso(
                         etTitulo.getText().toString(),
                         descripcionTextoPlano,
+                        etDescripcion.getText().toString(),
                         etPrecio.getText().toString(),
                         etNotaAprobacion.getText().toString(),
-                        cbRequiereExamen.isChecked()
+                        cbRequiereExamen.isChecked(),
+                        stVistaPreviaDescripcion.isChecked()
                 );
             }
         });
@@ -144,12 +169,15 @@ public class CrearCursoFragment extends Fragment {
             public void onClick(View v) {
                 mViewModel.guardarProgresoCurso(
                         etTitulo.getText().toString(),
+                        descripcionTextoPlano,
                         etDescripcion.getText().toString(),
                         etPrecio.getText().toString(),
                         etNotaAprobacion.getText().toString(),
-                        cbRequiereExamen.isChecked()
+                        cbRequiereExamen.isChecked(),
+                        stVistaPreviaDescripcion.isChecked(),
+                        true,
+                -1
                 );
-                mViewModel.navegarAFragmentCrearSeccion();
             }
         });
         mViewModel.getmMostrarNotaInput().observe(getViewLifecycleOwner(), new Observer<Double>() {
@@ -234,5 +262,11 @@ public class CrearCursoFragment extends Fragment {
         super.onDestroyView();
         binding = null;
         //InstructorMainActivity.seccionesLocal.clear();
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        mViewModel.cargarBorrador(getArguments());
     }
 }

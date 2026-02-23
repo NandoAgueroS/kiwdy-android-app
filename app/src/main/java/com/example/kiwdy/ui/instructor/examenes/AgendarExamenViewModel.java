@@ -28,6 +28,7 @@ import retrofit2.Response;
 public class AgendarExamenViewModel extends AndroidViewModel {
     private MutableLiveData<String> mError;
     private MutableLiveData<String> mErrorDeValidacion;
+    private MutableLiveData<String> mMensaje;
     private MutableLiveData<ExamenResponse> mExamenAgendado;
     private MutableLiveData<InscripcionResponse> mInscripcion;
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -49,6 +50,13 @@ public class AgendarExamenViewModel extends AndroidViewModel {
             mErrorDeValidacion = new MutableLiveData<>();
         }
         return mErrorDeValidacion;
+    }
+
+    public LiveData<String> getmMensaje(){
+        if (mMensaje == null) {
+            mMensaje = new MutableLiveData<>();
+        }
+        return mMensaje;
     }
 
     public LiveData<ExamenResponse> getmExamenAgendado() {
@@ -77,7 +85,8 @@ public class AgendarExamenViewModel extends AndroidViewModel {
     public void agendar(String modalidad, String fecha, String hora, String linkODireccion){
         String token = SharedPreferencesUtil.leerToken(getApplication());
         
-        CrearExamenRequest examen = construirExamen(modalidad, fecha, hora, linkODireccion);
+        CrearExamenRequest examen = validarCampos(modalidad, fecha, hora, linkODireccion);
+        if (examen == null) return;
 
         Call<ExamenResponse> crearExamenCall = ApiClient.getExamenesService().crear(token, examen);
         crearExamenCall.enqueue(new Callback<ExamenResponse>() {
@@ -100,14 +109,13 @@ public class AgendarExamenViewModel extends AndroidViewModel {
         });
     }
 
-    private CrearExamenRequest construirExamen(String modalidad, String fecha, String hora, String linkODireccion) {
+    private CrearExamenRequest validarCampos(String modalidad, String fecha, String hora, String linkODireccion) {
         int modalidadCodigo = -1;
-        LocalDateTime fechaYHora;
+        LocalDateTime fechaYHora = null;
+        boolean valido = true;
+        StringBuilder errores = new StringBuilder();
        try{
            modalidadCodigo = Integer.parseInt(modalidad);
-           fechaYHora = LocalDateTime.of(
-                   LocalDate.parse(fecha, dateFormatter),
-                   LocalTime.parse(hora, timeFormatter));
        } catch (NumberFormatException e) {
            mError.setValue("Ocurrió un error al obtener la modalidad");
            return null;
@@ -115,32 +123,56 @@ public class AgendarExamenViewModel extends AndroidViewModel {
            mError.setValue("Ocurrió un error inesperado");
            return null;
        }
-
-       StringBuilder errores = new StringBuilder();
-
-       if (!(Modalidad.PRESENCIAL.getCodigo() == modalidadCodigo || Modalidad.VIRTUAL.getCodigo() == modalidadCodigo)){
-           mError.setValue("Error al obtener la modalidad");
-       }
-       if (fecha.isBlank()){
-           errores.append("Tiene que seleccionar una fecha");
-       }
+        if (fecha.isBlank()){
+            errores.append("Tiene que ingresar una fecha \n");
+            valido = false;
+        }
         if (hora.isBlank()){
-            errores.append("Tiene que seleccionar una hora");
+            errores.append("Tiene que ingresar una hora \n");
+            valido = false;
         }
+       try{
+           if (!fecha.isBlank() && !hora.isBlank()) {
+               fechaYHora = LocalDateTime.of(
+                       LocalDate.parse(fecha, dateFormatter),
+                       LocalTime.parse(hora, timeFormatter));
+           }
+
+       } catch (Exception e) {
+           mError.setValue("Ocurrió un error al recuperar la fecha y hora");
+           valido = false;
+       }
+
+
+        if (fechaYHora != null && fechaYHora.isBefore(LocalDateTime.now())){
+            errores.append("La fecha y hora debe ser posterior a la actual \n");
+            valido = false;
+        }
+       if (!(Modalidad.PRESENCIAL.getCodigo() == modalidadCodigo || Modalidad.VIRTUAL.getCodigo() == modalidadCodigo)){
+           mError.setValue("Error al obtener la modalidad \n");
+           valido = false;
+       }
         if (linkODireccion.isBlank()){
-            errores.append("Tiene que ingresar un link o direccion");
+            errores.append("Tiene que ingresar un link o direccion \n");
+            valido = false;
+        }
+        if (!valido){
+            mMensaje.setValue(errores.toString());
+            mErrorDeValidacion.setValue("Dátos inválidos, revise los campos e intente nuevamente");
+            return null;
+        }else{
+            CrearExamenRequest examen = new CrearExamenRequest();
+            examen.setModalidad(modalidadCodigo);
+            Modalidad modalidadEnum = Modalidad.fromCodigo(modalidadCodigo);
+            switch (modalidadEnum){
+                case VIRTUAL: examen.setLink(linkODireccion);
+                    break;
+                case PRESENCIAL: examen.setDireccion(linkODireccion);
+            }
+            examen.setFechaYHora(fechaYHora);
+            examen.setIdInscripcion(mInscripcion.getValue().getIdInscripcion());
+            return examen;
         }
 
-        CrearExamenRequest examen = new CrearExamenRequest();
-        examen.setModalidad(modalidadCodigo);
-        Modalidad modalidadEnum = Modalidad.fromCodigo(modalidadCodigo);
-        switch (modalidadEnum){
-            case VIRTUAL: examen.setLink(linkODireccion);
-            break;
-            case PRESENCIAL: examen.setDireccion(linkODireccion);
-        }
-        examen.setFechaYHora(fechaYHora);
-        examen.setIdInscripcion(mInscripcion.getValue().getIdInscripcion());
-        return examen;
     }
 }

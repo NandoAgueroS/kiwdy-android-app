@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import com.example.kiwdy.R;
 import com.example.kiwdy.databinding.FragmentBorradoresBinding;
 import com.example.kiwdy.model.CursoLocal;
+import com.example.kiwdy.ui.compartido.UIDialogs;
 
 import java.util.List;
 
@@ -34,6 +35,13 @@ public class BorradoresFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(this).get(BorradoresViewModel.class);
         binding = FragmentBorradoresBinding.inflate(inflater, container, false);
+
+        mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                UIDialogs.error(requireContext(), s);
+            }
+        });
 
         mViewModel.getmBorradores().observe(getViewLifecycleOwner(), new Observer<List<CursoLocal>>() {
             @Override
