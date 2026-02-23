@@ -2,7 +2,9 @@ package com.example.kiwdy.model;
 
 import android.net.Uri;
 
-public class MaterialExtra {
+import java.io.Serializable;
+
+public class MaterialExtra implements Serializable {
     private String nombre;
     private Uri uri;
 

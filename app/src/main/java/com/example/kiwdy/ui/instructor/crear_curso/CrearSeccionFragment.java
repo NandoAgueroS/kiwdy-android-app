@@ -16,18 +16,25 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.MediaController;
+import android.widget.Switch;
 import android.widget.VideoView;
 
 import com.example.kiwdy.R;
 import com.example.kiwdy.databinding.FragmentCrearSeccionBinding;
 import com.example.kiwdy.model.MaterialExtra;
+import com.example.kiwdy.model.SeccionLocal;
 
 import java.util.List;
 
@@ -37,7 +44,7 @@ import io.noties.markwon.editor.MarkwonEditorTextWatcher;
 
 public class CrearSeccionFragment extends Fragment {
 
-    private CrearCursoViewModel mViewModel;
+    private CrearSeccionViewModel mViewModel;
     private FragmentCrearSeccionBinding binding;
     private ActivityResultLauncher<Intent> arlVideo;
     private ActivityResultLauncher<Intent> arlArchivo;
@@ -45,6 +52,7 @@ public class CrearSeccionFragment extends Fragment {
     private Intent intentArchivo;
     private Markwon markwon;
     private MarkwonEditor editor;
+    private String contenidoSeccionTextoPlano;
 
 
     public static CrearSeccionFragment newInstance() {
@@ -55,24 +63,34 @@ public class CrearSeccionFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentCrearSeccionBinding.inflate(inflater, container, false);
-        mViewModel = new ViewModelProvider(requireActivity()).get(CrearCursoViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(CrearSeccionViewModel.class);
 
         markwon = Markwon.create(requireContext());
         editor = MarkwonEditor.create(markwon);
 
         binding.etContenidoSeccion.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(editor));
 
+        EditText etTituloSeccion = binding.etTituloSeccion;
+        EditText etContenidoSeccion = binding.etContenidoSeccion;
+        Button btGuardarSeccion = binding.btGuardarSeccion;
+        Button btAgregarArchivo = binding.btAgregarArchivo;
+        Button btAgregarVideo = binding.btAgregarVideo;
+        VideoView vvSeccion = binding.vvSeccion;
+        FrameLayout flVideoSeccion = binding.flVideoSeccion;
+        RecyclerView rvMaterialesExtra = binding.rvMaterialesExtra;
+        Switch stVistaPreviaContenido = binding.stVistaPreviaContenidoSeccion;
+
         abrirGaleria();
         abrirArchivos();
 
-        binding.btAgregarVideo.setOnClickListener(new View.OnClickListener() {
+        btAgregarVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 arlVideo.launch(intentVideo);
             }
         });
 
-        binding.btAgregarArchivo.setOnClickListener(new View.OnClickListener() {
+        btAgregarArchivo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 arlArchivo.launch(intentArchivo);
@@ -82,14 +100,13 @@ public class CrearSeccionFragment extends Fragment {
         mViewModel.getmVideoUri().observe(getViewLifecycleOwner(), new Observer<Uri>() {
             @Override
             public void onChanged(Uri uri) {
-                VideoView videoView = binding.vvSeccion;
                 MediaController mediaController = new MediaController(requireContext());
-                mediaController.setAnchorView(videoView);
-                videoView.setMediaController(mediaController);
-                videoView.setVideoURI(uri);
-                binding.flVideoSeccion.setVisibility(View.VISIBLE);
-                videoView.start();
-                binding.btAgregarVideo.setText("Cambiar video");
+                mediaController.setAnchorView(vvSeccion);
+                vvSeccion.setMediaController(mediaController);
+                vvSeccion.setVideoURI(uri);
+                flVideoSeccion.setVisibility(View.VISIBLE);
+                vvSeccion.start();
+                btAgregarVideo.setText("Cambiar video");
             }
         });
         mViewModel.getmMaterialesExtra().observe(getViewLifecycleOwner(), new Observer<List<MaterialExtra>>() {
@@ -97,25 +114,67 @@ public class CrearSeccionFragment extends Fragment {
             public void onChanged(List<MaterialExtra> materialesExtra) {
                 MaterialExtraAdapter adapter = new MaterialExtraAdapter(materialesExtra, requireContext(), getLayoutInflater());
                 GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false);
-                binding.rvMaterialesExtra.setLayoutManager(gridLayoutManager);
-                binding.rvMaterialesExtra.setAdapter(adapter);
+                rvMaterialesExtra.setLayoutManager(gridLayoutManager);
+                rvMaterialesExtra.setAdapter(adapter);
             }
         });
         mViewModel.getmSeccionAgregada().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigateUp();
+                mViewModel.limpiarMutables();
             }
         });
-        binding.btGuardarSeccion.setOnClickListener(new View.OnClickListener() {
+        mViewModel.getmSeccionLocal().observe(getViewLifecycleOwner(), new Observer<SeccionLocal>() {
+            @Override
+            public void onChanged(SeccionLocal seccionLocal) {
+                etContenidoSeccion.setText(seccionLocal.getContenido());
+                contenidoSeccionTextoPlano = seccionLocal.getContenido();
+                etTituloSeccion.setText(seccionLocal.getTitulo());
+            }
+        });
+
+        mViewModel.getmMostrarVistaPrevia().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                contenidoSeccionTextoPlano = etContenidoSeccion.getText().toString();
+                markwon.setMarkdown(etContenidoSeccion, etContenidoSeccion.getText().toString());
+                etContenidoSeccion.setFocusable(false);
+                etContenidoSeccion.setFocusableInTouchMode(false);
+                etContenidoSeccion.setClickable(true);
+            }
+        });
+        mViewModel.getmOcultarVistaPrevia().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                etContenidoSeccion.setText(contenidoSeccionTextoPlano);
+                etContenidoSeccion.setFocusable(true);
+                etContenidoSeccion.setFocusableInTouchMode(true);
+            }
+        });
+
+        stVistaPreviaContenido.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
+                mViewModel.alternarVistaPreviaDescripcion(isChecked);
+            }
+        });
+
+
+        btGuardarSeccion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mViewModel.guardarProgresoSeccion(
-                        binding.etTituloSeccion.getText().toString(),
-                        binding.etContenidoSeccion.getText().toString()
+                        etTituloSeccion.getText().toString(),
+                        contenidoSeccionTextoPlano
                 );
             }
         });
+
+        mViewModel.recuperarCurso(getArguments());
+
+        etContenidoSeccion.setFocusable(true);
+        etContenidoSeccion.setFocusableInTouchMode(true);
         return binding.getRoot();
     }
     private void abrirGaleria() {

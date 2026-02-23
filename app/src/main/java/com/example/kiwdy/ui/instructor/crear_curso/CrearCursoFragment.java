@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,10 +20,18 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Switch;
 
 import com.example.kiwdy.R;
 import com.example.kiwdy.databinding.FragmentCrearCursoBinding;
@@ -41,6 +50,7 @@ public class CrearCursoFragment extends Fragment {
     private Intent intent;
     private Markwon markwon;
     private MarkwonEditor editor;
+    private String descripcionTextoPlano;
 
 
     public static CrearCursoFragment newInstance() {
@@ -58,8 +68,19 @@ public class CrearCursoFragment extends Fragment {
 
         binding.etDescripcion.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(editor));
 
+        EditText etTitulo= binding.etTitulo;
+        EditText etDescripcion = binding.etDescripcion;
+        EditText etPrecio = binding.etPrecio;
+        EditText etNotaAprobacion = binding.etNotaAprobacion;
+        CheckBox cbRequiereExamen = binding.cbRequiereExamen;
+        ImageView ivCurso = binding.ivCurso;
+        Switch stVistaPreviaDescripcion = binding.stVistaPreviaDescripcionCurso;
+        Button btAgregarSeccion = binding.btAgregarSeccion;
+        Button btGuardarCurso = binding.btGuardarCurso;
+        RecyclerView rvSecciones = binding.rvSecciones;
+
         abrirGaleria();
-        binding.btAgregarImagen.setOnClickListener(new View.OnClickListener() {
+        ivCurso.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 arl.launch(intent);
@@ -68,19 +89,20 @@ public class CrearCursoFragment extends Fragment {
         mViewModel.getmImagenUri().observe(getViewLifecycleOwner(), new Observer<Uri>() {
             @Override
             public void onChanged(Uri uri) {
-                binding.ivCurso.setImageURI(uri);
-                binding.ivCurso.setVisibility(View.VISIBLE);
+                ivCurso.setImageURI(uri);
+                ivCurso.setVisibility(View.VISIBLE);
             }
         });
 
-        binding.btGuardarCurso.setOnClickListener(new View.OnClickListener() {
+        btGuardarCurso.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mViewModel.guardarCurso(
-                        binding.etTitulo.getText().toString(),
-                        binding.etDescripcion.getText().toString(),
-                        binding.etPrecio.getText().toString(),
-                        binding.etNotaAprobacion.getText().toString()
+                        etTitulo.getText().toString(),
+                        descripcionTextoPlano,
+                        etPrecio.getText().toString(),
+                        etNotaAprobacion.getText().toString(),
+                        cbRequiereExamen.isChecked()
                 );
             }
         });
@@ -89,50 +111,108 @@ public class CrearCursoFragment extends Fragment {
             @Override
             public void onChanged(CursoLocal cursoLocal) {
 
-                binding.etTitulo.setText(cursoLocal.getTitulo());
-                binding.etDescripcion.setText(cursoLocal.getDescripcion());
-                RecyclerView.Adapter adapter = new SeccionResumenAdapter(cursoLocal.getSeccionLocalList(), getContext(), inflater);
+                etTitulo.setText(cursoLocal.getTitulo());
+                etDescripcion.setText(cursoLocal.getDescripcion());
+                descripcionTextoPlano = cursoLocal.getDescripcion();
+                etPrecio.setText(cursoLocal.getPrecio() + "");
+                RecyclerView.Adapter adapter = new SeccionResumenAdapter(cursoLocal.getSeccionLocalList(), getContext(), inflater, new SeccionResumenAdapter.OnClickListener() {
+                    @Override
+                    public void onClick(int orden) {
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("orden", orden);
+                        bundle.putString("nombreArchivoBorrador", cursoLocal.getNombreArchivoBorrador());
+                        Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.crearSeccionFragment, bundle);
+                    }
+                });
                 GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1,GridLayoutManager.VERTICAL,false);
-                binding.rvSecciones.setLayoutManager(gridLayoutManager);
-                binding.rvSecciones.setAdapter(adapter);
+                rvSecciones.setLayoutManager(gridLayoutManager);
+                rvSecciones.setAdapter(adapter);
+            }
+        });
+        mViewModel.getmNavegarACrearSeccion().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("nombreArchivoBorrador", s);
+                Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.crearSeccionFragment, bundle);
+                mViewModel.limpiarMutables();
             }
         });
 
-        binding.btAgregarSeccion.setOnClickListener(new View.OnClickListener() {
+        btAgregarSeccion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mViewModel.guardarProgresoCurso(
-                        binding.etTitulo.getText().toString(),
-                        binding.etDescripcion.getText().toString(),
-                        binding.etPrecio.getText().toString(),
-                        binding.etNotaAprobacion.getText().toString()
+                        etTitulo.getText().toString(),
+                        etDescripcion.getText().toString(),
+                        etPrecio.getText().toString(),
+                        etNotaAprobacion.getText().toString(),
+                        cbRequiereExamen.isChecked()
                 );
-                Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.crearSeccionFragment);
+                mViewModel.navegarAFragmentCrearSeccion();
             }
         });
         mViewModel.getmMostrarNotaInput().observe(getViewLifecycleOwner(), new Observer<Double>() {
             @Override
             public void onChanged(Double aDouble) {
-                binding.etNotaAprobacion.setVisibility(View.VISIBLE);
-                binding.etNotaAprobacion.setText(String.valueOf(aDouble));
+                etNotaAprobacion.setVisibility(View.VISIBLE);
+                etNotaAprobacion.setText(String.valueOf(aDouble));
             }
         });
 
         mViewModel.getmOcultarNotaInput().observe(getViewLifecycleOwner(), new Observer<Double>() {
             @Override
             public void onChanged(Double aDouble) {
-                binding.etNotaAprobacion.setVisibility(View.GONE);
-                binding.etNotaAprobacion.setText(String.valueOf(aDouble));
+                etNotaAprobacion.setVisibility(View.GONE);
+                etNotaAprobacion.setText(String.valueOf(aDouble));
             }
         });
 
-        binding.cbRequiereExamen.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mViewModel.getmMostrarVistaPrevia().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                descripcionTextoPlano = etDescripcion.getText().toString();
+                markwon.setMarkdown(etDescripcion, etDescripcion.getText().toString());
+                etDescripcion.setFocusable(false);
+                etDescripcion.setFocusableInTouchMode(false);
+                etDescripcion.setClickable(true);
+            }
+        });
+
+        mViewModel.getmOcultarVistaPrevia().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                etDescripcion.setText(descripcionTextoPlano);
+                etDescripcion.setFocusable(true);
+                etDescripcion.setFocusableInTouchMode(true);
+            }
+        });
+
+        mViewModel.getmActivarCheckRequiereExamen().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                cbRequiereExamen.setChecked(true);
+            }
+        });
+
+        cbRequiereExamen.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
                 mViewModel.mostrarNotaAprobacionInput(isChecked);
             }
         });
-        mViewModel.restaurarCurso(getArguments());
+        stVistaPreviaDescripcion.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
+                mViewModel.alternarVistaPreviaDescripcion(isChecked);
+            }
+        });
+        //mViewModel.restaurarCurso(getArguments());
+        mViewModel.cargarBorrador(getArguments());
+
+        etDescripcion.setFocusable(true);
+        etDescripcion.setFocusableInTouchMode(true);
+
         return binding.getRoot();
     }
 

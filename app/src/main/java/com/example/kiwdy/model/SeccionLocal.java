@@ -4,10 +4,11 @@ import android.net.Uri;
 
 import com.example.kiwdy.api.dto.request.CrearSeccionRequest;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SeccionLocal {
+public class SeccionLocal implements Serializable {
 
     private int idSeccion;
 
@@ -17,7 +18,7 @@ public class SeccionLocal {
 
     private int orden;
 
-    private Uri videoUri;
+    private String videoUri;
     private String videoUrl;
 
     private List<MaterialExtra> materialesExtra = new LinkedList<>();
@@ -25,7 +26,7 @@ public class SeccionLocal {
     public SeccionLocal() {
     }
 
-    public SeccionLocal(int idSeccion, String titulo, String contenido, int orden, Uri videoUri, List<MaterialExtra> materialesExtra) {
+    public SeccionLocal(int idSeccion, String titulo, String contenido, int orden, String videoUri, List<MaterialExtra> materialesExtra) {
         this.idSeccion = idSeccion;
         this.titulo = titulo;
         this.contenido = contenido;
@@ -66,11 +67,11 @@ public class SeccionLocal {
         this.contenido = contenido;
     }
 
-    public Uri getVideoUri() {
+    public String getVideoUri() {
         return videoUri;
     }
 
-    public void setVideoUri(Uri videoUri) {
+    public void setVideoUri(String videoUri) {
         this.videoUri = videoUri;
     }
 

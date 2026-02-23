@@ -102,4 +102,9 @@
         android:name="com.example.kiwdy.ui.compartido.examenes.ExamenesFragment"
         android:label="Agenda de exámenes"
         tools:layout="@layout/fragment_examenes" />
+    <fragment
+        android:id="@+id/nav_borradores"
+        android:name="com.example.kiwdy.ui.instructor.borradores.BorradoresFragment"
+        android:label="fragment_borradores"
+        tools:layout="@layout/fragment_borradores" />
 </navigation>

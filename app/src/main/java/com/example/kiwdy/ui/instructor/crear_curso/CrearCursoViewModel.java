@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -23,15 +24,19 @@ import com.example.kiwdy.api.ApiClient;
 import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.api.dto.response.SeccionResponse;
 import com.example.kiwdy.api.service.SeccionesService;
+import com.example.kiwdy.api.utils.JwtUtil;
 import com.example.kiwdy.api.utils.SharedPreferencesUtil;
 import com.example.kiwdy.model.CursoLocal;
 import com.example.kiwdy.model.MaterialExtra;
 import com.example.kiwdy.model.SeccionLocal;
+import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -48,23 +53,20 @@ import retrofit2.Response;
 
 public class CrearCursoViewModel extends AndroidViewModel {
 
-    private MutableLiveData<Integer> mIdCurso;
     private MutableLiveData<CursoLocal> mCursoLocal;
     private MutableLiveData<Boolean> mSeccionAgregada = new MutableLiveData<>();
-    private MutableLiveData<Uri> mVideoUri;
+    private MutableLiveData<String> mNavegarACrearSeccion;
     private MutableLiveData<Uri> mImagenUri;
-    private MutableLiveData<List<MaterialExtra>> mMaterialesExtra;
-    private List<MaterialExtra> materialesExtra = new LinkedList<>();
     private MutableLiveData<Double> mMostrarNotaInput;
     private MutableLiveData<Double> mOcultarNotaInput;
+    private MutableLiveData<Boolean> mActivarCheckRequiereExamen;
+    private MutableLiveData<Boolean> mMostrarVistaPrevia;
+    private MutableLiveData<Boolean> mOcultarVistaPrevia;
+    private String nombreArchivoBorrador;
+    private boolean guardadoExitoso = true;
 
     public CrearCursoViewModel(@NonNull Application application) {
         super(application);
-    }
-
-    public LiveData<Integer> getmIdCurso() {
-        if(mIdCurso == null) mIdCurso = new MutableLiveData<>();
-        return mIdCurso;
     }
 
     public LiveData<CursoLocal> getmCursoLocal(){
@@ -72,14 +74,11 @@ public class CrearCursoViewModel extends AndroidViewModel {
         return mCursoLocal;
     }
 
-    public LiveData<Boolean> getmSeccionAgregada() {
-        if (mSeccionAgregada == null) mSeccionAgregada = new MutableLiveData<>();
-        return mSeccionAgregada;
-    }
-
-    public LiveData<Uri> getmVideoUri() {
-        if (mVideoUri== null) mVideoUri= new MutableLiveData<>();
-        return mVideoUri;
+    public LiveData<String> getmNavegarACrearSeccion(){
+        if (mNavegarACrearSeccion == null) {
+            mNavegarACrearSeccion = new MutableLiveData<>();
+        }
+        return mNavegarACrearSeccion;
     }
 
     public LiveData<Uri> getmImagenUri() {
@@ -87,10 +86,6 @@ public class CrearCursoViewModel extends AndroidViewModel {
         return mImagenUri;
     }
 
-    public LiveData<List<MaterialExtra>> getmMaterialesExtra() {
-        if (mMaterialesExtra== null) mMaterialesExtra= new MutableLiveData<>();
-        return mMaterialesExtra;
-    }
     public LiveData<Double> getmMostrarNotaInput(){
         if (mMostrarNotaInput == null) {
             mMostrarNotaInput = new MutableLiveData<>();
@@ -104,6 +99,26 @@ public class CrearCursoViewModel extends AndroidViewModel {
         }
         return mOcultarNotaInput;
     }
+    public LiveData<Boolean> getmActivarCheckRequiereExamen(){
+        if (mActivarCheckRequiereExamen == null) {
+            mActivarCheckRequiereExamen = new MutableLiveData<>();
+        }
+        return mActivarCheckRequiereExamen;
+    }
+
+    public LiveData<Boolean> getmMostrarVistaPrevia(){
+        if (mMostrarVistaPrevia == null) {
+            mMostrarVistaPrevia = new MutableLiveData<>();
+        }
+        return mMostrarVistaPrevia;
+    }
+
+    public LiveData<Boolean> getmOcultarVistaPrevia(){
+        if (mOcultarVistaPrevia == null) {
+            mOcultarVistaPrevia = new MutableLiveData<>();
+        }
+        return mOcultarVistaPrevia;
+    }
 
     public void mostrarNotaAprobacionInput(boolean checked){
         if (checked){
@@ -116,28 +131,39 @@ public class CrearCursoViewModel extends AndroidViewModel {
             mOcultarNotaInput.setValue(-1.0);
         }
     }
-    public CursoLocal validarCampos(String titulo, String descripcion, String precio, String notaAprobacion){
+
+    public void navegarAFragmentCrearSeccion(){
+        mNavegarACrearSeccion.setValue(mCursoLocal.getValue().getNombreArchivoBorrador());
+    }
+    public CursoLocal validarCampos(String titulo, String descripcion, String precio, String notaAprobacion, boolean requiereExamen){
         if(mCursoLocal.getValue() == null) mCursoLocal.setValue(new CursoLocal());
         CursoLocal cursoLocal = mCursoLocal.getValue();
         cursoLocal.setTitulo(titulo);
         cursoLocal.setDescripcion(descripcion);
+        cursoLocal.setPortadaUri(mImagenUri.getValue().toString());
         try{
             float precioFloat = Float.parseFloat(precio);
-            double notaDouble = Double.parseDouble(notaAprobacion);
+            if (requiereExamen) {
+                double notaDouble = Double.parseDouble(notaAprobacion);
+                cursoLocal.setNotaAprobacion(notaDouble);
+            }else{
+                cursoLocal.setNotaAprobacion(-1);
+            }
+            cursoLocal.setRequiereExamen(requiereExamen);
             cursoLocal.setPrecio(precioFloat);
-            cursoLocal.setNotaAprobacion(notaDouble);
         }catch (NumberFormatException e){
             e.printStackTrace();
         }
         return cursoLocal;
     }
-    public void guardarProgresoCurso(String titulo, String descripcion, String precio, String notaAprobacion){
 
-        validarCampos(titulo, descripcion, precio, notaAprobacion);
+    public void guardarProgresoCurso(String titulo, String descripcion, String precio, String notaAprobacion, boolean requiereExamen){
+        guardarLocalmente(validarCampos(titulo, descripcion, precio, notaAprobacion, requiereExamen));
     }
-    public void guardarCurso(String titulo, String descripcion, String precio, String notaAprobacion) {
+
+    public void guardarCurso(String titulo, String descripcion, String precio, String notaAprobacion, boolean requiereExamen) {
         //validar campos
-        CursoLocal cursoLocal = validarCampos(titulo, descripcion, precio, notaAprobacion);
+        CursoLocal cursoLocal = validarCampos(titulo, descripcion, precio, notaAprobacion, requiereExamen);
 
         String token = SharedPreferencesUtil.leerToken(getApplication());
 
@@ -161,6 +187,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
                     guardarSecciones(response.body().getIdCurso());
                 }else{
                     Toast.makeText(getApplication(),"Error al crear el curso", Toast.LENGTH_LONG).show();
+                    guardadoExitoso = false;
                 }
             }
 
@@ -168,6 +195,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
             public void onFailure(Call<CursoResponse> call, Throwable t) {
                 Log.d("API_ERROR", t.getMessage());
                 Toast.makeText(getApplication(),"Error en el servidor", Toast.LENGTH_LONG).show();
+                guardadoExitoso = false;
             }
         });
 
@@ -187,7 +215,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
             MultipartBody.Part videoPart = null;
             File video;
             if (seccionLocal.getVideoUri() != null) {
-                video = copiarUriAFile(seccionLocal.getVideoUri());
+                video = copiarUriAFile(Uri.parse(seccionLocal.getVideoUri()), "video", ".mp4");
 
                 RequestBody videoField = RequestBody.create(MediaType.parse("video/mp4"), video);
                 videoPart= MultipartBody.Part.createFormData("video", video.getName(), videoField);
@@ -213,6 +241,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
                             video.delete();
                         }
                     }else{
+                        guardadoExitoso = false;
                         try {
                             Toast.makeText(getApplication(),"Error al crear el curso", Toast.LENGTH_LONG).show();
                             Log.d("API_ERROR", response.errorBody().string());
@@ -226,49 +255,86 @@ public class CrearCursoViewModel extends AndroidViewModel {
                 public void onFailure(Call<SeccionResponse> call, Throwable t) {
                     Log.d("API_ERROR", t.getMessage());
                     Toast.makeText(getApplication(),"Error en el servidor", Toast.LENGTH_LONG).show();
+                    guardadoExitoso = false;
                 }
             });
+            if (guardadoExitoso && nombreArchivoBorrador != null){
+                eliminarBorrador(nombreArchivoBorrador);
+            }
 
 
         }
     }
 
-    public void guardarProgresoSeccion(String titulo, String contenido) {
-        SeccionLocal seccionLocal = new SeccionLocal();
-        seccionLocal.setTitulo(titulo);
-        seccionLocal.setContenido(contenido);
-        List<SeccionLocal> seccionLocalList = mCursoLocal.getValue().getSeccionLocalList();
-        if (seccionLocalList == null) {
-           seccionLocalList = new LinkedList<>();
+    public void alternarVistaPreviaDescripcion(boolean isChecked){
+        if (isChecked){
+            mMostrarVistaPrevia.setValue(true);
+        }else{
+            mOcultarVistaPrevia.setValue(true);
         }
-        seccionLocal.setOrden(seccionLocalList.size() + 1);
-        if (mMaterialesExtra.isInitialized()) seccionLocal.setMaterialesExtra(List.copyOf(mMaterialesExtra.getValue()));
-        if (mVideoUri.getValue() != null) seccionLocal.setVideoUri(mVideoUri.getValue());
-        mCursoLocal.getValue().getSeccionLocalList().add(seccionLocal);
-        mSeccionAgregada.setValue(true);
-        //mMaterialesExtra.setValue(new LinkedList<>());
-        materialesExtra.clear();
+    }
+
+    public void leerLocal(String nombreArchivoBorrador){
+        if (nombreArchivoBorrador != null){
+            this.nombreArchivoBorrador = nombreArchivoBorrador;
+        }
+        File dir = new File(getApplication().getFilesDir(), "borradores");
+        File file = new File(dir, nombreArchivoBorrador);
+        Gson gson = new Gson();
+        try {
+            FileReader reader = new FileReader(file);
+            CursoLocal cursoLocal = gson.fromJson(reader, CursoLocal.class);
+            mCursoLocal.setValue(cursoLocal);
+            if (cursoLocal.getNotaAprobacion() != -1){
+                mActivarCheckRequiereExamen.setValue(true);
+            }
+            mImagenUri.setValue(Uri.parse(cursoLocal.getPortadaUri()));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void eliminarBorrador(String nombreArchivoBorrador){
+        File file = new File(nombreArchivoBorrador);
+        file.delete();
+    }
+    public void guardarLocalmente(CursoLocal cursoLocal){
+        if (nombreArchivoBorrador == null){
+            nombreArchivoBorrador = JwtUtil.obtenerId(SharedPreferencesUtil.leerToken(getApplication())) + "_borrador_" + System.currentTimeMillis();
+        }
+        File dir = new File(getApplication().getFilesDir(), "borradores");
+        if (!dir.exists()){
+            dir.mkdir();
+        }
+        File file = new File(dir, nombreArchivoBorrador);
+        cursoLocal.setNombreArchivoBorrador(nombreArchivoBorrador);
+        mCursoLocal.getValue().setNombreArchivoBorrador(nombreArchivoBorrador);
+        Gson gson = new Gson();
+
+        String json = gson.toJson(cursoLocal);
+
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write(json);
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void limpiarMutables() {
         mSeccionAgregada = null;
-        mVideoUri = null;
+        mNavegarACrearSeccion = null;
+        mActivarCheckRequiereExamen = null;
+        mMostrarNotaInput = null;
+        mOcultarNotaInput = null;
     }
 
-    public void recibirVideo(ActivityResult result) {
-        if (result.getResultCode() == RESULT_OK){
-            Intent data = result.getData();
-            Uri uri = data.getData();
-            mVideoUri.setValue(uri);
-        }
-    }
-    private File copiarUriAFile(Uri uri) {
+    private File copiarUriAFile(Uri uri, String prefijo, String extencion) {
         File file = null;
-        try {
-            file = File.createTempFile("video", ".mp4",getApplication().getCacheDir());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            String tipo = getApplication().getContentResolver().getType(uri);
+            String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(tipo);
+            String nombreArchivo = prefijo + System.currentTimeMillis() +  "." + extension;
+            file = new File(getApplication().getFilesDir(), nombreArchivo);
         try (
                 InputStream inputStream = getApplication()
                     .getContentResolver()
@@ -291,21 +357,6 @@ public class CrearCursoViewModel extends AndroidViewModel {
         }
     }
 
-    public void recibirArchivo(ActivityResult result) {
-        if (result.getResultCode() == RESULT_OK){
-            Intent data = result.getData();
-            Uri uri = data.getData();
-
-            Cursor cursor = getApplication().getContentResolver().query(uri, null, null, null, null);
-            int nombreIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-            cursor.moveToFirst();
-            String nombre = cursor.getString(nombreIndex);
-            cursor.close();
-            MaterialExtra materialExtra = new MaterialExtra(nombre, uri);
-            materialesExtra.add(materialExtra);
-            mMaterialesExtra.setValue(materialesExtra);
-        }
-    }
 
     public byte[] transformarArchivo(Uri uri){
         try {
@@ -329,7 +380,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
     public void recibirImagen(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK){
             Intent data = result.getData();
-            Uri uri = data.getData();
+            Uri uri = Uri.fromFile(copiarUriAFile(data.getData(), "portada", null));
             mImagenUri.setValue(uri);
         }
     }
@@ -345,6 +396,15 @@ public class CrearCursoViewModel extends AndroidViewModel {
         } catch (
                 FileNotFoundException er) {
             return new byte[]{};
+        }
+    }
+
+    public void cargarBorrador(Bundle arguments){
+        if (arguments != null){
+            nombreArchivoBorrador = arguments.getString("nombreArchivoBorrador");
+            leerLocal(nombreArchivoBorrador);
+        }else{
+
         }
     }
 

@@ -13,6 +13,10 @@
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/mis_cursos" />
         <item
+            android:id="@+id/nav_borradores"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/borradores" />
+        <item
             android:id="@+id/nav_examenes"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/agenda_de_examenes" />
