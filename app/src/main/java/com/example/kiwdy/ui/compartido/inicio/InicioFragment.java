@@ -51,6 +51,23 @@ public class InicioFragment extends Fragment {
             }
         });
 
+        mViewModel.getmVistaInstructor().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                binding.btCrearCurso.setVisibility(View.VISIBLE);
+                binding.tvDescripcionVistaInicio.setText("Crea un curso o navega por el menú para ver más opciones");
+                binding.tvTituloListaInicio.setText("Mis cursos populares");
+            }
+        });
+        mViewModel.getmVistaAlumno().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                binding.btCrearCurso.setVisibility(View.GONE);
+                binding.tvDescripcionVistaInicio.setText("Inscribete a un curso o navega por el menú para ver más opciones");
+                binding.tvTituloListaInicio.setText("Cursos populares");
+            }
+        });
+
 
         mViewModel.getmCursos().observe(getViewLifecycleOwner(), new Observer<List<CursoResponse>>() {
             @Override
@@ -62,6 +79,7 @@ public class InicioFragment extends Fragment {
             }
         });
 
+        mViewModel.verificarRol();
         mViewModel.cargarListaCursos();
         return binding.getRoot();
     }

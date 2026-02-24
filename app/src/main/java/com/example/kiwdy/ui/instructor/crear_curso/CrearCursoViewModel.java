@@ -69,6 +69,8 @@ public class CrearCursoViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> mActivarCheckRequiereExamen;
     private MutableLiveData<Boolean> mMostrarVistaPrevia;
     private MutableLiveData<Boolean> mOcultarVistaPrevia;
+    private MutableLiveData<Boolean> mCursoGuardado;
+    private MutableLiveData<Boolean> mBorradorGuardado;
     private String nombreArchivoBorrador;
     private boolean guardadoExitoso = true;
     private boolean anteriorActualizacionHabilitadoFallo = false;
@@ -80,6 +82,10 @@ public class CrearCursoViewModel extends AndroidViewModel {
 
     public void setAnteriorActualizacionHabilitadoFallo(boolean anteriorActualizacionHabilitadoFallo) {
         this.anteriorActualizacionHabilitadoFallo = anteriorActualizacionHabilitadoFallo;
+    }
+
+    public void setPrimerCambioDelSwitch(boolean primerCambioDelSwitch) {
+        this.primerCambioDelSwitch = primerCambioDelSwitch;
     }
 
     public LiveData<String> getmError(){
@@ -180,6 +186,20 @@ public class CrearCursoViewModel extends AndroidViewModel {
         return mOcultarVistaPrevia;
     }
 
+    public LiveData<Boolean> getmCursoGuardado(){
+        if (mCursoGuardado == null) {
+            mCursoGuardado = new MutableLiveData<>();
+        }
+        return mCursoGuardado;
+    }
+
+    public LiveData<Boolean> getmBorradorGuardado(){
+        if (mBorradorGuardado == null) {
+            mBorradorGuardado = new MutableLiveData<>();
+        }
+        return mBorradorGuardado;
+    }
+
     public void mostrarNotaAprobacionInput(boolean checked){
         if (checked){
             double nota = 0;
@@ -269,6 +289,8 @@ public class CrearCursoViewModel extends AndroidViewModel {
             guardarLocalmente(cursoLocal);
             if (navegarACrearSeccion){
                 mNavegarACrearSeccion.setValue(nombreArchivoBorrador);
+            }else{
+                mBorradorGuardado.setValue(true);
             }
         }
     }
@@ -380,6 +402,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
             if (guardadoExitoso && nombreArchivoBorrador != null){
                 boolean eliminado = eliminarBorrador(nombreArchivoBorrador);
             }
+            if (guardadoExitoso) mCursoGuardado.postValue(true);
 
 
         }

@@ -27,6 +27,8 @@ public class InicioViewModel extends AndroidViewModel {
     private MutableLiveData<List<CursoResponse>> mCursos;
     private MutableLiveData<Boolean> mAlumnoNavigation;
     private MutableLiveData<Boolean> mInstructorNavigation;
+    private MutableLiveData<Boolean> mVistaInstructor;
+    private MutableLiveData<Boolean> mVistaAlumno;
 
     public InicioViewModel(@NonNull Application application) {
         super(application);
@@ -59,6 +61,41 @@ public class InicioViewModel extends AndroidViewModel {
         return mInstructorNavigation;
     }
 
+    public LiveData<Boolean> getmVistaInstructor(){
+        if (mVistaInstructor == null) {
+            mVistaInstructor = new MutableLiveData<>();
+        }
+        return mVistaInstructor;
+    }
+
+    public LiveData<Boolean> getmVistaAlumno(){
+        if (mVistaAlumno == null) {
+            mVistaAlumno = new MutableLiveData<>();
+        }
+        return mVistaAlumno;
+    }
+
+    public void verificarRol(){
+        String token = SharedPreferencesUtil.leerToken(getApplication());
+        String rol = JwtUtil.obtenerRol(token.replace("Bearer ", ""));
+        if (rol == null){
+            mError.setValue("Ocurrió un error inesperado");
+            return;
+        }
+        if (rol.isBlank()){
+            mError.setValue("Ocurrió un error inesperado");
+            return;
+        }
+
+        switch (rol){
+            case "Instructor": mVistaInstructor.setValue(true);
+            break;
+            case "Alumno": mVistaAlumno.setValue(true);
+            break;
+        }
+
+
+    }
     public void cargarListaCursos(){
         String token = SharedPreferencesUtil.leerToken(getApplication());
 

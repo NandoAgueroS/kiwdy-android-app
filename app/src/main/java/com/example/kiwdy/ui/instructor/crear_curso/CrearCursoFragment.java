@@ -86,6 +86,7 @@ public class CrearCursoFragment extends Fragment {
         MaterialSwitch stHabilitado = binding.stHabilitadoCrearCurso;
         Button btAgregarSeccion = binding.btAgregarSeccion;
         Button btGuardarCurso = binding.btGuardarCurso;
+        Button btGuardarBorradorCurso = binding.btGuardarBorradorCurso;
         RecyclerView rvSecciones = binding.rvSecciones;
 
         mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
@@ -122,20 +123,6 @@ public class CrearCursoFragment extends Fragment {
             }
         });
 
-        btGuardarCurso.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.guardarCurso(
-                        etTitulo.getText().toString(),
-                        descripcionTextoPlano,
-                        etDescripcion.getText().toString(),
-                        etPrecio.getText().toString(),
-                        etNotaAprobacion.getText().toString(),
-                        cbRequiereExamen.isChecked(),
-                        stVistaPreviaDescripcion.isChecked()
-                );
-            }
-        });
 
         mViewModel.getmCursoLocal().observe(getViewLifecycleOwner(), new Observer<CursoLocal>() {
             @Override
@@ -179,6 +166,7 @@ public class CrearCursoFragment extends Fragment {
                 cbRequiereExamen.setEnabled(false);
                 btGuardarCurso.setVisibility(View.INVISIBLE);
                 btAgregarSeccion.setVisibility(View.INVISIBLE);
+                btGuardarBorradorCurso.setVisibility(View.INVISIBLE);
 
                 stHabilitado.setChecked(cursoLocal.isHabilitado());
                 stHabilitado.setVisibility(View.VISIBLE);
@@ -198,6 +186,7 @@ public class CrearCursoFragment extends Fragment {
                         Bundle bundle = new Bundle();
                         bundle.putInt("orden", orden);
                         bundle.putInt("idCurso", cursoLocal.getIdCurso());
+                        mViewModel.setPrimerCambioDelSwitch(true);
                         Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.crearSeccionFragment, bundle);
                     }
                 });
@@ -214,6 +203,38 @@ public class CrearCursoFragment extends Fragment {
                 bundle.putSerializable("nombreArchivoBorrador", s);
                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.crearSeccionFragment, bundle);
                 mViewModel.limpiarMutables();
+            }
+        });
+
+        btGuardarCurso.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewModel.guardarCurso(
+                        etTitulo.getText().toString(),
+                        descripcionTextoPlano,
+                        etDescripcion.getText().toString(),
+                        etPrecio.getText().toString(),
+                        etNotaAprobacion.getText().toString(),
+                        cbRequiereExamen.isChecked(),
+                        stVistaPreviaDescripcion.isChecked()
+                );
+            }
+        });
+
+        btGuardarBorradorCurso.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewModel.guardarProgresoCurso(
+                        etTitulo.getText().toString(),
+                        descripcionTextoPlano,
+                        etDescripcion.getText().toString(),
+                        etPrecio.getText().toString(),
+                        etNotaAprobacion.getText().toString(),
+                        cbRequiereExamen.isChecked(),
+                        stVistaPreviaDescripcion.isChecked(),
+                        false,
+                        -1
+                );
             }
         });
 
@@ -314,6 +335,32 @@ public class CrearCursoFragment extends Fragment {
             @Override
             public void onChanged(Boolean aBoolean) {
                 stHabilitado.setChecked(aBoolean);
+            }
+        });
+        mViewModel.getmCursoGuardado().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Curso publicado")
+                        .setMessage("Curso publicado correctamente")
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigateUp();
+                            }
+                        })
+                        .show();
+            }
+        });
+
+        mViewModel.getmBorradorGuardado().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Borrador guardado")
+                        .setMessage("Borrador guardado correctamente")
+                        .setPositiveButton("Ok", null)
+                        .show();
             }
         });
 

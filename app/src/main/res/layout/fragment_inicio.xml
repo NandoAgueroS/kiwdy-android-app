@@ -10,35 +10,37 @@
         android:id="@+id/btCrearCurso"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="116dp"
+        android:layout_marginTop="120dp"
         android:text="Nuevo curso"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvDescripcionVistaInicio" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCursosInicio"
-        android:layout_width="406dp"
-        android:layout_height="351dp"
-        android:background="#D8D6D6"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="370dp"
+        android:layout_marginTop="8dp"
+        android:background="#27CACACA"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTituloListaInicio"
-        app:layout_constraintVertical_bias="0.298" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTituloListaInicio" />
 
     <TextView
         android:id="@+id/tvTituloListaInicio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="224dp"
         android:text="TextView"
+        android:textSize="26sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.045"
+        app:layout_constraintHorizontal_bias="0.052"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btCrearCurso" />
+        app:layout_constraintTop_toBottomOf="@+id/tvDescripcionVistaInicio" />
 
     <TextView
         android:id="@+id/textView4"
@@ -57,6 +59,7 @@
         android:id="@+id/tvDescripcionVistaInicio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="12dp"
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"

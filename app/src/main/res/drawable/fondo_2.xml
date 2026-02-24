@@ -3,11 +3,6 @@
 <corners android:radius="10dp"/>
     <gradient
         android:angle="45"
-        android:type="sweep"
-        android:startColor="#7B927B"
-        android:endColor="#B2FFF180"/>
-    <stroke
-        android:color="#A9967B"
-        android:width="5dp"
-        />
+        android:startColor="#792D3531"
+        android:endColor="#7C38423D"/>
 </shape>

@@ -11,14 +11,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Consulta tu agenda de exámenes"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/btGroupExamenes"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:baselineAligned="false"
         app:checkedButton="@id/btDesdeHoyExamenes"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +54,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvExamenes"
         android:layout_width="409dp"
-        android:layout_height="662dp"
+        android:layout_height="602dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

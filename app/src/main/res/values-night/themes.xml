@@ -9,5 +9,9 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/green_3</item>
         <!-- Customize your theme here. -->
+        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
+    </style>
+    <style name="Widget.App.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">#262927</item>
     </style>
 </resources>

@@ -194,8 +194,8 @@ public class CrearSeccionViewModel extends AndroidViewModel {
             }
             //if (mSeccionLocal.getValue() == null) mSeccionLocal.setValue(new SeccionLocal());
 
-            if (video != null){
-                seccionLocal.setVideoUri(video);
+            if (mVideoUri.getValue() != null){
+                seccionLocal.setVideoUri(mVideoUri.getValue().toString());
             }
             seccionLocal.setTitulo(titulo);
             seccionLocal.setContenido(contenido);
@@ -245,11 +245,15 @@ public class CrearSeccionViewModel extends AndroidViewModel {
     }
     public void recuperarCurso(Bundle arguments){
         if (arguments == null) return;
-        if (arguments.containsKey("nombreArchivoBorrador") && arguments.containsKey("orden")){
-           restaurarSeccionDesdeArchivo(
-                   arguments.getInt("orden"),
-                   arguments.getString("nombreArchivoBorrador")
-           );
+        if (arguments.containsKey("nombreArchivoBorrador")){
+            if (arguments.containsKey("orden")) {
+                restaurarSeccionDesdeArchivo(
+                        arguments.getInt("orden"),
+                        arguments.getString("nombreArchivoBorrador")
+                );
+            }else{
+                nuevaSeccion(arguments.getString("nombreArchivoBorrador"));
+            }
         }else if (arguments.containsKey("idCurso") && arguments.containsKey("orden")){
            restaurarSeccionDesdeServidor(
                    arguments.getInt("orden"),
@@ -302,6 +306,12 @@ public class CrearSeccionViewModel extends AndroidViewModel {
         seccionLocal.setMaterialesExtra(materialesLocal);
         return seccionLocal;
 
+    }
+
+    public void nuevaSeccion(String nombreArchivoBorrador){
+        this.nombreArchivoBorrador = nombreArchivoBorrador;
+        if (nombreArchivoBorrador == null) return;
+        cursoLocal = leerLocal(nombreArchivoBorrador);
     }
 
     public void restaurarSeccionDesdeArchivo(int orden, String nombreArchivoBorrador){

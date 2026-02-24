@@ -3,67 +3,83 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cvInscripcionLista"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_margin="20dp"
+    android:layout_width="180dp"
+    android:layout_height="300dp"
+    android:layout_margin="10dp"
     app:cardBackgroundColor="#00FFFFFF">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="168dp"
-        android:layout_height="250dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@drawable/fondo">
 
         <TextView
             android:id="@+id/tvAlumnoExamenItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="152dp"
+            android:layout_height="45dp"
             android:layout_marginTop="12dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:text="TextView"
             android:textColor="#000000"
-            android:textSize="20sp"
-            android:textStyle="normal"
+            android:textSize="18sp"
+            android:textStyle="normal|bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.098"
+            app:layout_constraintHorizontal_bias="0.428"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ivPortadaCursoItem" />
+            app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
 
         <TextView
             android:id="@+id/tvDescripcionCursoItem"
-            android:layout_width="wrap_content"
+            android:layout_width="153dp"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:text="TextView"
-            android:textColor="#545454"
+            android:textColor="#444444"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btVerInscriptosItem"
-            app:layout_constraintHorizontal_bias="0.17"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.384"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvAlumnoExamenItem"
             app:layout_constraintVertical_bias="0.0" />
 
-        <ImageView
-            android:id="@+id/ivPortadaCursoItem"
-            android:layout_width="153dp"
-            android:layout_height="129dp"
-            android:layout_marginTop="32dp"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/materialCardView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:cardCornerRadius="30dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.494"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@tools:sample/avatars" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/ivPortadaCursoItem"
+                android:layout_width="153dp"
+                android:layout_height="129dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.494"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@tools:sample/avatars" />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <ImageButton
             android:id="@+id/btVerInscriptosItem"
             android:layout_width="53dp"
             android:layout_height="59dp"
             android:background="#00FFFFFF"
-            android:visibility="gone"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.652"
-            app:layout_constraintStart_toEndOf="@+id/tvAlumnoExamenItem"
-            app:layout_constraintTop_toBottomOf="@+id/ivPortadaCursoItem"
-            app:layout_constraintVertical_bias="0.534"
+            app:layout_constraintHorizontal_bias="0.503"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvDescripcionCursoItem"
+            app:layout_constraintVertical_bias="0.937"
             app:srcCompat="@drawable/ic_inscripciones" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
