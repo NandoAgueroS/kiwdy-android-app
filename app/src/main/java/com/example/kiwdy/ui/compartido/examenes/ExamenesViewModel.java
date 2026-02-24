@@ -26,6 +26,7 @@ public class ExamenesViewModel extends AndroidViewModel {
     private MutableLiveData<List<ExamenResponse>> mExamenes;
     private MutableLiveData<String> mError;
     private MutableLiveData<String> mErrorValidacion;
+    private MutableLiveData<String> mMensajeNotaDialog;
     private MutableLiveData<Boolean> mMostrarBotonFinalizar;
 
     public ExamenesViewModel(@NonNull Application application) {
@@ -51,6 +52,13 @@ public class ExamenesViewModel extends AndroidViewModel {
             mErrorValidacion = new MutableLiveData<>();
         }
         return mErrorValidacion;
+    }
+
+    public LiveData<String> getmMensajeNotaDialog(){
+        if (mMensajeNotaDialog == null) {
+            mMensajeNotaDialog = new MutableLiveData<>();
+        }
+        return  mMensajeNotaDialog;
     }
 
     public LiveData<Boolean> getmMostrarBotonFinalizar(){
@@ -95,10 +103,14 @@ public class ExamenesViewModel extends AndroidViewModel {
 
     public void guardarNota(int idExamen, String nota){
         int notaInt;
+        if (nota.isBlank()){
+            mMensajeNotaDialog.setValue("Debe ingresar una nota");
+            return;
+        }
         try{
             notaInt = Integer.parseInt(nota);
         } catch (NumberFormatException e) {
-            mErrorValidacion.setValue("La nota tiene que ser númerica");
+            mMensajeNotaDialog.setValue("La nota tiene que ser númerica");
             return;
         } catch (Exception e) {
             mError.setValue("Ocurrió un error inesperado");

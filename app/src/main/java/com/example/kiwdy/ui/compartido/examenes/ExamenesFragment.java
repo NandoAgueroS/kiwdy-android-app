@@ -3,6 +3,7 @@ package com.example.kiwdy.ui.compartido.examenes;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.kiwdy.R;
 import com.example.kiwdy.api.dto.response.ExamenResponse;
@@ -51,11 +53,21 @@ public class ExamenesFragment extends Fragment {
             public void onChanged(List<ExamenResponse> examenResponses) {
                 ExamenAdapter adapter = new ExamenAdapter(examenResponses, requireContext(), inflater, new ExamenAdapter.OnClickListener() {
                     @Override
-                    public void onClickGuardarNota(Button bt, int idExamen, String nota) {
+                    public void onClickGuardarNota(DialogInterface dialog, View dialogView, Button bt, int idExamen, String nota) {
                         mViewModel.getmMostrarBotonFinalizar().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
                             @Override
                             public void onChanged(Boolean aBoolean) {
                                 bt.setVisibility(View.GONE);
+                                dialog.dismiss();
+                            }
+                        });
+
+                        EditText etNotaDialog = dialogView.findViewById(R.id.etNotaExamenDialog);
+
+                        mViewModel.getmMensajeNotaDialog().observe(getViewLifecycleOwner(), new Observer<String>() {
+                            @Override
+                            public void onChanged(String s) {
+                                etNotaDialog.setError(s);
                             }
                         });
                         mViewModel.guardarNota(idExamen, nota);

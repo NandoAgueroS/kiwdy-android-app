@@ -58,9 +58,11 @@ public class CrearCursoViewModel extends AndroidViewModel {
     private MutableLiveData<String> mErrorDeValidacion;
     private MutableLiveData<String> mMensaje;
     private MutableLiveData<CursoLocal> mCursoLocal;
+    private MutableLiveData<CursoLocal> mCursoLocalModoVisualizacion;
     private MutableLiveData<Boolean> mSeccionAgregada = new MutableLiveData<>();
     private MutableLiveData<String> mNavegarACrearSeccion;
     private MutableLiveData<Uri> mImagenUri;
+    private MutableLiveData<Uri> mImagenUrlGLide;
     private MutableLiveData<Double> mMostrarNotaInput;
     private MutableLiveData<Double> mOcultarNotaInput;
     private MutableLiveData<Boolean> mActivarCheckRequiereExamen;
@@ -97,6 +99,11 @@ public class CrearCursoViewModel extends AndroidViewModel {
     public LiveData<CursoLocal> getmCursoLocal(){
         if (mCursoLocal == null) mCursoLocal = new MutableLiveData<>();
         return mCursoLocal;
+    }
+
+    public LiveData<CursoLocal> getmCursoLocalModoVisualizacion(){
+        if (mCursoLocalModoVisualizacion == null) mCursoLocalModoVisualizacion = new MutableLiveData<>();
+        return mCursoLocalModoVisualizacion;
     }
 
     public LiveData<String> getmNavegarACrearSeccion(){
@@ -343,7 +350,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
                 }
             });
             if (guardadoExitoso && nombreArchivoBorrador != null){
-                eliminarBorrador(nombreArchivoBorrador);
+                boolean eliminado = eliminarBorrador(nombreArchivoBorrador);
             }
 
 
@@ -385,9 +392,10 @@ public class CrearCursoViewModel extends AndroidViewModel {
             throw new RuntimeException(e);
         }
     }
-    public void eliminarBorrador(String nombreArchivoBorrador){
-        File file = new File(nombreArchivoBorrador);
-        file.delete();
+    public boolean eliminarBorrador(String nombreArchivoBorrador){
+        File dir = new File(getApplication().getFilesDir(), "borradores");
+        File file = new File(dir, nombreArchivoBorrador);
+        return file.delete();
     }
     public void guardarLocalmente(CursoLocal cursoLocal){
         if (nombreArchivoBorrador == null){
@@ -474,6 +482,11 @@ public class CrearCursoViewModel extends AndroidViewModel {
     public void recibirImagen(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK){
             Intent data = result.getData();
+            String tipo = getApplication().getContentResolver().getType(data.getData());
+            if (!tipo.startsWith("image/")){
+                mErrorDeValidacion.setValue("El archivo no es una imágen");
+                return;
+            }
             Uri uri = Uri.fromFile(copiarUriAFile(data.getData(), "portada", null));
             mImagenUri.setValue(uri);
         }
@@ -495,10 +508,16 @@ public class CrearCursoViewModel extends AndroidViewModel {
 
     public void cargarBorrador(Bundle arguments){
         if (arguments != null){
-            nombreArchivoBorrador = arguments.getString("nombreArchivoBorrador");
-            leerLocal(nombreArchivoBorrador);
+            if (arguments.containsKey("nombreArchivoBorrador")){
+                nombreArchivoBorrador = arguments.getString("nombreArchivoBorrador");
+                leerLocal(nombreArchivoBorrador);
+            }else if (arguments.containsKey("idCurso")){
+                restaurarCurso(arguments);
+            }
         }else if (nombreArchivoBorrador != null){
             leerLocal(nombreArchivoBorrador);
+        }else{
+            mCursoLocal.setValue(new CursoLocal());
         }
     }
 
@@ -513,7 +532,7 @@ public class CrearCursoViewModel extends AndroidViewModel {
         buscarCursoCall.enqueue(new Callback<CursoResponse>() {
             @Override
             public void onResponse(Call<CursoResponse> call, Response<CursoResponse> response) {
-                if (response.isSuccessful()) mostrarCurso(response.body());
+                if (response.isSuccessful()) mapearCursoResponseACursoLocal(response.body());
                 else Toast.makeText(getApplication(), "Error al recuperar el curso: " + response.code(), Toast.LENGTH_LONG).show();
             }
 
@@ -523,13 +542,22 @@ public class CrearCursoViewModel extends AndroidViewModel {
 
             }
         });}
-    public void mostrarCurso(CursoResponse curso) {
+    public void mapearCursoResponseACursoLocal(CursoResponse curso) {
 
         if (curso != null){
             CursoLocal cursoLocal = new CursoLocal();
 
+            cursoLocal.setIdCurso(curso.getIdCurso());
             cursoLocal.setTitulo(curso.getTitulo());
             cursoLocal.setDescripcion(curso.getDescripcion());
+            cursoLocal.setNotaAprobacion(curso.getNotaAprobacion());
+            cursoLocal.setPortadaUrl(curso.getPortadaUrl());
+            if (curso.getNotaAprobacion() != -1){
+                cursoLocal.setRequiereExamen(true);
+                mMostrarNotaInput.postValue(curso.getNotaAprobacion());
+                mActivarCheckRequiereExamen.postValue(true);
+            }
+            cursoLocal.setPrecio(curso.getPrecio());
             for (SeccionResponse seccionResponse: curso.getSecciones()) {
 
                 cursoLocal.getSeccionLocalList().add(new SeccionLocal(
@@ -540,8 +568,10 @@ public class CrearCursoViewModel extends AndroidViewModel {
                         seccionResponse.getVideoUrl()
                 ));
             }
-            mCursoLocal.setValue(cursoLocal);
-            mSeccionAgregada.setValue(true);
+            mCursoLocalModoVisualizacion.postValue(cursoLocal);
+            mMostrarVistaPrevia.postValue(true);
+            //mSeccionAgregada.setValue(true);
+
 
         }
 

@@ -30,7 +30,7 @@ public interface SeccionesService {
                                        @Part MultipartBody.Part video,
                                        @Part List<MultipartBody.Part> materialExtra);
 
-    @GET("secciones/{orden}/curso/{idCurso}")
+    @GET("secciones/orden/{orden}/curso/{idCurso}")
     Call<SeccionResponse> buscar(@Header("Authorization") String token, @Path("idCurso") int idCurso,@Path("orden") int ordenSeccion);
 
     @GET("secciones/material/{idMaterial}")

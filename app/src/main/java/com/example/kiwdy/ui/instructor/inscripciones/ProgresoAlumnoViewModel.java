@@ -40,6 +40,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ProgresoAlumnoViewModel extends AndroidViewModel {
+    private MutableLiveData<String> mError;
+    private MutableLiveData<String> mMensajeNotaDialog;
     private MutableLiveData<InscripcionResponse> mEstadoSolicitadaInstructor;
     private MutableLiveData<InscripcionResponse> mEstadoEnCursoInstructor;
     private MutableLiveData<InscripcionResponse> mEstadoPendienteCertificacionInstructor;
@@ -50,7 +52,6 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
     private MutableLiveData<InscripcionResponse> mEstadoCertificadaAlumno;
     private MutableLiveData<Integer> mProgreso;
     private MutableLiveData<File> mCertificadoPdf;
-    private MutableLiveData<String> mError;
     private MutableLiveData<ArchivoDescargado> mCertificadoGuardado;
     private MutableLiveData<Boolean> mCertificadoGuardadoLegacy;
     private MutableLiveData<InscripcionExamenes> mExamenes;
@@ -60,6 +61,20 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
 
     public ProgresoAlumnoViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<String> getmError(){
+        if (mError == null) {
+            mError = new MutableLiveData<>();
+        }
+        return mError;
+    }
+
+    public LiveData<String> getmMensajeNotaDialog(){
+        if (mMensajeNotaDialog == null) {
+            mMensajeNotaDialog = new MutableLiveData<>();
+        }
+        return  mMensajeNotaDialog;
     }
 
    public LiveData<InscripcionResponse> getmEstadoSolicitadaInstructor(){
@@ -129,13 +144,6 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
             mCertificadoPdf = new MutableLiveData<>();
         }
         return mCertificadoPdf;
-    }
-
-    public LiveData<String> getmError(){
-        if (mError == null) {
-            mError = new MutableLiveData<>();
-        }
-        return mError;
     }
 
     public LiveData<ArchivoDescargado> getmCertificadoGuardado(){
@@ -467,10 +475,14 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
 
     public void guardarNota(int idExamen, String nota){
         int notaInt;
+        if (nota.isBlank()){
+            mMensajeNotaDialog.setValue("Debe ingresar una nota");
+            return;
+        }
         try{
             notaInt = Integer.parseInt(nota);
         } catch (NumberFormatException e) {
-            mErrorValidacion.setValue("La nota tiene que ser númerica");
+            mMensajeNotaDialog.setValue("La nota tiene que ser númerica");
             return;
         } catch (Exception e) {
             mError.setValue("Ocurrió un error inesperado");

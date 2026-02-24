@@ -34,7 +34,9 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.kiwdy.R;
+import com.example.kiwdy.api.ApiClient;
 import com.example.kiwdy.databinding.FragmentCrearCursoBinding;
 import com.example.kiwdy.model.CursoLocal;
 import com.example.kiwdy.ui.compartido.UIDialogs;
@@ -154,6 +156,51 @@ public class CrearCursoFragment extends Fragment {
                 rvSecciones.setAdapter(adapter);
             }
         });
+
+        mViewModel.getmCursoLocalModoVisualizacion().observe(getViewLifecycleOwner(), new Observer<CursoLocal>() {
+            @Override
+            public void onChanged(CursoLocal cursoLocal) {
+                //etTitulo.setEnabled(false);
+                //etDescripcion.setEnabled(false);
+                etTitulo.setFocusable(false);
+                etTitulo.setFocusableInTouchMode(false);
+                etDescripcion.setFocusable(false);
+                etDescripcion.setFocusableInTouchMode(false);
+                etPrecio.setFocusable(false);
+                etPrecio.setFocusableInTouchMode(false);
+                etNotaAprobacion.setFocusable(false);
+                etNotaAprobacion.setFocusableInTouchMode(false);
+                ivCurso.setClickable(false);
+                stVistaPreviaDescripcion.setChecked(true);
+                stVistaPreviaDescripcion.setEnabled(false);
+                cbRequiereExamen.setEnabled(false);
+                btGuardarCurso.setVisibility(View.INVISIBLE);
+                btAgregarSeccion.setVisibility(View.INVISIBLE);
+
+                Glide.with(requireContext())
+                        .load(ApiClient.URL_BASE + cursoLocal.getPortadaUrl())
+                        .placeholder(R.drawable.fondo)
+                        .error(R.drawable.fondo)
+                        .into(binding.ivCurso);
+
+                etTitulo.setText(cursoLocal.getTitulo());
+                etDescripcion.setText(cursoLocal.getDescripcion());
+                etPrecio.setText(cursoLocal.getPrecio() + "");
+                RecyclerView.Adapter adapter = new SeccionResumenAdapter(cursoLocal.getSeccionLocalList(), getContext(), inflater, new SeccionResumenAdapter.OnClickListener() {
+                    @Override
+                    public void onClick(int orden) {
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("orden", orden);
+                        bundle.putInt("idCurso", cursoLocal.getIdCurso());
+                        Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main).navigate(R.id.crearSeccionFragment, bundle);
+                    }
+                });
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1,GridLayoutManager.VERTICAL,false);
+                rvSecciones.setLayoutManager(gridLayoutManager);
+                rvSecciones.setAdapter(adapter);
+            }
+        });
+
         mViewModel.getmNavegarACrearSeccion().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {

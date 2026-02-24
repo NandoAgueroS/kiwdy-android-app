@@ -43,6 +43,14 @@ public class SeccionLocal implements Serializable {
         this.videoUrl = videoUrl;
     }
 
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
     public int getOrden() {
         return orden;
     }

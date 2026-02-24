@@ -82,7 +82,6 @@ public class InscripcionesViewModel extends AndroidViewModel {
         if (!seleccionado) return;
         String token = SharedPreferencesUtil.leerToken(getApplication());
         int estadoInt = Integer.parseInt(estado);
-        Log.d("INSCRIPCION", estado);
         Call<List<InscripcionResponse>> inscripcionesCall;
         if (mIdCurso.isInitialized()){
              inscripcionesCall = ApiClient.getInscripcionesService().listarInscripciones(token, estadoInt, mIdCurso.getValue());

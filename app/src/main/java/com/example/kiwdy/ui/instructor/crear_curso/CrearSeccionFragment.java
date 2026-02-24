@@ -32,6 +32,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.example.kiwdy.BuildConfig;
 import com.example.kiwdy.R;
 import com.example.kiwdy.databinding.FragmentCrearSeccionBinding;
 import com.example.kiwdy.model.MaterialExtra;
@@ -156,6 +157,39 @@ public class CrearSeccionFragment extends Fragment {
                 etContenidoSeccion.setText(seccionLocal.getContenido());
                 contenidoSeccionTextoPlano = seccionLocal.getContenido();
                 etTituloSeccion.setText(seccionLocal.getTitulo());
+            }
+        });
+        mViewModel.getmSeccionLocalModoVisualizacion().observe(getViewLifecycleOwner(), new Observer<SeccionLocal>() {
+            @Override
+            public void onChanged(SeccionLocal seccionLocal) {
+                etContenidoSeccion.setFocusable(false);
+                etContenidoSeccion.setFocusableInTouchMode(false);
+                etTituloSeccion.setFocusable(false);
+                etTituloSeccion.setFocusableInTouchMode(false);
+                btAgregarArchivo.setVisibility(View.INVISIBLE);
+                btAgregarVideo.setVisibility(View.INVISIBLE);
+                btGuardarSeccion.setVisibility(View.INVISIBLE);
+
+                stVistaPreviaContenido.setChecked(true);
+                stVistaPreviaContenido.setEnabled(false);
+                etContenidoSeccion.setText(seccionLocal.getContenido());
+                etTituloSeccion.setText(seccionLocal.getTitulo());
+                MaterialExtraAdapter adapter = new MaterialExtraAdapter(seccionLocal.getMaterialesExtra(), requireContext(), getLayoutInflater());
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), 1, GridLayoutManager.VERTICAL, false);
+                rvMaterialesExtra.setLayoutManager(gridLayoutManager);
+                rvMaterialesExtra.setAdapter(adapter);
+            }
+        });
+
+        mViewModel.getmVideoUrlPath().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                MediaController mediaController = new MediaController(requireContext());
+                mediaController.setAnchorView(vvSeccion);
+                vvSeccion.setMediaController(mediaController);
+                vvSeccion.setVideoPath(BuildConfig.URL_BASE_API + s);
+                flVideoSeccion.setVisibility(View.VISIBLE);
+                vvSeccion.start();
             }
         });
 

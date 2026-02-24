@@ -21,6 +21,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.kiwdy.api.ApiClient;
+import com.example.kiwdy.api.dto.response.ArchivoSeccionResponse;
 import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.api.dto.response.SeccionResponse;
 import com.example.kiwdy.api.service.SeccionesService;
@@ -59,8 +60,10 @@ public class CrearSeccionViewModel extends AndroidViewModel {
     private MutableLiveData<String> mMensaje;
     private MutableLiveData<Integer> mIdCurso;
     private MutableLiveData<SeccionLocal> mSeccionLocal;
+    private MutableLiveData<SeccionLocal> mSeccionLocalModoVisualizacion;
     private MutableLiveData<Boolean> mSeccionAgregada;
     private MutableLiveData<Uri> mVideoUri;
+    private MutableLiveData<String> mVideoUrlPath;
     private MutableLiveData<List<MaterialExtra>> mMaterialesExtra;
     private List<MaterialExtra> materialesExtra = new LinkedList<>();
     private MutableLiveData<Boolean> mMostrarVistaPrevia;
@@ -102,6 +105,11 @@ public class CrearSeccionViewModel extends AndroidViewModel {
         return mSeccionLocal;
     }
 
+    public LiveData<SeccionLocal> getmSeccionLocalModoVisualizacion(){
+        if (mSeccionLocalModoVisualizacion == null) mSeccionLocalModoVisualizacion = new MutableLiveData<>();
+        return mSeccionLocalModoVisualizacion;
+    }
+
     public LiveData<Boolean> getmSeccionAgregada(){
         if (mSeccionAgregada == null) mSeccionAgregada = new MutableLiveData<>();
         return mSeccionAgregada;
@@ -110,6 +118,11 @@ public class CrearSeccionViewModel extends AndroidViewModel {
     public LiveData<Uri> getmVideoUri() {
         if (mVideoUri== null) mVideoUri= new MutableLiveData<>();
         return mVideoUri;
+    }
+
+    public LiveData<String> getmVideoUrlPath() {
+        if (mVideoUrlPath== null) mVideoUrlPath= new MutableLiveData<>();
+        return mVideoUrlPath;
     }
 
     public LiveData<List<MaterialExtra>> getmMaterialesExtra() {
@@ -232,14 +245,70 @@ public class CrearSeccionViewModel extends AndroidViewModel {
     }
     public void recuperarCurso(Bundle arguments){
         if (arguments == null) return;
+        if (arguments.containsKey("nombreArchivoBorrador") && arguments.containsKey("orden")){
+           restaurarSeccionDesdeArchivo(
+                   arguments.getInt("orden"),
+                   arguments.getString("nombreArchivoBorrador")
+           );
+        }else if (arguments.containsKey("idCurso") && arguments.containsKey("orden")){
+           restaurarSeccionDesdeServidor(
+                   arguments.getInt("orden"),
+                   arguments.getInt("idCurso")
+           );
+        }
+    }
+    public void restaurarSeccionDesdeServidor(int orden, int idCurso){
+       String token = SharedPreferencesUtil.leerToken(getApplication());
 
-        nombreArchivoBorrador = arguments.getString("nombreArchivoBorrador");
+       Call<SeccionResponse> seccionCall = ApiClient.getSeccionesService().buscar(token, idCurso, orden);
+
+       seccionCall.enqueue(new Callback<SeccionResponse>() {
+           @Override
+           public void onResponse(Call<SeccionResponse> call, Response<SeccionResponse> response) {
+               if (response.isSuccessful() && response.body() != null){
+                   mSeccionLocalModoVisualizacion.postValue(
+                           mapearSeccionResponseASeccionLocal(response.body())
+                   );
+                   if (response.body().getVideoUrl() != null && !response.body().getVideoUrl().isBlank()){
+                       mVideoUrlPath.postValue(response.body().getVideoUrl());
+                   }
+                   mMostrarVistaPrevia.postValue(true);
+               }else{
+                   mError.postValue("Ocurrió un error al recuperar la sección");
+               }
+           }
+
+           @Override
+           public void onFailure(Call<SeccionResponse> call, Throwable t) {
+               mError.postValue("Ocurrió un error al recuperar la sección");
+               Log.d("API_ERROR", "Error al recuperar la sección", t);
+           }
+       });
+    }
+
+    private SeccionLocal mapearSeccionResponseASeccionLocal(SeccionResponse seccionResponse){
+        SeccionLocal seccionLocal = new SeccionLocal();
+        seccionLocal.setTitulo(seccionResponse.getTitulo());
+        seccionLocal.setContenido(seccionResponse.getContenido());
+        seccionLocal.setOrden(seccionResponse.getOrden());
+        seccionLocal.setVideoUrl(seccionResponse.getVideoUrl());
+        List<MaterialExtra> materialesLocal = new LinkedList<>();
+        for (ArchivoSeccionResponse material:
+             seccionResponse.getMateriales()) {
+            MaterialExtra materialExtra = new MaterialExtra();
+            materialExtra.setNombre(material.getNombre());
+            materialesLocal.add(materialExtra);
+        }
+        seccionLocal.setMaterialesExtra(materialesLocal);
+        return seccionLocal;
+
+    }
+
+    public void restaurarSeccionDesdeArchivo(int orden, String nombreArchivoBorrador){
+
+        this.nombreArchivoBorrador = nombreArchivoBorrador;
         if (nombreArchivoBorrador == null) return;
         cursoLocal = leerLocal(nombreArchivoBorrador);
-
-        if (!arguments.containsKey("orden")) return;
-        int orden = arguments.getInt("orden");
-
 
         SeccionLocal seccionLocal = cursoLocal.getSeccionLocalList().stream().filter(s -> s.getOrden() == orden).findFirst().orElse(null);
         if (seccionLocal == null) return;

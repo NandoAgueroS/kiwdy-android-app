@@ -7,12 +7,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CursoLocal implements Serializable {
+    private int idCurso;
     private String titulo;
     private String descripcion;
     private float precio;
     private boolean requiereExamen;
     private double notaAprobacion;
     private String portadaUri;
+    private String portadaUrl;
     private String nombreArchivoBorrador;
     private List<SeccionLocal> seccionLocalList = new LinkedList<>();
 
@@ -28,6 +30,22 @@ public class CursoLocal implements Serializable {
         this.portadaUri = portadaUri;
         this.nombreArchivoBorrador = nombreArchivoBorrador;
         this.requiereExamen = requiereExamen;
+    }
+
+    public int getIdCurso() {
+        return idCurso;
+    }
+
+    public void setIdCurso(int idCurso) {
+        this.idCurso = idCurso;
+    }
+
+    public String getPortadaUrl() {
+        return portadaUrl;
+    }
+
+    public void setPortadaUrl(String portadaUrl) {
+        this.portadaUrl = portadaUrl;
     }
 
     public boolean isRequiereExamen() {

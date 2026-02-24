@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -256,13 +257,22 @@ public class ProgresoAlumnoFragment extends Fragment {
             public void onChanged(InscripcionExamenes inscripcionExamenes) {
                 ExamenAdapter adapter = new ExamenAdapter(inscripcionExamenes.getExamenResponses(), requireContext(), inflater, new ExamenAdapter.OnClickListener() {
                     @Override
-                    public void onClickGuardarNota(Button bt, int idExamen, String nota) {
+                    public void onClickGuardarNota(DialogInterface dialog, View dialogView, Button bt, int idExamen, String nota) {
                         mViewModel.getmMostrarBotonFinalizar().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
                             @Override
                             public void onChanged(Boolean aBoolean) {
                                 bt.setVisibility(View.GONE);
+                                dialog.dismiss();
                             }
                         });
+                        EditText etNotaDialog = dialogView.findViewById(R.id.etNotaExamenDialog);
+                        mViewModel.getmMensajeNotaDialog().observe(getViewLifecycleOwner(), new Observer<String>() {
+                            @Override
+                            public void onChanged(String s) {
+                                etNotaDialog.setError(s);
+                            }
+                        });
+
                         mViewModel.guardarNota(idExamen, nota);
                     }
                 });

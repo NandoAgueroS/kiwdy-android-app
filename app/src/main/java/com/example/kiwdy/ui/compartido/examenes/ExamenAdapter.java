@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kiwdy.R;
@@ -32,7 +33,7 @@ public class ExamenAdapter extends RecyclerView.Adapter<ExamenAdapter.ExamenView
     private LayoutInflater layoutInflater;
 
     public interface OnClickListener{
-        void onClickGuardarNota(Button bt, int idExamen, String nota);
+        void onClickGuardarNota(DialogInterface dialog, View dialogNotaView, Button bt, int idExamen, String nota);
     }
 
     private OnClickListener listener;
@@ -84,20 +85,27 @@ public class ExamenAdapter extends RecyclerView.Adapter<ExamenAdapter.ExamenView
                     View dialogView = layoutInflater.inflate(R.layout.dialog_input_nota, null);
                     TextInputEditText etNotaExamenDialog = dialogView.findViewById(R.id.etNotaExamenDialog);
 
-                    new MaterialAlertDialogBuilder(context)
+                    AlertDialog dialog = new MaterialAlertDialogBuilder(context)
                             .setTitle("Finalizar exámen")
                             .setMessage("Ingrese la nota del exámen")
                             .setView(dialogView)
-                            .setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    listener.onClickGuardarNota(holder.btFinalizarExamenItem, examen.getIdExamen(), etNotaExamenDialog.getText().toString());
-                                }
-                            })
+                            .setPositiveButton("Guardar", null)
                             .setNegativeButton("Cancelar", null)
-                            .show();
+                            .create();
+                    dialog.show();
+
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            listener.onClickGuardarNota(dialog, dialogView, holder.btFinalizarExamenItem, examen.getIdExamen(), etNotaExamenDialog.getText().toString());
+                        }
+                    });
                 }
             });
+        }else{
+            holder.tvNotaLabelExamenItem.setVisibility(View.VISIBLE);
+            holder.tvNotaExamenItem.setText(examen.getNota() + "");
+            holder.tvNotaExamenItem.setVisibility(View.VISIBLE);
         }
     }
 
@@ -107,7 +115,7 @@ public class ExamenAdapter extends RecyclerView.Adapter<ExamenAdapter.ExamenView
     }
 
     public class ExamenViewHolder extends RecyclerView.ViewHolder{
-        TextView tvAlumnoExamenItem, tvCursoExamenItem, tvFechaExamenItem, tvHoraExamenItem, tvModalidadExamenItem, tvLinkODireccionExamenItem, tvTituloLinkODireccionExamenItem;
+        TextView tvAlumnoExamenItem, tvCursoExamenItem, tvFechaExamenItem, tvHoraExamenItem, tvModalidadExamenItem, tvLinkODireccionExamenItem, tvTituloLinkODireccionExamenItem, tvNotaLabelExamenItem, tvNotaExamenItem;
         Button btFinalizarExamenItem;
 
         public ExamenViewHolder(@NonNull View itemView) {
@@ -117,6 +125,8 @@ public class ExamenAdapter extends RecyclerView.Adapter<ExamenAdapter.ExamenView
             tvFechaExamenItem = itemView.findViewById(R.id.tvFechaExamenItem);
             tvHoraExamenItem = itemView.findViewById(R.id.tvHoraExamenItem);
             tvModalidadExamenItem = itemView.findViewById(R.id.tvModalidadExamenItem);
+            tvNotaLabelExamenItem= itemView.findViewById(R.id.tvNotaLabelExamenItem);
+            tvNotaExamenItem = itemView.findViewById(R.id.tvNotaExamenItem);
             tvTituloLinkODireccionExamenItem = itemView.findViewById(R.id.tvTituloLinkODireccionExamenItem);
             tvLinkODireccionExamenItem = itemView.findViewById(R.id.tvLinkODireccionExamenItem);
             btFinalizarExamenItem = itemView.findViewById(R.id.btFinalizarExamenItem);
