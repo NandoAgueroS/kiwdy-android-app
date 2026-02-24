@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -41,6 +42,7 @@ import com.example.kiwdy.databinding.FragmentCrearCursoBinding;
 import com.example.kiwdy.model.CursoLocal;
 import com.example.kiwdy.ui.compartido.UIDialogs;
 import com.example.kiwdy.ui.instructor.InstructorMainActivity;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
 
 import io.noties.markwon.Markwon;
@@ -81,6 +83,7 @@ public class CrearCursoFragment extends Fragment {
         CheckBox cbRequiereExamen = binding.cbRequiereExamen;
         ImageView ivCurso = binding.ivCurso;
         MaterialSwitch stVistaPreviaDescripcion = binding.stVistaPreviaDescripcionCurso;
+        MaterialSwitch stHabilitado = binding.stHabilitadoCrearCurso;
         Button btAgregarSeccion = binding.btAgregarSeccion;
         Button btGuardarCurso = binding.btGuardarCurso;
         RecyclerView rvSecciones = binding.rvSecciones;
@@ -177,6 +180,9 @@ public class CrearCursoFragment extends Fragment {
                 btGuardarCurso.setVisibility(View.INVISIBLE);
                 btAgregarSeccion.setVisibility(View.INVISIBLE);
 
+                stHabilitado.setChecked(cursoLocal.isHabilitado());
+                stHabilitado.setVisibility(View.VISIBLE);
+
                 Glide.with(requireContext())
                         .load(ApiClient.URL_BASE + cursoLocal.getPortadaUrl())
                         .placeholder(R.drawable.fondo)
@@ -270,6 +276,47 @@ public class CrearCursoFragment extends Fragment {
             }
         });
 
+        mViewModel.getmMostrarDialogActualizarHabilitado().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Actualizar estado del curso")
+                        .setMessage(s)
+                        .setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mViewModel.actualizarHabilitado(stHabilitado.isChecked());
+                            }
+                        })
+                        .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mViewModel.setAnteriorActualizacionHabilitadoFallo(true);
+                                stHabilitado.setChecked(!stHabilitado.isChecked());
+                            }
+                        })
+                        .show();
+            }
+        });
+
+        mViewModel.getmHabilitadoActualizado().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Estado actualizado")
+                        .setMessage("Se actualizó el estado del curso correctamente")
+                        .setPositiveButton("Ok", null)
+                        .show();
+            }
+        });
+
+        mViewModel.getmHabilitadoNoActualizado().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                stHabilitado.setChecked(aBoolean);
+            }
+        });
+
         cbRequiereExamen.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
@@ -280,6 +327,13 @@ public class CrearCursoFragment extends Fragment {
             @Override
             public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
                 mViewModel.alternarVistaPreviaDescripcion(isChecked);
+            }
+        });
+
+        stHabilitado.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked) {
+                mViewModel.mostrarDialogActualizarHabilitado(isChecked);
             }
         });
         //mViewModel.restaurarCurso(getArguments());

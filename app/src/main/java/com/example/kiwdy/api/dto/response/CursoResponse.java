@@ -11,6 +11,7 @@ public class CursoResponse implements Serializable {
     private UsuarioResponse usuarioInstructor;
     private double notaAprobacion;
     private float precio;
+    private boolean habilitado;
     private List<SeccionResponse> secciones;
     private boolean estaInscripto;
     private boolean estaFinalizado;
@@ -18,7 +19,7 @@ public class CursoResponse implements Serializable {
     public CursoResponse() {
     }
 
-    public CursoResponse(int idCurso, String titulo, String descripcion, String portadaUrl, double notaAprobacion, List<SeccionResponse> secciones, boolean estaInscripto, boolean estaFinalizado, UsuarioResponse usuarioInstructor, float precio) {
+    public CursoResponse(int idCurso, String titulo, String descripcion, String portadaUrl, double notaAprobacion, List<SeccionResponse> secciones, boolean estaInscripto, boolean estaFinalizado, UsuarioResponse usuarioInstructor, float precio, boolean habilitado) {
         this.idCurso = idCurso;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -29,6 +30,15 @@ public class CursoResponse implements Serializable {
         this.estaFinalizado = estaFinalizado;
         this.usuarioInstructor = usuarioInstructor;
         this.precio = precio;
+        this.habilitado = habilitado;
+    }
+
+    public boolean isHabilitado() {
+        return habilitado;
+    }
+
+    public void setHabilitado(boolean habilitado) {
+        this.habilitado = habilitado;
     }
 
     public float getPrecio() {

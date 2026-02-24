@@ -21,6 +21,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.kiwdy.api.ApiClient;
+import com.example.kiwdy.api.dto.request.ActualizarHabilitadoCursoRequest;
 import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.api.dto.response.SeccionResponse;
 import com.example.kiwdy.api.service.SeccionesService;
@@ -42,7 +43,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -59,10 +59,11 @@ public class CrearCursoViewModel extends AndroidViewModel {
     private MutableLiveData<String> mMensaje;
     private MutableLiveData<CursoLocal> mCursoLocal;
     private MutableLiveData<CursoLocal> mCursoLocalModoVisualizacion;
-    private MutableLiveData<Boolean> mSeccionAgregada = new MutableLiveData<>();
     private MutableLiveData<String> mNavegarACrearSeccion;
+    private MutableLiveData<String> mMostrarDialogActualizarHabilitado;
+    private MutableLiveData<Boolean> mHabilitadoActualizado;
+    private MutableLiveData<Boolean> mHabilitadoNoActualizado;
     private MutableLiveData<Uri> mImagenUri;
-    private MutableLiveData<Uri> mImagenUrlGLide;
     private MutableLiveData<Double> mMostrarNotaInput;
     private MutableLiveData<Double> mOcultarNotaInput;
     private MutableLiveData<Boolean> mActivarCheckRequiereExamen;
@@ -70,9 +71,15 @@ public class CrearCursoViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> mOcultarVistaPrevia;
     private String nombreArchivoBorrador;
     private boolean guardadoExitoso = true;
+    private boolean anteriorActualizacionHabilitadoFallo = false;
+    private boolean primerCambioDelSwitch = false;
 
     public CrearCursoViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public void setAnteriorActualizacionHabilitadoFallo(boolean anteriorActualizacionHabilitadoFallo) {
+        this.anteriorActualizacionHabilitadoFallo = anteriorActualizacionHabilitadoFallo;
     }
 
     public LiveData<String> getmError(){
@@ -111,6 +118,27 @@ public class CrearCursoViewModel extends AndroidViewModel {
             mNavegarACrearSeccion = new MutableLiveData<>();
         }
         return mNavegarACrearSeccion;
+    }
+
+    public LiveData<String> getmMostrarDialogActualizarHabilitado(){
+        if (mMostrarDialogActualizarHabilitado == null) {
+            mMostrarDialogActualizarHabilitado = new MutableLiveData<>();
+        }
+        return mMostrarDialogActualizarHabilitado;
+    }
+
+    public LiveData<Boolean> getmHabilitadoActualizado(){
+        if (mHabilitadoActualizado == null) {
+            mHabilitadoActualizado = new MutableLiveData<>();
+        }
+        return mHabilitadoActualizado;
+    }
+
+    public LiveData<Boolean> getmHabilitadoNoActualizado(){
+        if (mHabilitadoNoActualizado == null) {
+            mHabilitadoNoActualizado = new MutableLiveData<>();
+        }
+        return mHabilitadoNoActualizado;
     }
 
     public LiveData<Uri> getmImagenUri() {
@@ -422,13 +450,14 @@ public class CrearCursoViewModel extends AndroidViewModel {
     }
 
     public void limpiarMutables() {
-        mSeccionAgregada = null;
         mNavegarACrearSeccion = null;
         mActivarCheckRequiereExamen = null;
         mMostrarNotaInput = null;
         mOcultarNotaInput = null;
         mError = null;
         mErrorDeValidacion = null;
+        mMostrarDialogActualizarHabilitado = null;
+        mHabilitadoActualizado = null;
     }
 
     private File copiarUriAFile(Uri uri, String prefijo, String extencion) {
@@ -552,6 +581,10 @@ public class CrearCursoViewModel extends AndroidViewModel {
             cursoLocal.setDescripcion(curso.getDescripcion());
             cursoLocal.setNotaAprobacion(curso.getNotaAprobacion());
             cursoLocal.setPortadaUrl(curso.getPortadaUrl());
+            cursoLocal.setHabilitado(curso.isHabilitado());
+            if (curso.isHabilitado()){
+                primerCambioDelSwitch = true;
+            }
             if (curso.getNotaAprobacion() != -1){
                 cursoLocal.setRequiereExamen(true);
                 mMostrarNotaInput.postValue(curso.getNotaAprobacion());
@@ -574,7 +607,62 @@ public class CrearCursoViewModel extends AndroidViewModel {
 
 
         }
+    }
+    public void mostrarDialogActualizarHabilitado(boolean habilitado){
+        if (habilitado && primerCambioDelSwitch){
+            primerCambioDelSwitch = false;
+            return;
+        }
+        if (anteriorActualizacionHabilitadoFallo){
+            anteriorActualizacionHabilitadoFallo = false;
+            return;
+        }
+        if (habilitado){
+            mMostrarDialogActualizarHabilitado.setValue("El curso se habilitará para incripciones");
+        }else{
+            mMostrarDialogActualizarHabilitado.setValue("El curso no estará visible para nuevas inscripciones, los alumnos inscriptos seguiran viendolo");
+        }
+    }
+    public void actualizarHabilitado(boolean habilitado){
+        String token = SharedPreferencesUtil.leerToken(getApplication());
+        if (mCursoLocalModoVisualizacion.getValue() == null) {
+            mError.setValue("Ocurrió un error al actualizar el curso");
+            mHabilitadoNoActualizado.setValue(!habilitado);
+            anteriorActualizacionHabilitadoFallo = true;
+            return;
+        }
+        if (mCursoLocalModoVisualizacion.getValue().getIdCurso() == 0) {
+            mError.setValue("Ocurrió un error al actualizar el curso");
+            mHabilitadoNoActualizado.setValue(!habilitado);
+            anteriorActualizacionHabilitadoFallo = true;
+            return;
+        }
+        ActualizarHabilitadoCursoRequest actualizarHabilitado = new ActualizarHabilitadoCursoRequest(habilitado);
 
+        Call<Void> habilitadoCall = ApiClient.getCursosService().actualizarHabilitado(token, mCursoLocalModoVisualizacion.getValue().getIdCurso(), actualizarHabilitado);
+
+        habilitadoCall.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()){
+                    mHabilitadoActualizado.postValue(true);
+                }else{
+                    mError.postValue("Ocurrió un error al actualizar el estado del curso");
+                    mHabilitadoNoActualizado.postValue(!habilitado);
+                    anteriorActualizacionHabilitadoFallo = true;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                mError.postValue("Ocurrió un error inesperado al actualizar el estado del curso");
+                Log.d("API_ERROR", "Error al actualizar estado habilitado", t);
+                mHabilitadoNoActualizado.postValue(!habilitado);
+                anteriorActualizacionHabilitadoFallo = true;
+            }
+        });
 
     }
+
+
 }

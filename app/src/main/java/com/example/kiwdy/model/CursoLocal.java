@@ -16,6 +16,7 @@ public class CursoLocal implements Serializable {
     private String portadaUri;
     private String portadaUrl;
     private String nombreArchivoBorrador;
+    private boolean habilitado;
     private List<SeccionLocal> seccionLocalList = new LinkedList<>();
 
     public CursoLocal() {
@@ -30,6 +31,14 @@ public class CursoLocal implements Serializable {
         this.portadaUri = portadaUri;
         this.nombreArchivoBorrador = nombreArchivoBorrador;
         this.requiereExamen = requiereExamen;
+    }
+
+    public boolean isHabilitado() {
+        return habilitado;
+    }
+
+    public void setHabilitado(boolean habilitado) {
+        this.habilitado = habilitado;
     }
 
     public int getIdCurso() {

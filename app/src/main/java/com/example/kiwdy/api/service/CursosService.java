@@ -1,5 +1,6 @@
 package com.example.kiwdy.api.service;
 
+import com.example.kiwdy.api.dto.request.ActualizarHabilitadoCursoRequest;
 import com.example.kiwdy.api.dto.response.CursoInscripcionResponse;
 import com.example.kiwdy.api.dto.response.CursoResponse;
 
@@ -8,9 +9,11 @@ import java.util.List;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
@@ -26,6 +29,9 @@ public interface CursosService {
                                    @Part("precio") RequestBody precio,
                                    @Part("notaAprobacion") RequestBody notaAprobacion,
                                    @Part MultipartBody.Part portada);
+
+    @PATCH("cursos/habilitado/{idCurso}")
+    Call<Void> actualizarHabilitado(@Header("Authorization") String token, @Path("idCurso") int idCurso, @Body ActualizarHabilitadoCursoRequest actualizarHabilitadoCursoRequest);
 
     @GET("cursos/listar")
     Call<List<CursoResponse>> listarCursos(@Header("Authorization") String token);
