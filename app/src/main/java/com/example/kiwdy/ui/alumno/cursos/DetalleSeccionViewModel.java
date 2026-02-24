@@ -39,6 +39,7 @@ import retrofit2.Response;
 
 public class DetalleSeccionViewModel extends AndroidViewModel {
 
+    private MutableLiveData<Boolean> mSesionInvalida;
     private MutableLiveData<SeccionResponse> mSeccion;
     private MutableLiveData<InscripcionResponse> mInscripcion;
     private MutableLiveData<Boolean> mMostrarBotonMarcarCompletada;
@@ -48,11 +49,19 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
     private MutableLiveData<ArchivoDescargado> mAbrirArchivoDescargado;
     private MutableLiveData<String> mArchivoDescargado;
     private MutableLiveData<String> mMostrarVideo;
+    private MutableLiveData<Boolean> mOcultarVideo;
     private MutableLiveData<CursoFinalizadoMensaje> mSeccionesFinalizadas;
     private int ordenActual = 0;
 
     public DetalleSeccionViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
+        return mSesionInvalida;
     }
 
     public LiveData<SeccionResponse> getmSeccion(){
@@ -115,6 +124,14 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
         }
         return mMostrarVideo;
     }
+
+    public LiveData<Boolean> getmOcultarVideo(){
+        if (mOcultarVideo == null) {
+            mOcultarVideo = new MutableLiveData<>();
+        }
+        return mOcultarVideo;
+    }
+
     public LiveData<CursoFinalizadoMensaje> getmSeccionesFinalizadas(){
         if (mSeccionesFinalizadas == null) {
             mSeccionesFinalizadas = new MutableLiveData<>();
@@ -137,11 +154,19 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
         inscripcionCall.enqueue(new Callback<InscripcionResponse>() {
             @Override
             public void onResponse(Call<InscripcionResponse> call, Response<InscripcionResponse> response) {
-                if (response.isSuccessful()) mInscripcion.postValue(response.body());
+                if (response.isSuccessful()) {
+                    mInscripcion.postValue(response.body());
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
+                }else{
+                    mError.postValue("Ocurrió un error al recuperar la inscripción");
+                }
             }
 
             @Override
             public void onFailure(Call<InscripcionResponse> call, Throwable t) {
+                mError.postValue("Ocurrió un error inesperado al recuperar la inscripción");
+                Log.d("API_ERROR", "Error al recuperar la inscripción", t);
 
             }
         });
@@ -191,7 +216,11 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
         String token = SharedPreferencesUtil.leerToken(getApplication());
         SeccionResponse seccion = mInscripcion.getValue().getCurso().getSecciones().stream().filter(s -> s.getOrden() == ordenSeccion).findFirst().orElse(null);
         mSeccion.setValue(seccion);
-        if (seccion.getVideoUrl() != null) mMostrarVideo.setValue(seccion.getVideoUrl());
+        if (seccion.getVideoUrl() != null) {
+            mMostrarVideo.setValue(seccion.getVideoUrl());
+        }else{
+            mOcultarVideo.setValue(true);
+        }
 
         Call<SeccionResponse> seccionCall = ApiClient.getSeccionesService().buscar(token, idCurso, ordenSeccion);
 /*
@@ -208,6 +237,11 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
 
             }
         });*/
+    }
+    public void limpiarMutables(){
+        mSeccionesFinalizadas = null;
+        mError = null;
+        mAbrirArchivoDescargado = null;
     }
 
     public void marcarCompletada(){
@@ -234,16 +268,18 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
                         case "Certificada": mSeccionesFinalizadas.postValue(new CursoFinalizadoMensaje("Felicidades! ha finalizado el curso. \n Ahora puede ver su certificado en la sección de progreso", mInscripcion.getValue().getCurso().getIdCurso()));
                             break;
                     }
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
                 }
                 else {
-                    mError.postValue("Error al completar la seccion");
+                    mError.postValue("Ocurrió un error al completar la sección");
                 }
             }
 
             @Override
             public void onFailure(Call<InscripcionResponse> call, Throwable t) {
-                Toast.makeText(getApplication(), "Error" + t.getMessage(), Toast.LENGTH_LONG).show();
-
+                mError.postValue("Ocurrió un error inesperado al completar la sección");
+                Log.d("API_ERROR", "Error al completar la sección", t);
             }
         });
     }
@@ -255,7 +291,7 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
         archivoCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     ResponseBody body = response.body();
                     InputStream input = body.byteStream();
                     OutputStream output;
@@ -264,16 +300,16 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
 
                     try {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        ContentValues values = new ContentValues();
-                        values.put(MediaStore.MediaColumns.DISPLAY_NAME, nombreArchivo);
+                            ContentValues values = new ContentValues();
+                            values.put(MediaStore.MediaColumns.DISPLAY_NAME, nombreArchivo);
                             mime = URLConnection.guessContentTypeFromName(nombreArchivo);
-                            if (mime == null){
+                            if (mime == null) {
                                 mime = "application/octet-stream";
                             }
-                        values.put(MediaStore.MediaColumns.MIME_TYPE, mime);
-                        values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+                            values.put(MediaStore.MediaColumns.MIME_TYPE, mime);
+                            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
 
-                        ContentResolver contentResolver = getApplication().getContentResolver();
+                            ContentResolver contentResolver = getApplication().getContentResolver();
                             uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
                             if (uri == null) {
                                 mError.postValue("Error al guardar el archivo");
@@ -282,7 +318,7 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
                             output = contentResolver.openOutputStream(uri);
                             escribirArchivo(output, input);
                             mAbrirArchivoDescargado.postValue(new ArchivoDescargado(uri, mime));
-                        }else{
+                        } else {
                             File file = new File(
                                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                                     nombreArchivo
@@ -299,6 +335,8 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
                         Log.d("ERROR", "Error al descargar el archivo", e);
                     }
 
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
                 }else {
                     mError.postValue("Ocurrió un error al descargar el material");
                 }
@@ -306,7 +344,8 @@ public class DetalleSeccionViewModel extends AndroidViewModel {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                mError.postValue("Ocurrió un error inesperado al descargar el material");
+                Log.d("API_ERROR", "Error al descargar el material", t);
             }
         });
     }

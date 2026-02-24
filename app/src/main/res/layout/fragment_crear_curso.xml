@@ -130,13 +130,15 @@
                 android:id="@+id/ivCurso"
                 android:layout_width="276dp"
                 android:layout_height="83dp"
-                android:scaleType="centerCrop"
+                android:background="#70FFFFFF"
+                android:scaleType="fitCenter"
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.496"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/stHabilitadoCrearCurso"
-                tools:src="@tools:sample/avatars" />
+                app:srcCompat="@drawable/cargar_imagen"
+                tools:src="@drawable/cargar_imagen" />
 
             <CheckBox
                 android:id="@+id/cbRequiereExamen"

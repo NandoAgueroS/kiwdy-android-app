@@ -23,7 +23,7 @@
     <fragment
         android:id="@+id/crearCursoFragment"
         android:name="com.example.kiwdy.ui.instructor.crear_curso.CrearCursoFragment"
-        android:label="fragment_crear_curso"
+        android:label="@string/crear_curso"
         tools:layout="@layout/fragment_crear_curso" >
         <action
             android:id="@+id/action_crearCursoFragment_to_crearSeccionFragment"
@@ -35,7 +35,7 @@
     <fragment
         android:id="@+id/crearSeccionFragment"
         android:name="com.example.kiwdy.ui.instructor.crear_curso.CrearSeccionFragment"
-        android:label="fragment_crear_seccion"
+        android:label="@string/crear_seccion"
         tools:layout="@layout/fragment_crear_seccion" >
         <action
             android:id="@+id/action_crearSeccionFragment_to_crearCursoFragment"
@@ -44,7 +44,7 @@
     <fragment
         android:id="@+id/nav_mis_cursos"
         android:name="com.example.kiwdy.ui.compartido.CursosFragment"
-        android:label="fragment_cursos"
+        android:label="@string/mis_cursos"
         tools:layout="@layout/fragment_cursos" >
         <action
             android:id="@+id/action_nav_cursos_to_crearCursoFragment2"
@@ -58,7 +58,7 @@
     <fragment
         android:id="@+id/nav_inscripciones"
         android:name="com.example.kiwdy.ui.instructor.inscripciones.InscripcionesFragment"
-        android:label="fragment_inscripciones"
+        android:label="@string/inscriptos"
         tools:layout="@layout/fragment_inscripciones" >
         <action
             android:id="@+id/action_inscripcionesFragment_to_progresoAlumnoFragment"
@@ -67,7 +67,7 @@
     <fragment
         android:id="@+id/inscripcionesFragment"
         android:name="com.example.kiwdy.ui.instructor.inscripciones.InscripcionesFragment"
-        android:label="fragment_inscripciones"
+        android:label="@string/inscriptos"
         tools:layout="@layout/fragment_inscripciones" >
         <action
             android:id="@+id/action_inscripcionesFragment_to_progresoAlumnoFragment2"
@@ -76,7 +76,7 @@
     <fragment
         android:id="@+id/progresoAlumnoFragment"
         android:name="com.example.kiwdy.ui.instructor.inscripciones.ProgresoAlumnoFragment"
-        android:label="Progreso del alumno"
+        android:label="@string/progreso_del_alumno"
         tools:layout="@layout/fragment_progreso_alumno" >
         <action
             android:id="@+id/action_progresoAlumnoFragment_to_inscripcionesFragment"
@@ -91,7 +91,7 @@
     <fragment
         android:id="@+id/agendarExamenFragment"
         android:name="com.example.kiwdy.ui.instructor.examenes.AgendarExamenFragment"
-        android:label="Agendar exámen"
+        android:label="@string/agendar_examen"
         tools:layout="@layout/fragment_agendar_examen" >
         <action
             android:id="@+id/action_agendarExamenFragment_to_progresoAlumnoFragment"
@@ -100,11 +100,11 @@
     <fragment
         android:id="@+id/nav_examenes"
         android:name="com.example.kiwdy.ui.compartido.examenes.ExamenesFragment"
-        android:label="Agenda de exámenes"
+        android:label="@string/agenda_de_examenes"
         tools:layout="@layout/fragment_examenes" />
     <fragment
         android:id="@+id/nav_borradores"
         android:name="com.example.kiwdy.ui.instructor.borradores.BorradoresFragment"
-        android:label="fragment_borradores"
+        android:label="@string/borradores"
         tools:layout="@layout/fragment_borradores" />
 </navigation>

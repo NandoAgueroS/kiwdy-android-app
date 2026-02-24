@@ -22,11 +22,20 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MisIncripcionesViewModel extends AndroidViewModel {
+
+    private MutableLiveData<Boolean> mSesionInvalida;
     private MutableLiveData<List<CursoResponse>> mCursos;
     private MutableLiveData<String> mError;
 
     public MisIncripcionesViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
+        return mSesionInvalida;
     }
 
     public LiveData<List<CursoResponse>> getmCursos(){
@@ -57,6 +66,8 @@ public class MisIncripcionesViewModel extends AndroidViewModel {
             public void onResponse(Call<List<InscripcionResponse>> call, Response<List<InscripcionResponse>> response) {
                 if (response.isSuccessful()){
                     extraerCursosDeInscripciones(response.body());
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
                 }else{
                     mError.postValue("Ocurrió un error al recuperar las inscripciones");
                 }
@@ -64,7 +75,6 @@ public class MisIncripcionesViewModel extends AndroidViewModel {
 
             @Override
             public void onFailure(Call<List<InscripcionResponse>> call, Throwable t) {
-
                 mError.postValue("Ocurrió un error inesperado al recuperar las inscripciones");
                 Log.d("API_ERROR", "Error al recuperar las inscripciones", t);
             }

@@ -40,6 +40,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ProgresoAlumnoViewModel extends AndroidViewModel {
+
+    private MutableLiveData<Boolean> mSesionInvalida;
     private MutableLiveData<String> mError;
     private MutableLiveData<String> mMensajeNotaDialog;
     private MutableLiveData<InscripcionResponse> mEstadoSolicitadaInstructor;
@@ -61,6 +63,13 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
 
     public ProgresoAlumnoViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
+        return mSesionInvalida;
     }
 
     public LiveData<String> getmError(){
@@ -255,7 +264,7 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
         inscripcionCall.enqueue(new Callback<InscripcionResponse>() {
             @Override
             public void onResponse(Call<InscripcionResponse> call, Response<InscripcionResponse> response) {
-                if (response.isSuccessful())
+                if (response.isSuccessful()){
                     switch (response.body().getEstado()){
                         case "Solicitada": mEstadoSolicitadaInstructor.postValue(response.body());
                             break;
@@ -277,11 +286,16 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
                         }
                             break;
                     }
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
+                }else {
+                    mError.postValue("Ocurrió un error al recuperar la inscripcion");
+                }
             }
 
             @Override
             public void onFailure(Call<InscripcionResponse> call, Throwable t) {
-                mError.postValue("Ocurrió error al recuperar la inscripcion");
+                mError.postValue("Ocurrió error inesperado al recuperar la inscripcion");
                 Log.d("API_ERROR", "Error al recuperar la inscripción", t);
             }
         });
@@ -301,10 +315,12 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
         certificadoCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     File certificado = guardarCertificadoEnCache(response.body());
-                    if (certificado == null)return;
+                    if (certificado == null) return;
                     mCertificadoPdf.postValue(certificado);
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
                 }else if (response.code() == 404){
                     mError.postValue("No se encontró el certificado");
                 }else{
@@ -331,6 +347,8 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
                 if (response.isSuccessful()) {
                     String estadoAprobacion = calcularEstado(inscripcionResponse, response.body());
                     mExamenes.postValue(new InscripcionExamenes(inscripcionResponse, response.body(), estadoAprobacion));
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
                 }else{
                     mError.postValue("Ocurrió un error al recuperar los exámenes");
                 }
@@ -346,7 +364,7 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
     private String calcularEstado(InscripcionResponse inscripcion, List<ExamenResponse> examenes){
         if (examenes == null || examenes.size() == 0 || inscripcion.getCurso().getNotaAprobacion() == -1) return "";
         double ultimaNota = examenes.get(0).getNota();
-        if (ultimaNota == -1){
+        if (examenes.stream().filter(e -> e.getNota() != -1).findFirst().orElse(null) == null){
             return "Aún no rindió exámenes";
         }else if (ultimaNota >= inscripcion.getCurso().getNotaAprobacion()){
             return "Aprobado";
@@ -461,13 +479,21 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
         actualizarEstadoCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                Toast.makeText(getApplication(), "Inscripción aceptada", Toast.LENGTH_LONG).show();
-                //mEstadoEnCursoInstructor.postValue(mEstadoSolicitadaInstructor.getValue());
-                buscarInscripcion(mEstadoSolicitadaInstructor.getValue().getIdInscripcion());
+                if (response.isSuccessful()){
+                    Toast.makeText(getApplication(), "Inscripción aceptada", Toast.LENGTH_LONG).show();
+                    //mEstadoEnCursoInstructor.postValue(mEstadoSolicitadaInstructor.getValue());
+                    buscarInscripcion(mEstadoSolicitadaInstructor.getValue().getIdInscripcion());
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
+                }else {
+                    mError.postValue("Ocurrió un error al aceptar la incripción");
+                }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
+                mError.postValue("Ocurrió un error inesperado al aceptar la incripción");
+                Log.d("API_ERROR", "Error al aceptar la inscripción", t);
 
             }
         });
@@ -503,8 +529,11 @@ public class ProgresoAlumnoViewModel extends AndroidViewModel {
                     Toast.makeText(getApplication(), "Nota guardada correctamente", Toast.LENGTH_LONG).show();
                     mMostrarBotonFinalizar.postValue(false);
                     buscarInscripcion(idInscripcion);
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
+                }else {
+                    mError.postValue("Ocurrió un error al guardar la nota");
                 }
-                else mError.postValue("Ocurrió un error al guardar la nota");
             }
 
             @Override

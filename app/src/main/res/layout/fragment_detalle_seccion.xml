@@ -32,18 +32,21 @@
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tvTituloSeccionDetalle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textSize="30sp"
+                android:textStyle="bold" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tvContenidoSeccionDetalle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="100dp" />
+                android:layout_marginTop="50dp" />
 
             <FrameLayout
                 android:id="@+id/flVideoSeccionDetalle"
                 android:layout_width="407dp"
                 android:layout_height="230dp"
+                android:layout_marginTop="30dp"
                 android:visibility="gone">
 
                 <VideoView
@@ -56,8 +59,9 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvMaterialesExtraDetalle"
-                android:layout_width="412dp"
-                android:layout_height="122dp" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp" />
         </LinearLayout>
     </ScrollView>
 

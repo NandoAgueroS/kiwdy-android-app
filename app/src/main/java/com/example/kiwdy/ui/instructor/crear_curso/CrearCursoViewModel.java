@@ -54,6 +54,7 @@ import retrofit2.Response;
 
 public class CrearCursoViewModel extends AndroidViewModel {
 
+    private MutableLiveData<Boolean> mSesionInvalida;
     private MutableLiveData<String> mError;
     private MutableLiveData<String> mErrorDeValidacion;
     private MutableLiveData<String> mMensaje;
@@ -86,6 +87,13 @@ public class CrearCursoViewModel extends AndroidViewModel {
 
     public void setPrimerCambioDelSwitch(boolean primerCambioDelSwitch) {
         this.primerCambioDelSwitch = primerCambioDelSwitch;
+    }
+
+    public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
+        return mSesionInvalida;
     }
 
     public LiveData<String> getmError(){
@@ -321,11 +329,12 @@ public class CrearCursoViewModel extends AndroidViewModel {
         crearCursoCall.enqueue(new Callback<CursoResponse>() {
             @Override
             public void onResponse(Call<CursoResponse> call, Response<CursoResponse> response) {
-                if (response.isSuccessful()){
-                    Toast.makeText(getApplication(),"Curso creado", Toast.LENGTH_LONG).show();
+                if (response.isSuccessful()) {
                     guardarSecciones(response.body().getIdCurso());
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
                 }else{
-                    Toast.makeText(getApplication(),"Error al crear el curso", Toast.LENGTH_LONG).show();
+                    mError.postValue("Ocurrió un error al crear el curso");
                     guardadoExitoso = false;
                 }
             }
@@ -381,10 +390,12 @@ public class CrearCursoViewModel extends AndroidViewModel {
                         if (video != null){
                             video.delete();
                         }
+                    }else if (response.code() == 401){
+                        mSesionInvalida.postValue(true);
                     }else{
                         guardadoExitoso = false;
                         try {
-                            Toast.makeText(getApplication(),"Error al crear el curso", Toast.LENGTH_LONG).show();
+                            mError.postValue("Ocurrió un error al guardar la sección");
                             Log.d("API_ERROR", response.errorBody().string());
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -394,8 +405,8 @@ public class CrearCursoViewModel extends AndroidViewModel {
 
                 @Override
                 public void onFailure(Call<SeccionResponse> call, Throwable t) {
-                    Log.d("API_ERROR", t.getMessage());
-                    Toast.makeText(getApplication(),"Error en el servidor", Toast.LENGTH_LONG).show();
+                    Log.d("API_ERROR", "Error al guardar la sección", t);
+                    mError.postValue("Ocurrió un error inesperado al guardar la sección");
                     guardadoExitoso = false;
                 }
             });
@@ -584,14 +595,19 @@ public class CrearCursoViewModel extends AndroidViewModel {
         buscarCursoCall.enqueue(new Callback<CursoResponse>() {
             @Override
             public void onResponse(Call<CursoResponse> call, Response<CursoResponse> response) {
-                if (response.isSuccessful()) mapearCursoResponseACursoLocal(response.body());
-                else Toast.makeText(getApplication(), "Error al recuperar el curso: " + response.code(), Toast.LENGTH_LONG).show();
+                if (response.isSuccessful()){
+                    mapearCursoResponseACursoLocal(response.body());
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
+                }else {
+                    mError.postValue("Ocurrió un error al recuperar el curso");
+                }
             }
 
             @Override
             public void onFailure(Call<CursoResponse> call, Throwable t) {
-                Toast.makeText(getApplication(), "Error en el servidor", Toast.LENGTH_LONG).show();
-
+                mError.postValue("Ocurrió un error inesperado al recuperar el curso");
+                Log.d("API_ERROR", "Error al recuperar el curso", t);
             }
         });}
     public void mapearCursoResponseACursoLocal(CursoResponse curso) {
@@ -667,8 +683,10 @@ public class CrearCursoViewModel extends AndroidViewModel {
         habilitadoCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     mHabilitadoActualizado.postValue(true);
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
                 }else{
                     mError.postValue("Ocurrió un error al actualizar el estado del curso");
                     mHabilitadoNoActualizado.postValue(!habilitado);

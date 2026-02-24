@@ -12,6 +12,7 @@ import androidx.navigation.Navigation;
 import com.example.kiwdy.R;
 import com.example.kiwdy.api.ApiClient;
 import com.example.kiwdy.api.dto.response.CursoResponse;
+import com.example.kiwdy.api.dto.response.UsuarioResponse;
 import com.example.kiwdy.api.utils.JwtUtil;
 import com.example.kiwdy.api.utils.SharedPreferencesUtil;
 
@@ -22,17 +23,27 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class InicioViewModel extends AndroidViewModel {
-    private MutableLiveData<String> mError;
 
+    private MutableLiveData<Boolean> mSesionInvalida;
+    private MutableLiveData<String> mError;
     private MutableLiveData<List<CursoResponse>> mCursos;
     private MutableLiveData<Boolean> mAlumnoNavigation;
     private MutableLiveData<Boolean> mInstructorNavigation;
     private MutableLiveData<Boolean> mVistaInstructor;
     private MutableLiveData<Boolean> mVistaAlumno;
+    private MutableLiveData<UsuarioResponse> mPerfilUsuario;
 
     public InicioViewModel(@NonNull Application application) {
         super(application);
     }
+
+    public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
+        return mSesionInvalida;
+    }
+
     public LiveData<String> getmError(){
         if (mError == null) {
             mError = new MutableLiveData<>();
@@ -75,6 +86,39 @@ public class InicioViewModel extends AndroidViewModel {
         return mVistaAlumno;
     }
 
+    public LiveData<UsuarioResponse> getmPerfilUsuario(){
+        if (mPerfilUsuario == null) {
+            mPerfilUsuario = new MutableLiveData<>();
+        }
+        return mPerfilUsuario;
+    }
+
+    public void recuperarPerfil(){
+        String token = SharedPreferencesUtil.leerToken(getApplication());
+
+        Call<UsuarioResponse> perfilCall = ApiClient.getUsuariosService().getPerfil(token);
+
+        perfilCall.enqueue(new Callback<UsuarioResponse>() {
+            @Override
+            public void onResponse(Call<UsuarioResponse> call, Response<UsuarioResponse> response) {
+                if (response.isSuccessful()){
+                    mPerfilUsuario.postValue(response.body());
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
+                }else{
+                    mError.postValue("Ocurrió un error al recuperar el perfil del usuario");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UsuarioResponse> call, Throwable t) {
+                mError.postValue("Ocurrió un error inesperado al recuperar el perfil del usuario");
+                Log.d("API_ERROR", "Error al recuperar el perfil del usuario", t);
+
+            }
+        });
+    }
+
     public void verificarRol(){
         String token = SharedPreferencesUtil.leerToken(getApplication());
         String rol = JwtUtil.obtenerRol(token.replace("Bearer ", ""));
@@ -99,12 +143,14 @@ public class InicioViewModel extends AndroidViewModel {
     public void cargarListaCursos(){
         String token = SharedPreferencesUtil.leerToken(getApplication());
 
-        Call<List<CursoResponse>> cursosCall = ApiClient.getCursosService().listarCursos(token);
+        Call<List<CursoResponse>> cursosCall = ApiClient.getCursosService().listarCursosPopulares(token);
         cursosCall.enqueue(new Callback<List<CursoResponse>>() {
             @Override
             public void onResponse(Call<List<CursoResponse>> call, Response<List<CursoResponse>> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     mCursos.setValue(response.body());
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
                 }else{
                     mError.postValue("Ocurrió un error al recuperar los cursos");
                 }

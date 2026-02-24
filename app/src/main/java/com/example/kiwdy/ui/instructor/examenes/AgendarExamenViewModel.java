@@ -26,6 +26,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AgendarExamenViewModel extends AndroidViewModel {
+
+    private MutableLiveData<Boolean> mSesionInvalida;
     private MutableLiveData<String> mError;
     private MutableLiveData<String> mErrorDeValidacion;
     private MutableLiveData<String> mMensaje;
@@ -37,7 +39,14 @@ public class AgendarExamenViewModel extends AndroidViewModel {
     public AgendarExamenViewModel(@NonNull Application application) {
         super(application);
     }
-    
+
+    public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
+        return mSesionInvalida;
+    }
+
     public LiveData<String> getmError(){
         if (mError == null) {
             mError = new MutableLiveData<>();
@@ -94,8 +103,10 @@ public class AgendarExamenViewModel extends AndroidViewModel {
             public void onResponse(Call<ExamenResponse> call, Response<ExamenResponse> response) {
                 if (response.isSuccessful()){
                     mExamenAgendado.postValue(response.body());
-                }else if (response.code() == 400){
+                }else if (response.code() == 400) {
                     mError.postValue("Petición inválida");
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
                 }else{
                     mError.postValue("Error al procesar la solicitud");
                 }

@@ -27,6 +27,7 @@ import com.example.kiwdy.databinding.FragmentDetalleSeccionBinding;
 import com.example.kiwdy.model.ArchivoDescargado;
 import com.example.kiwdy.model.CursoFinalizadoMensaje;
 import com.example.kiwdy.ui.compartido.UIDialogs;
+import com.example.kiwdy.ui.compartido.login.LoginActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import io.noties.markwon.Markwon;
@@ -45,6 +46,17 @@ public class DetalleSeccionFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(this).get(DetalleSeccionViewModel.class);
         binding = FragmentDetalleSeccionBinding.inflate(inflater, container, false);
+
+        mViewModel.getmSesionInvalida().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("desde_sesion_expirada", true);
+                startActivity(intent);
+            }
+        });
 
         mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -102,6 +114,7 @@ public class DetalleSeccionFragment extends Fragment {
                 MediaController mediaController = new MediaController(requireContext());
                 mediaController.setAnchorView(videoView);
                 videoView.setMediaController(mediaController);
+                videoView.start();
             }
         });
 
@@ -145,10 +158,18 @@ public class DetalleSeccionFragment extends Fragment {
                                 bundle.putInt("idCurso", cursoFinalizadoMensaje.getIdCurso());
                                 bundle.putString("Desde", "DetalleSeccion");
                                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_alumno).navigate(R.id.progresoAlumnoFragment, bundle);
+                                mViewModel.limpiarMutables();
                             }
                         })
                         .setNegativeButton("Cerrar", null)
                         .show();
+            }
+        });
+
+        mViewModel.getmOcultarVideo().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                binding.flVideoSeccionDetalle.setVisibility(View.GONE);
             }
         });
 

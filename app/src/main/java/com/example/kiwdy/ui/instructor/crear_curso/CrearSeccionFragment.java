@@ -38,6 +38,7 @@ import com.example.kiwdy.databinding.FragmentCrearSeccionBinding;
 import com.example.kiwdy.model.MaterialExtra;
 import com.example.kiwdy.model.SeccionLocal;
 import com.example.kiwdy.ui.compartido.UIDialogs;
+import com.example.kiwdy.ui.compartido.login.LoginActivity;
 import com.google.android.material.materialswitch.MaterialSwitch;
 
 import java.util.List;
@@ -84,6 +85,17 @@ public class CrearSeccionFragment extends Fragment {
         FrameLayout flVideoSeccion = binding.flVideoSeccion;
         RecyclerView rvMaterialesExtra = binding.rvMaterialesExtra;
         MaterialSwitch stVistaPreviaContenido = binding.stVistaPreviaContenidoSeccion;
+
+        mViewModel.getmSesionInvalida().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("desde_sesion_expirada", true);
+                startActivity(intent);
+            }
+        });
 
         mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override

@@ -23,6 +23,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ExamenesViewModel extends AndroidViewModel {
+
+    private MutableLiveData<Boolean> mSesionInvalida;
     private MutableLiveData<List<ExamenResponse>> mExamenes;
     private MutableLiveData<String> mError;
     private MutableLiveData<String> mErrorValidacion;
@@ -31,6 +33,13 @@ public class ExamenesViewModel extends AndroidViewModel {
 
     public ExamenesViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
+        return mSesionInvalida;
     }
 
     public LiveData<List<ExamenResponse>> getmExamenes(){
@@ -88,13 +97,18 @@ public class ExamenesViewModel extends AndroidViewModel {
         listarExamenesCall.enqueue(new Callback<List<ExamenResponse>>() {
             @Override
             public void onResponse(Call<List<ExamenResponse>> call, Response<List<ExamenResponse>> response) {
-                if (response.isSuccessful()) mExamenes.postValue(response.body());
-                else mError.postValue("Error al obtener los exámenes");
+                if (response.isSuccessful()){
+                    mExamenes.postValue(response.body());
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
+                }
+                else{
+                    mError.postValue("Error al obtener los exámenes");
+                }
             }
 
             @Override
             public void onFailure(Call<List<ExamenResponse>> call, Throwable t) {
-
                 mError.postValue("Ocurrió un error inesperado");
                 Log.d("API_ERROR","Error al obtener los exámenes", t);
             }
@@ -130,8 +144,11 @@ public class ExamenesViewModel extends AndroidViewModel {
                 if (response.isSuccessful()) {
                     Toast.makeText(getApplication(), "Nota guardada correctamente", Toast.LENGTH_LONG).show();
                     mMostrarBotonFinalizar.postValue(false);
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
+                }else {
+                    mError.postValue("Ocurrió un error al guardar la nota");
                 }
-                else mError.postValue("Ocurrió un error al guardar la nota");
             }
 
             @Override

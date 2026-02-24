@@ -4,6 +4,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,6 +24,7 @@ import com.example.kiwdy.api.dto.response.CursoInscripcionResponse;
 import com.example.kiwdy.api.dto.response.CursoResponse;
 import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.databinding.FragmentDetalleCursoBinding;
+import com.example.kiwdy.ui.compartido.login.LoginActivity;
 
 import io.noties.markwon.Markwon;
 
@@ -41,6 +43,17 @@ public class DetalleCursoFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(this).get(DetalleCursoViewModel.class);
         binding = FragmentDetalleCursoBinding.inflate(inflater, container, false);
+
+        mViewModel.getmSesionInvalida().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("desde_sesion_expirada", true);
+                startActivity(intent);
+            }
+        });
 
         mViewModel.getmRequiereExamen().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override

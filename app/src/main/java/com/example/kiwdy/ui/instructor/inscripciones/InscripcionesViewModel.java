@@ -23,6 +23,7 @@ import retrofit2.Response;
 
 public class InscripcionesViewModel extends AndroidViewModel {
 
+    private MutableLiveData<Boolean> mSesionInvalida;
     private MutableLiveData<List<InscripcionResponse>> mInscripciones;
     private MutableLiveData<Integer> mIdCurso;
     private MutableLiveData<String> mError;
@@ -31,6 +32,13 @@ public class InscripcionesViewModel extends AndroidViewModel {
 
     public InscripcionesViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
+        return mSesionInvalida;
     }
 
     public LiveData<List<InscripcionResponse>> getmInscripciones(){
@@ -93,8 +101,11 @@ public class InscripcionesViewModel extends AndroidViewModel {
             public void onResponse(Call<List<InscripcionResponse>> call, Response<List<InscripcionResponse>> response) {
                 if (response.isSuccessful()) {
                     mInscripciones.postValue(response.body());
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
+                } else {
+                    mError.postValue("Error al obtener las inscripciones: " + response.code());
                 }
-                else mError.postValue("Error al obtener las inscripciones: " + response.code());
             }
 
             @Override

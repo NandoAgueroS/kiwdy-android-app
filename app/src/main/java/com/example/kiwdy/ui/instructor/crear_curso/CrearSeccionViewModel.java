@@ -55,6 +55,7 @@ import retrofit2.Response;
 
 public class CrearSeccionViewModel extends AndroidViewModel {
 
+    private MutableLiveData<Boolean> mSesionInvalida;
     private MutableLiveData<String> mError;
     private MutableLiveData<String> mErrorDeValidacion;
     private MutableLiveData<String> mMensaje;
@@ -73,6 +74,13 @@ public class CrearSeccionViewModel extends AndroidViewModel {
 
     public CrearSeccionViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
+        return mSesionInvalida;
     }
 
     public LiveData<String> getmError(){
@@ -269,14 +277,16 @@ public class CrearSeccionViewModel extends AndroidViewModel {
        seccionCall.enqueue(new Callback<SeccionResponse>() {
            @Override
            public void onResponse(Call<SeccionResponse> call, Response<SeccionResponse> response) {
-               if (response.isSuccessful() && response.body() != null){
+               if (response.isSuccessful() && response.body() != null) {
                    mSeccionLocalModoVisualizacion.postValue(
                            mapearSeccionResponseASeccionLocal(response.body())
                    );
-                   if (response.body().getVideoUrl() != null && !response.body().getVideoUrl().isBlank()){
+                   if (response.body().getVideoUrl() != null && !response.body().getVideoUrl().isBlank()) {
                        mVideoUrlPath.postValue(response.body().getVideoUrl());
                    }
                    mMostrarVistaPrevia.postValue(true);
+               }else if (response.code() == 401){
+                   mSesionInvalida.postValue(true);
                }else{
                    mError.postValue("Ocurrió un error al recuperar la sección");
                }

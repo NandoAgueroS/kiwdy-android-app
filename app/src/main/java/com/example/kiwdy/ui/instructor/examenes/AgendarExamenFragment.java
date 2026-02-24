@@ -3,6 +3,7 @@ package com.example.kiwdy.ui.instructor.examenes;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,6 +25,7 @@ import com.example.kiwdy.api.dto.response.InscripcionResponse;
 import com.example.kiwdy.api.dto.response.UsuarioResponse;
 import com.example.kiwdy.databinding.FragmentAgendarExamenBinding;
 import com.example.kiwdy.ui.compartido.UIDialogs;
+import com.example.kiwdy.ui.compartido.login.LoginActivity;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
@@ -62,6 +64,17 @@ public class AgendarExamenFragment extends Fragment {
         TextView tvError = binding.tvErrorAgendarExamen;
         MaterialButtonToggleGroup btGroupModalidad = binding.btGroupModalidad;
         Button btAgendarExamen = binding.btAgendarExamen;
+
+        mViewModel.getmSesionInvalida().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("desde_sesion_expirada", true);
+                startActivity(intent);
+            }
+        });
 
         mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override

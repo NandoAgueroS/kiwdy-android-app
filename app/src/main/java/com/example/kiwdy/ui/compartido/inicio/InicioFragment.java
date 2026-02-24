@@ -3,6 +3,7 @@ package com.example.kiwdy.ui.compartido.inicio;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,11 +15,14 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.kiwdy.R;
 import com.example.kiwdy.api.dto.response.CursoResponse;
+import com.example.kiwdy.api.dto.response.UsuarioResponse;
 import com.example.kiwdy.databinding.FragmentInicioBinding;
 import com.example.kiwdy.ui.compartido.UIDialogs;
+import com.example.kiwdy.ui.compartido.login.LoginActivity;
 
 import java.util.List;
 
@@ -37,6 +41,17 @@ public class InicioFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(InicioViewModel.class);
         binding = FragmentInicioBinding.inflate(inflater, container, false);
 
+        mViewModel.getmSesionInvalida().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("desde_sesion_expirada", true);
+                startActivity(intent);
+            }
+        });
+
         binding.btCrearCurso.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,6 +66,15 @@ public class InicioFragment extends Fragment {
             }
         });
 
+        mViewModel.getmPerfilUsuario().observe(getViewLifecycleOwner(), new Observer<UsuarioResponse>() {
+            @Override
+            public void onChanged(UsuarioResponse usuarioResponse) {
+                TextView tvNombreNavHeader = getActivity().findViewById(R.id.tvNombreNavHeader);
+                TextView tvEmailNavHeader = getActivity().findViewById(R.id.tvEmailNavHeader);
+                tvNombreNavHeader.setText(usuarioResponse.getNombre() + " " + usuarioResponse.getApellido());
+                tvEmailNavHeader.setText(usuarioResponse.getEmail());
+            }
+        });
         mViewModel.getmVistaInstructor().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
@@ -81,6 +105,7 @@ public class InicioFragment extends Fragment {
 
         mViewModel.verificarRol();
         mViewModel.cargarListaCursos();
+        mViewModel.recuperarPerfil();
         return binding.getRoot();
     }
 

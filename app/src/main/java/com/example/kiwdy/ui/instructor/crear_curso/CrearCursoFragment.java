@@ -41,6 +41,7 @@ import com.example.kiwdy.api.ApiClient;
 import com.example.kiwdy.databinding.FragmentCrearCursoBinding;
 import com.example.kiwdy.model.CursoLocal;
 import com.example.kiwdy.ui.compartido.UIDialogs;
+import com.example.kiwdy.ui.compartido.login.LoginActivity;
 import com.example.kiwdy.ui.instructor.InstructorMainActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
@@ -89,6 +90,17 @@ public class CrearCursoFragment extends Fragment {
         Button btGuardarBorradorCurso = binding.btGuardarBorradorCurso;
         RecyclerView rvSecciones = binding.rvSecciones;
 
+        mViewModel.getmSesionInvalida().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("desde_sesion_expirada", true);
+                startActivity(intent);
+            }
+        });
+
         mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
@@ -120,6 +132,7 @@ public class CrearCursoFragment extends Fragment {
             public void onChanged(Uri uri) {
                 ivCurso.setImageURI(uri);
                 ivCurso.setVisibility(View.VISIBLE);
+                ivCurso.setScaleType(ImageView.ScaleType.CENTER_CROP);
             }
         });
 

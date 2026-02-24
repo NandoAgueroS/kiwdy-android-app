@@ -55,12 +55,14 @@ public class CursoAdapter extends RecyclerView.Adapter<CursoAdapter.CursoViewHol
                 .placeholder(R.drawable.fondo)
                 .error(R.drawable.fondo)
                 .into(holder.ivPortadaCurso);
+
         Bundle bundle = new Bundle();
         bundle.putInt("idCurso", curso.getIdCurso());
         bundle.putString("tituloCurso", curso.getTitulo());
-        Log.d("TOKEN", SharedPreferencesUtil.leerToken(context));
+
         String rol = JwtUtil.obtenerRol(SharedPreferencesUtil.leerToken(context).replace("Bearer ", ""));
         if (rol.equals("Instructor")) holder.btVerInscriptos.setVisibility(View.VISIBLE);
+
         holder.btVerInscriptos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -4,6 +4,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,7 @@ import com.example.kiwdy.R;
 import com.example.kiwdy.api.dto.response.ExamenResponse;
 import com.example.kiwdy.databinding.FragmentExamenesBinding;
 import com.example.kiwdy.ui.compartido.UIDialogs;
+import com.example.kiwdy.ui.compartido.login.LoginActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
@@ -40,6 +42,17 @@ public class ExamenesFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(this).get(ExamenesViewModel.class);
         binding = FragmentExamenesBinding.inflate(inflater, container, false);
+
+        mViewModel.getmSesionInvalida().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("desde_sesion_expirada", true);
+                startActivity(intent);
+            }
+        });
 
         mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override

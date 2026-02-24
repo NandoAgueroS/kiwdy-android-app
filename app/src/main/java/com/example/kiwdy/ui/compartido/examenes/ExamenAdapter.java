@@ -102,7 +102,7 @@ public class ExamenAdapter extends RecyclerView.Adapter<ExamenAdapter.ExamenView
                     });
                 }
             });
-        }else{
+        }else if (examen.getNota() != -1){
             holder.tvNotaLabelExamenItem.setVisibility(View.VISIBLE);
             holder.tvNotaExamenItem.setText(examen.getNota() + "");
             holder.tvNotaExamenItem.setVisibility(View.VISIBLE);

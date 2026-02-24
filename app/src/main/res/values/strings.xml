@@ -21,4 +21,11 @@
     <string name="mis_inscripciones">Mis inscripciones</string>
     <string name="cursos">Cursos</string>
     <string name="borradores">Borradores</string>
+    <string name="detalle_del_curso">Detalle del curso</string>
+    <string name="detalle_de_la_seccion">Detalle de la sección</string>
+    <string name="progreso_del_alumno">Progreso del alumno</string>
+    <string name="crear_curso">Crear curso</string>
+    <string name="crear_seccion">Crear sección</string>
+    <string name="agendar_examen">Agendar exámen</string>
+    <string name="inscriptos">Inscriptos</string>
 </resources>

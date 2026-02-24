@@ -25,6 +25,7 @@ import retrofit2.Response;
 
 public class DetalleCursoViewModel extends AndroidViewModel {
 
+    private MutableLiveData<Boolean> mSesionInvalida;
     private MutableLiveData<CursoResponse> mCurso;
     private MutableLiveData<CursoResponse> mNavegarASeccion;
     private MutableLiveData<Integer> mNavegarAProgreso;
@@ -39,6 +40,13 @@ public class DetalleCursoViewModel extends AndroidViewModel {
 
     public DetalleCursoViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
+        return mSesionInvalida;
     }
 
     public LiveData<CursoResponse> getmCurso(){
@@ -137,13 +145,17 @@ public class DetalleCursoViewModel extends AndroidViewModel {
                        mRequiereExamen.postValue("Requiere aprobar un exámen");
                    }
                    buscarInscripcion(idCurso);
+               }else if (response.code() == 401){
+                   mSesionInvalida.postValue(true);
+               }else {
+                   mError.postValue("Ocurrió un error al recuperar el curso");
                }
-               else Toast.makeText(getApplication(), "Error al recuperar el curso: " + response.code(), Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onFailure(Call<CursoResponse> call, Throwable t) {
-                Toast.makeText(getApplication(), "Error en el servidor", Toast.LENGTH_LONG).show();
+                mError.postValue("Ocurrió un error inesperado al recuperar el curso");
+                Log.d("API_ERROR", "Error al recuperar el curso", t);
 
             }
         });
@@ -171,8 +183,10 @@ public class DetalleCursoViewModel extends AndroidViewModel {
         inscripcionCall.enqueue(new Callback<InscripcionResponse>() {
             @Override
             public void onResponse(Call<InscripcionResponse> call, Response<InscripcionResponse> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     manejarVistaSegunEstadoInscripcion(response.body());
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
                 }else if (response.code() == 404){
                     manejarVistaSegunEstadoInscripcion(null);
                 }else{
@@ -199,14 +213,18 @@ public class DetalleCursoViewModel extends AndroidViewModel {
                 if (response.isSuccessful()){
                     buscarInscripcion(idCurso);
                     Toast.makeText(getApplication(), "Inscripto correctamente: " + response.code(), Toast.LENGTH_LONG).show();
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
+                }else{
+                    mError.postValue("Ocurrió un error al inscribir al curso");
                 }
-                else Toast.makeText(getApplication(), "Error al recuperar el curso: " + response.code(), Toast.LENGTH_LONG).show();
 
             }
 
             @Override
             public void onFailure(Call<InscripcionResponse> call, Throwable t) {
-                Toast.makeText(getApplication(), "Error en el servidor", Toast.LENGTH_LONG).show();
+                mError.postValue("Ocurrió un error inesperado al inscribir al curso");
+                Log.d("API_ERROR", "Error al inscribir al curso", t);
             }
         });
     }

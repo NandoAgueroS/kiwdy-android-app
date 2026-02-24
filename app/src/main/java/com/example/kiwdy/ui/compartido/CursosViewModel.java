@@ -20,11 +20,20 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CursosViewModel extends AndroidViewModel {
+
+    private MutableLiveData<Boolean> mSesionInvalida;
     private MutableLiveData<List<CursoResponse>> mCursos;
     private MutableLiveData<String> mError;
 
     public CursosViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public LiveData<Boolean> getmSesionInvalida() {
+        if (mSesionInvalida == null) {
+            mSesionInvalida = new MutableLiveData<>();
+        }
+        return mSesionInvalida;
     }
 
     public LiveData<List<CursoResponse>> getmCursos(){
@@ -53,9 +62,10 @@ public class CursosViewModel extends AndroidViewModel {
         cursosCall.enqueue(new Callback<List<CursoResponse>>() {
             @Override
             public void onResponse(Call<List<CursoResponse>> call, Response<List<CursoResponse>> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     mCursos.postValue(response.body());
-
+                }else if (response.code() == 401){
+                    mSesionInvalida.postValue(true);
                 }else{
                     mError.postValue("Ocurrió un error al recuperar los cursos");
                 }
@@ -63,7 +73,6 @@ public class CursosViewModel extends AndroidViewModel {
 
             @Override
             public void onFailure(Call<List<CursoResponse>> call, Throwable t) {
-
                 mError.postValue("Ocurrió un error inesperado al recuperar los cursos");
                 Log.d("API_ERROR", "Error al recuperar los cursos", t);
             }

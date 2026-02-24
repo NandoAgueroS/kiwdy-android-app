@@ -30,6 +30,7 @@ import com.example.kiwdy.model.ArchivoDescargado;
 import com.example.kiwdy.model.InscripcionExamenes;
 import com.example.kiwdy.ui.compartido.UIDialogs;
 import com.example.kiwdy.ui.compartido.examenes.ExamenAdapter;
+import com.example.kiwdy.ui.compartido.login.LoginActivity;
 import com.github.barteksc.pdfviewer.PDFView;
 
 import java.io.File;
@@ -61,6 +62,17 @@ public class ProgresoAlumnoFragment extends Fragment {
         Button btAceptarInscripcion = binding.btAceptarInscripcionProgreso;
         Button btDescargarCertificado = binding.btDescargarCertificadoProgreso;
         Button btAgendarExamen = binding.btAgendarExamenProgreso;
+
+        mViewModel.getmSesionInvalida().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("desde_sesion_expirada", true);
+                startActivity(intent);
+            }
+        });
 
         mViewModel.getmError().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
